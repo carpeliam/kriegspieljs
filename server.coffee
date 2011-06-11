@@ -1,6 +1,9 @@
 # require 'coffee-script'
-Kriegspiel = require './lib/kriegspiel'
+process.addListener 'uncaughtException', (err, stack) ->
+  console.log 'EXCEPTION: ' + err
+  console.log stack
 
-new Kriegspiel(
-  port: 8000
-)
+process.chdir __dirname
+
+Kriegspiel = require './lib/kriegspiel'
+new Kriegspiel()
