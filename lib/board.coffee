@@ -1,14 +1,15 @@
-UNOCCUPIED = 0
-WHITE = 1
-BLACK = -1
-PAWN = 1
-KNIGHT = 2
-BISHOP = 3
-ROOK = 4
-QUEEN = 5
-KING = 6
+_ = require 'underscore'
 
 class Board
+  UNOCCUPIED = 0
+  WHITE = 1
+  BLACK = -1
+  PAWN = 1
+  KNIGHT = 2
+  BISHOP = 3
+  ROOK = 4
+  QUEEN = 5
+  KING = 6
   constructor: ->
     @squares = []
     @squares[i] = [] for i in [0..8]
@@ -57,9 +58,16 @@ class Board
     xRatio = if xDelta is 0 then 0 else xDelta / Math.abs(xDelta)
     yDelta = yNew - yOrig
     yRatio = if yDelta is 0 then 0 else yDelta / Math.abs(yDelta)
-    for x in [xOrig + xRatio...xNew] by xRatio
-      for y in [yOrig + yRatio...yNew] by yRatio
-        return true if @value(x, y) isnt UNOCCUPIED
+    
+    x = xOrig# + xRatio
+    y = yOrig# + yRatio
+    while x < xNew or y < yNew
+      x += xRatio
+      y += yRatio
+      return true if @value(x, y) isnt UNOCCUPIED
+    # for x in [xOrig + xRatio...xNew] by xRatio
+    #   for y in [yOrig + yRatio...yNew] by yRatio
+    #     return true if @value(x, y) isnt UNOCCUPIED
     return false
   
   canMove: (xOrig, yOrig, xNew, yNew) ->
@@ -108,4 +116,4 @@ class Board
   move: (xOrig, yOrig, xNew, yNew) ->
     @canMove(xOrig, yOrig, xNew, yNew) && @forceMove(xOrig, yOrig, xNew, yNew)
 
-(exports ? this).Board = Board
+module.exports = Board
