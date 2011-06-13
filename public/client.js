@@ -11,10 +11,8 @@ $.fn.coordinates = function() {
 }
 
 $(document).ready(function() {
-  /* Get board dimensions */
   var board = new Board();
   
-  /* Make pieces draggable */
   $('#board a').draggable({
     containment: $('#board'),
     grid: [80, 80],
@@ -23,7 +21,6 @@ $(document).ready(function() {
     revert: 'invalid',
     stop: function(event, ui) {
       $(this).removeAttr('style');
-      board.i = 0;
     }
   });
   
