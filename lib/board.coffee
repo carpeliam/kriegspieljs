@@ -73,7 +73,7 @@ class Board
   canMove: (xOrig, yOrig, xNew, yNew) ->
     return false if !@squares[xNew]? or !@squares[xNew][yNew]?
     color = @color(xOrig, yOrig)
-    return false if color == @color(xNew, yNew)
+    return false if color != @turn or color == @color(xNew, yNew)
     return false if @moveResultsInCheck(xOrig, yOrig, xNew, yNew)
     switch @pieceType(xOrig, yOrig)
       when PAWN
@@ -110,10 +110,10 @@ class Board
     @squares[xNew][yNew] = @squares[xOrig][yOrig]
     @squares[xOrig][yOrig] = UNOCCUPIED
     # TODO handle pawn advancement, castling, check/mate
-    @turn *= -1 # advance turn
     true
   
   move: (xOrig, yOrig, xNew, yNew) ->
     @canMove(xOrig, yOrig, xNew, yNew) && @forceMove(xOrig, yOrig, xNew, yNew)
+    @turn *= -1 # advance turn
 
 module.exports = Board

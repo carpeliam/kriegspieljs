@@ -56,12 +56,18 @@ describe "Board", ->
     
     it "can't capture a piece of the same color", ->
       expect(board.canMove(4, 0, 4, 1)).toBeFalsy()
-      board.move 4, 1, 4, 3
+      board.forceMove 4, 1, 4, 3
       expect(board.canMove(4, 0, 4, 1)).toBeTruthy()
+    
+    it "can't be moved if it's not that piece's turn", ->
+      expect(board.canMove(0, 6, 0, 5)).toBeFalsy()
+      board.move 0, 2, 0, 3
+      expect(board.canMove(0, 6, 0, 5)).toBeTruthy()
   
   describe "a pawn", ->
     it "should be able to advance twice from homerow", ->
       expect(board.canMove(0, 1, 0, 3)).toBeTruthy()
+      board.move 0, 1, 0, 3 # advance turn
       expect(board.canMove(0, 6, 0, 4)).toBeTruthy()
     
     it "shouldn't be able to advance twice if not on the homerow", ->
@@ -70,8 +76,10 @@ describe "Board", ->
     
     it "should be able to advance once from anywhere", ->
       expect(board.canMove(0, 1, 0, 2)).toBeTruthy()
+      board.move 0, 1, 0, 2 # advance turn
       expect(board.canMove(0, 6, 0, 5)).toBeTruthy()
-      board.forceMove 0, 1, 3, 3
+      board.move 0, 6, 0, 5 # advance turn
+      board.forceMove 0, 2, 3, 3
       expect(board.canMove(3, 3, 3, 4)).toBeTruthy()
     
     it "shouldn't be able to advance onto another piece", ->
