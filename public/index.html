@@ -3,9 +3,12 @@
   <head>
     <title>Kriegspiel.js</title>
     <script src="/require.js"></script>
+    <link rel="stylesheet" href="jquery-ui-1.8.13.custom.css" type="text/css">
     <link rel="stylesheet" href="kriegspiel.css" type="text/css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
+    <script src="/jquery.cookie.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="client.js"></script>
   </head>
   <body>
@@ -14,24 +17,14 @@
     <a href="https://github.com/carpeliam/kriegspieljs"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://d3nwyuy0nl342s.cloudfront.net/img/71eeaab9d563c2b3c590319b398dd35683265e85/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub"></a>
     <table id="board" cellpadding="0" cellspacing="0">
       <tr>
-        <td><a href="#" class="rook black">&#9820;</a></td>
-        <td><a href="#" class="knight black">&#9822;</a></td>
-        <td><a href="#" class="bishop black">&#9821;</a></td>
-        <td><a href="#" class="king black">&#9819;</a></td>
-        <td><a href="#" class="queen black">&#9818;</a></td>
-        <td><a href="#" class="bishop black">&#9821;</a></td>
-        <td><a href="#" class="knight black">&#9822;</a></td>
-        <td><a href="#" class="rook black">&#9820;</a></td>
-      </tr>
-      <tr>
-        <td><a href="#" class="pawn black">&#9823;</a></td>
-        <td><a href="#" class="pawn black">&#9823;</a></td>
-        <td><a href="#" class="pawn black">&#9823;</a></td>
-        <td><a href="#" class="pawn black">&#9823;</a></td>
-        <td><a href="#" class="pawn black">&#9823;</a></td>
-        <td><a href="#" class="pawn black">&#9823;</a></td>
-        <td><a href="#" class="pawn black">&#9823;</a></td>
-        <td><a href="#" class="pawn black">&#9823;</a></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
       </tr>
       <tr>
         <td></td>
@@ -74,35 +67,56 @@
         <td></td>
       </tr>
       <tr>
-        <td><a href="#" class="pawn white">&#9817;</a></td>
-        <td><a href="#" class="pawn white">&#9817;</a></td>
-        <td><a href="#" class="pawn white">&#9817;</a></td>
-        <td><a href="#" class="pawn white">&#9817;</a></td>
-        <td><a href="#" class="pawn white">&#9817;</a></td>
-        <td><a href="#" class="pawn white">&#9817;</a></td>
-        <td><a href="#" class="pawn white">&#9817;</a></td>
-        <td><a href="#" class="pawn white">&#9817;</a></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
       </tr>
       <tr>
-        <td><a href="#" class="rook white">&#9814;</a></td>
-        <td><a href="#" class="knight white">&#9816;</a></td>
-        <td><a href="#" class="bishop white">&#9815;</a></td>
-        <td><a href="#" class="king white">&#9813;</a></td>
-        <td><a href="#" class="queen white">&#9812;</a></td>
-        <td><a href="#" class="bishop white">&#9815;</a></td>
-        <td><a href="#" class="knight white">&#9816;</a></td>
-        <td><a href="#" class="rook white">&#9814;</a></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
       </tr>
     </table>
+    
+    <form id="connect" title="Log in">
+      <label for="handle">Name:</label>
+      <input type="text" id="handle" placeholder="Bobby">
+    </form>
+    
+    <button id="white" class="seat">sit as white</button>
+    <button id="black" class="seat">sit as black</button>
+    
+    
     Technologies:
     <ul>
       <li><a href="http://designindevelopment.com/css/css3-chess-board/">CSS3 Chess Board</a></li>
+      <li><a href="http://ubuwaits.github.com/css3-buttons/">Slick CSS3 Buttons</a></li>
       <li>
         <a href="http://nodejs.org/">Node.js</a>
         <ul>
           <li><a href="https://github.com/senchalabs/connect">Connect</a></li>
           <li><a href="https://github.com/substack/node-browserify">Browserify</a></li>
-          <li>I'm still evaluating different approaches for the transport layer.</a></li>
+          <li><a href="http://socket.io/">Socket.IO</a></li>
         </ul>
       </li>
     </ul>
