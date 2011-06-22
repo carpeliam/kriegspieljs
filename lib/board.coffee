@@ -1,6 +1,7 @@
 _ = require 'underscore'
 
 class Board
+  # FIXME what's the best way to share these values?
   UNOCCUPIED = 0
   WHITE = 1
   BLACK = -1
@@ -34,22 +35,22 @@ class Board
     @turn = WHITE
     @whiteHasCastled = @blackHasCastled = false
     
-  value: (x,y) ->
+  valueAt: (x,y) ->
     @squares[x][y]
   
   pieceType: (x, y) ->
-    return undefined if @value(x, y) == UNOCCUPIED
-    Math.abs(@value(x, y))
+    return undefined if @valueAt(x, y) == UNOCCUPIED
+    Math.abs(@valueAt(x, y))
   
   color: (x, y) ->
-    return undefined if @value(x, y) == UNOCCUPIED
-    @value(x, y) / Math.abs(@value(x, y))
+    return undefined if @valueAt(x, y) == UNOCCUPIED
+    @valueAt(x, y) / Math.abs(@valueAt(x, y))
   
   moveResultsInCheck: (xOrig, yOrig, xNew, yNew) ->
-    newSquareValue = @value(xNew, yNew)
+    newSquareValue = @valueAt(xNew, yNew)
     @forceMove(xOrig, yOrig, xNew, yNew)
     inCheck = false
-    @squares[xOrig][yOrig] = @value(xNew, yNew)
+    @squares[xOrig][yOrig] = @valueAt(xNew, yNew)
     @squares[xNew][yNew] = newSquareValue
     inCheck
   
@@ -64,10 +65,10 @@ class Board
     while x < xNew or y < yNew
       x += xRatio
       y += yRatio
-      return true if @value(x, y) isnt UNOCCUPIED
+      return true if @valueAt(x, y) isnt UNOCCUPIED
     # for x in [xOrig + xRatio...xNew] by xRatio
     #   for y in [yOrig + yRatio...yNew] by yRatio
-    #     return true if @value(x, y) isnt UNOCCUPIED
+    #     return true if @valueAt(x, y) isnt UNOCCUPIED
     return false
   
   canMove: (xOrig, yOrig, xNew, yNew) ->
@@ -81,7 +82,7 @@ class Board
         if xOrig == xNew # moving
           maxMovement = if onHomeRow then 2 else 1
           return false if color * (yNew - yOrig) > maxMovement
-          return false if @value(xNew, yNew) isnt UNOCCUPIED
+          return false if @valueAt(xNew, yNew) isnt UNOCCUPIED
           return false if @passesOverPieces(xOrig, yOrig, xNew, yNew)
         else # capturing
           # TODO account for en passant
