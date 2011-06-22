@@ -4,7 +4,8 @@
   "description": "Kriegspiel Chess game",
   "version": "0.0.0",
   "repository": {
-    "url": ""
+    "type": "git",
+    "url": "https://github.com/carpeliam/kriegspieljs"
   },
   "engines": {
     "node": "~v0.4.5"
