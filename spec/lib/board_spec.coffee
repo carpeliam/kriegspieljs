@@ -61,7 +61,7 @@ describe "Board", ->
     
     it "can't be moved if it's not that piece's turn", ->
       expect(board.canMove(0, 6, 0, 5)).toBeFalsy()
-      board.move 0, 2, 0, 3
+      expect(board.move(0, 1, 0, 3)).toBeTruthy()
       expect(board.canMove(0, 6, 0, 5)).toBeTruthy()
   
   describe "a pawn", ->
@@ -100,39 +100,85 @@ describe "Board", ->
   
   describe "a bishop", ->
     it "moves on the diagonals", ->
-      board.forceMove 2, 0, 4, 4
-      expect(board.canMove(4, 4, 2, 2)).toBeTruthy()
-      # expect(board.canMove(4, 4, 2, 6)).toBeTruthy()
-      # expect(board.canMove(4, 4, 3, 3)).toBeTruthy()
-      # expect(board.canMove(4, 4, 3, 5)).toBeTruthy()
-      # expect(board.canMove(4, 4, 5, 5)).toBeTruthy()
-      # expect(board.canMove(4, 4, 5, 3)).toBeTruthy()
-      # expect(board.canMove(4, 4, 6, 6)).toBeTruthy()
-      # expect(board.canMove(4, 4, 6, 2)).toBeTruthy()
+      canMoveLikeBishop 2, 0
     
     it "can't jump over pieces", ->
       board.forceMove 2, 0, 5, 5
       expect(board.canMove(5, 5, 2, 2)).toBeTruthy()
-      board.move 4, 6, 4, 4
+      board.forceMove 4, 6, 4, 4
       expect(board.canMove(5, 5, 2, 2)).toBeFalsy()
   
   describe "a rook", ->
     it "moves on the rows/columns", ->
-      board.forceMove 0, 0, 4, 4
-      expect(board.canMove(4, 4, 0, 4)).toBeTruthy()
-      expect(board.canMove(4, 4, 1, 4)).toBeTruthy()
-      expect(board.canMove(4, 4, 2, 4)).toBeTruthy()
-      expect(board.canMove(4, 4, 3, 4)).toBeTruthy()
-      expect(board.canMove(4, 4, 5, 4)).toBeTruthy()
-      expect(board.canMove(4, 4, 6, 4)).toBeTruthy()
-      expect(board.canMove(4, 4, 7, 4)).toBeTruthy()
-      expect(board.canMove(4, 4, 4, 2)).toBeTruthy()
-      expect(board.canMove(4, 4, 4, 3)).toBeTruthy()
-      expect(board.canMove(4, 4, 4, 5)).toBeTruthy()
-      expect(board.canMove(4, 4, 4, 6)).toBeTruthy()
+      canMoveLikeRook 0, 0
     
     it "can't jump over pieces", ->
       board.forceMove 0, 0, 4, 4
       expect(board.canMove(4, 4, 0, 4)).toBeTruthy()
-      board.move 3, 6, 3, 4
+      board.forceMove 3, 6, 3, 4
+      expect(board.valueAt(3,4)).toBe -1
       expect(board.canMove(4, 4, 0, 4)).toBeFalsy()
+    
+  describe "a queen", ->
+    it "can move like a rook on rows/columns", ->
+      canMoveLikeRook 3, 0
+    it "can move like a bishop on the diagonals", ->
+      canMoveLikeBishop 3, 0
+    
+    it "can't jump over pieces", ->
+      board.forceMove 3, 0, 4, 4
+      expect(board.canMove(4, 4, 0, 4)).toBeTruthy()
+      board.forceMove 3, 6, 3, 4
+      expect(board.canMove(4, 4, 0, 4)).toBeFalsy()
+  
+  describe "a king", ->
+    it "can move one square in any direction", ->
+      board.forceMove 4, 0, 4, 4
+      expect(board.canMove(4, 4, 3, 3)).toBeTruthy()
+      expect(board.canMove(4, 4, 4, 3)).toBeTruthy()
+      expect(board.canMove(4, 4, 5, 3)).toBeTruthy()
+      expect(board.canMove(4, 4, 3, 4)).toBeTruthy()
+      expect(board.canMove(4, 4, 5, 4)).toBeTruthy()
+      expect(board.canMove(4, 4, 3, 5)).toBeTruthy()
+      expect(board.canMove(4, 4, 4, 5)).toBeTruthy()
+      expect(board.canMove(4, 4, 5, 5)).toBeTruthy()
+    
+    it "can castle king-side", ->
+      board.forceMove 5, 0, 5, 2 # move bishop out of the way
+      board.forceMove 6, 0, 6, 2 # move knight out of the way
+      expect(board.move(4, 0, 6, 0)).toBeTruthy()
+      expect(board.valueAt(7, 0)).toBe 0
+      expect(board.valueAt(5, 0)).toBe 4
+    
+    it "can castle queen-side", ->
+      board.forceMove 1, 0, 1, 2 # move knight out of the way
+      board.forceMove 2, 0, 2, 2 # move bishop out of the way
+      board.forceMove 3, 0, 3, 2 # move queen out of the way
+      expect(board.move(4, 0, 2, 0)).toBeTruthy()
+      expect(board.valueAt(0, 0)).toBe 0
+      expect(board.valueAt(3, 0)).toBe 4
+  
+  canMoveLikeBishop = (xOrig, yOrig) ->
+    board.forceMove xOrig, yOrig, 4, 4
+    expect(board.canMove(4, 4, 2, 2)).toBeTruthy()
+    expect(board.canMove(4, 4, 2, 6)).toBeTruthy()
+    expect(board.canMove(4, 4, 3, 3)).toBeTruthy()
+    expect(board.canMove(4, 4, 3, 5)).toBeTruthy()
+    expect(board.canMove(4, 4, 5, 5)).toBeTruthy()
+    expect(board.canMove(4, 4, 5, 3)).toBeTruthy()
+    expect(board.canMove(4, 4, 6, 6)).toBeTruthy()
+    expect(board.canMove(4, 4, 6, 2)).toBeTruthy()
+  
+  canMoveLikeRook = (xOrig, yOrig) ->
+    board.forceMove xOrig, yOrig, 4, 4
+    expect(board.canMove(4, 4, 0, 4)).toBeTruthy()
+    expect(board.canMove(4, 4, 1, 4)).toBeTruthy()
+    expect(board.canMove(4, 4, 2, 4)).toBeTruthy()
+    expect(board.canMove(4, 4, 3, 4)).toBeTruthy()
+    expect(board.canMove(4, 4, 5, 4)).toBeTruthy()
+    expect(board.canMove(4, 4, 6, 4)).toBeTruthy()
+    expect(board.canMove(4, 4, 7, 4)).toBeTruthy()
+    expect(board.canMove(4, 4, 4, 2)).toBeTruthy()
+    expect(board.canMove(4, 4, 4, 3)).toBeTruthy()
+    expect(board.canMove(4, 4, 4, 5)).toBeTruthy()
+    expect(board.canMove(4, 4, 4, 6)).toBeTruthy()

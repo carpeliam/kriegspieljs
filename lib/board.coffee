@@ -32,8 +32,11 @@ class Board
     for y in [2...6]
       @squares[x][y] = UNOCCUPIED for x in [0...8]
     
+    @hasMoved = []
+    @hasMoved[WHITE] = king: false, kingsRook: false, queensRook: false
+    @hasMoved[BLACK] = king: false, kingsRook: false, queensRook: false
+    
     @turn = WHITE
-    @whiteHasCastled = @blackHasCastled = false
     
   valueAt: (x,y) ->
     @squares[x][y]
@@ -56,19 +59,15 @@ class Board
   
   passesOverPieces: (xOrig, yOrig, xNew, yNew) ->
     xDelta = xNew - xOrig
-    xRatio = if xDelta is 0 then 0 else xDelta / Math.abs(xDelta)
     yDelta = yNew - yOrig
-    yRatio = if yDelta is 0 then 0 else yDelta / Math.abs(yDelta)
+    xDelta /= Math.abs(xDelta) unless xDelta is 0
+    yDelta /= Math.abs(yDelta) unless yDelta is 0
+    x = xOrig + xDelta
+    y = yOrig + yDelta
     
-    x = xOrig# + xRatio
-    y = yOrig# + yRatio
-    while x < xNew or y < yNew
-      x += xRatio
-      y += yRatio
+    while x isnt xNew or y isnt yNew
       return true if @valueAt(x, y) isnt UNOCCUPIED
-    # for x in [xOrig + xRatio...xNew] by xRatio
-    #   for y in [yOrig + yRatio...yNew] by yRatio
-    #     return true if @valueAt(x, y) isnt UNOCCUPIED
+      x += xDelta; y += yDelta
     return false
   
   canMove: (xOrig, yOrig, xNew, yNew) ->
@@ -78,7 +77,7 @@ class Board
     return false if @moveResultsInCheck(xOrig, yOrig, xNew, yNew)
     switch @pieceType(xOrig, yOrig)
       when PAWN
-        onHomeRow = if color == WHITE then (yOrig == 1) else (yOrig == 6)
+        onHomeRow = if color is WHITE then (yOrig == 1) else (yOrig == 6)
         if xOrig == xNew # moving
           maxMovement = if onHomeRow then 2 else 1
           return false if color * (yNew - yOrig) > maxMovement
@@ -104,6 +103,12 @@ class Board
         return false if @passesOverPieces(xOrig, yOrig, xNew, yNew)
       when KING
         # TODO handle castling
+        backRow = if color is WHITE then 0 else 7
+        if !@hasMoved[color].king and yNew == backRow
+          if xNew - xOrig == 2
+            return !@passesOverPieces(xOrig, yOrig, xNew, yNew)
+          else if xOrig - xNew == 2
+            return !@passesOverPieces(xOrig, yOrig, xNew, yNew)
         return false if Math.abs(xNew - xOrig) != 1 and Math.abs(yNew - yOrig) != 1
     true
   
@@ -114,7 +119,24 @@ class Board
     true
   
   move: (xOrig, yOrig, xNew, yNew) ->
-    @canMove(xOrig, yOrig, xNew, yNew) && @forceMove(xOrig, yOrig, xNew, yNew)
-    @turn *= -1 # advance turn
+    moved = @canMove(xOrig, yOrig, xNew, yNew) && @forceMove(xOrig, yOrig, xNew, yNew)
+    if moved
+      # advance turn
+      @turn *= -1
+      # keep track of king/rook movement for any future castling
+      color = @color(xNew, yNew)
+      backRow = if color is WHITE then 0 else 7
+      switch @pieceType(xNew, yNew)
+        when ROOK
+          @hasMoved[color].queensRook = true if xOrig == 0 and yOrig == backRow
+          @hasMoved[color].kingsRook  = true if xOrig == 7 and yOrig == backRow
+        when KING
+          if !@hasMoved[color].king
+            if xNew - xOrig == 2
+              @forceMove(7, backRow, 5, backRow)
+            else if xOrig - xNew == 2
+              @forceMove(0, backRow, 3, backRow)
+          @hasMoved[color].king = true
+    return moved
 
 module.exports = Board
