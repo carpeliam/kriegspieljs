@@ -11,7 +11,7 @@ class Board
   ROOK = 4
   QUEEN = 5
   KING = 6
-  constructor: ->
+  constructor: (@options = {}) ->
     @squares = []
     @squares[i] = [] for i in [0..8]
     @init()
@@ -102,12 +102,12 @@ class Board
           (xNew != xOrig and yNew != yOrig)
         return false if @passesOverPieces(xOrig, yOrig, xNew, yNew)
       when KING
-        # TODO handle castling
+        # TODO handle castling into/out of/through check
         backRow = if color is WHITE then 0 else 7
         if !@hasMoved[color].king and yNew == backRow
-          if xNew - xOrig == 2
+          if xNew - xOrig == 2 and !@hasMoved[color].kingsRook # castling king-side
             return !@passesOverPieces(xOrig, yOrig, xNew, yNew)
-          else if xOrig - xNew == 2
+          else if xOrig - xNew == 2 and !@hasMoved[color].queensRook # castling queen-side
             return !@passesOverPieces(xOrig, yOrig, xNew, yNew)
         return false if Math.abs(xNew - xOrig) != 1 and Math.abs(yNew - yOrig) != 1
     true
@@ -134,8 +134,10 @@ class Board
           if !@hasMoved[color].king
             if xNew - xOrig == 2
               @forceMove(7, backRow, 5, backRow)
+              @options.onForcedMove?(7, backRow, 5, backRow)
             else if xOrig - xNew == 2
               @forceMove(0, backRow, 3, backRow)
+              @options.onForcedMove?(0, backRow, 3, backRow)
           @hasMoved[color].king = true
     return moved
 

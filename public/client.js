@@ -25,7 +25,7 @@ var client = {
         client.loadBoard(board);
         client.room.emit('nickname.set', client.name);
         client.room.on('room.list', function(list) {
-          console.log('-> room.list', list);
+          // console.log('-> room.list', list);
         });
         client.room.on('sit', function(color, player) {
           if (player.id == client.socket.socket.sessionid) {
@@ -57,7 +57,11 @@ var client = {
   },
   loadBoard: function(board) {
     // board.__proto__ = Board.prototype; // deprecated
-    this.board = new Board();
+    this.board = new Board({onForcedMove: function(xOrig, yOrig, xNew, yNew) {
+      var piece = getCell(xOrig, yOrig).children('a');
+      var destination = getCell(xNew, yNew);
+      piece.appendTo(destination);
+    }});
     for (prop in board) {
       if (this.board.hasOwnProperty(prop))
         this.board.prop = board.prop;

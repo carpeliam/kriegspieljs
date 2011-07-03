@@ -1,8 +1,9 @@
 describe "Board", ->
   board = undefined
+  onForcedMove = jasmine.createSpy()
   beforeEach ->
     Board = require("../../lib/Board")
-    board = new Board()
+    board = new Board(onForcedMove: onForcedMove)
   
   describe "#pieceType", ->
     it "should be undefined when unoccupied", ->
@@ -149,6 +150,17 @@ describe "Board", ->
       expect(board.move(4, 0, 6, 0)).toBeTruthy()
       expect(board.valueAt(7, 0)).toBe 0
       expect(board.valueAt(5, 0)).toBe 4
+      expect(onForcedMove).toHaveBeenCalledWith(7, 0, 5, 0)
+    it "can't castle king-side if the king's rook has moved", ->
+      board.forceMove 5, 0, 5, 2 # move bishop out of the way
+      board.forceMove 6, 0, 6, 2 # move knight out of the way
+      expect(board.canMove(4, 0, 6, 0)).toBeTruthy()
+      board.move 7, 0, 5, 0
+      board.move 0, 6, 0, 5 # advance turn
+      board.move 5, 0, 7, 0
+      board.move 0, 5, 0, 4 # advance turn
+      expect(board.canMove(4, 0, 6, 0)).toBeFalsy()
+    
     
     it "can castle queen-side", ->
       board.forceMove 1, 0, 1, 2 # move knight out of the way
@@ -157,6 +169,15 @@ describe "Board", ->
       expect(board.move(4, 0, 2, 0)).toBeTruthy()
       expect(board.valueAt(0, 0)).toBe 0
       expect(board.valueAt(3, 0)).toBe 4
+      expect(onForcedMove).toHaveBeenCalledWith(0, 0, 3, 0)
+    it "can't castle queen-side if the queen's rook has moved", ->
+      board.forceMove 1, 0, 1, 2 # move knight out of the way
+      board.forceMove 2, 0, 2, 2 # move bishop out of the way
+      board.forceMove 3, 0, 3, 2 # move queen out of the way
+      expect(board.canMove(4, 0, 2, 0)).toBeTruthy()
+      board.move 0, 0, 1, 0
+      board.move 0, 6, 0, 5 # advance turn
+      expect(board.move(4, 0, 2, 0)).toBeFalsy()
   
   canMoveLikeBishop = (xOrig, yOrig) ->
     board.forceMove xOrig, yOrig, 4, 4
