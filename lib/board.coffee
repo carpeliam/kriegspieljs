@@ -35,11 +35,17 @@ class Board
     @hasMoved = []
     @hasMoved[WHITE] = king: false, kingsRook: false, queensRook: false
     @hasMoved[BLACK] = king: false, kingsRook: false, queensRook: false
+    # @alreadyLookingForCheck = null
     
     @turn = WHITE
     
   valueAt: (x,y) ->
     @squares[x][y]
+  
+  findPiece: (value) ->
+    for x in [0..7]
+      for y in [0..7]
+        return [x, y] if @valueAt(x, y) is value
   
   pieceType: (x, y) ->
     return undefined if @valueAt(x, y) == UNOCCUPIED
@@ -49,12 +55,32 @@ class Board
     return undefined if @valueAt(x, y) == UNOCCUPIED
     @valueAt(x, y) / Math.abs(@valueAt(x, y))
   
+  # forces a given move, detects if a check exists, and then undoes the move
   moveResultsInCheck: (xOrig, yOrig, xNew, yNew) ->
-    newSquareValue = @valueAt(xNew, yNew)
-    @forceMove(xOrig, yOrig, xNew, yNew)
+    # make sure we don't recurse
+    return false if @alreadyLookingForCheck?
+    @alreadyLookingForCheck = true
+    
+    newSquareValue = @valueAt xNew, yNew
+    @forceMove xOrig, yOrig, xNew, yNew
+    
+    [xKing, yKing] = @findPiece(@color(xNew, yNew) * KING)
+    
+    @turn *= -1
+    
     inCheck = false
-    @squares[xOrig][yOrig] = @valueAt(xNew, yNew)
+    for x in [0..7] # brute force, check all squares (could be improved)
+      break if inCheck
+      for y in [0..7]
+        if @canMove(x, y, xKing, yKing)
+          inCheck = true
+          break
+    
+    # reset
+    @squares[xOrig][yOrig] = @valueAt xNew, yNew
     @squares[xNew][yNew] = newSquareValue
+    @turn *= -1
+    delete @alreadyLookingForCheck
     inCheck
   
   passesOverPieces: (xOrig, yOrig, xNew, yNew) ->
@@ -73,7 +99,7 @@ class Board
   canMove: (xOrig, yOrig, xNew, yNew) ->
     return false if !@squares[xNew]? or !@squares[xNew][yNew]?
     color = @color(xOrig, yOrig)
-    return false if color != @turn or color == @color(xNew, yNew)
+    return false if color != @turn or color is @color(xNew, yNew)
     return false if @moveResultsInCheck(xOrig, yOrig, xNew, yNew)
     switch @pieceType(xOrig, yOrig)
       when PAWN
@@ -105,14 +131,19 @@ class Board
         # TODO handle castling into/out of/through check
         backRow = if color is WHITE then 0 else 7
         if !@hasMoved[color].king and yNew == backRow
+          castleSafeFromCheck = =>
+            for x in [xOrig..xNew]
+              return false if @moveResultsInCheck(xOrig, yOrig, x, yOrig)
+            return true
           if xNew - xOrig == 2 and !@hasMoved[color].kingsRook # castling king-side
-            return !@passesOverPieces(xOrig, yOrig, xNew, yNew)
+            return !@passesOverPieces(xOrig, yOrig, xNew, yNew) and castleSafeFromCheck()
           else if xOrig - xNew == 2 and !@hasMoved[color].queensRook # castling queen-side
-            return !@passesOverPieces(xOrig, yOrig, xNew, yNew)
-        return false if Math.abs(xNew - xOrig) != 1 and Math.abs(yNew - yOrig) != 1
+            return !@passesOverPieces(xOrig, yOrig, xNew, yNew) and castleSafeFromCheck()
+        return false if Math.abs(xNew - xOrig) > 1 or Math.abs(yNew - yOrig) > 1
     true
   
   forceMove: (xOrig, yOrig, xNew, yNew) ->
+    return true if xOrig is xNew and yOrig is yNew
     @squares[xNew][yNew] = @squares[xOrig][yOrig]
     @squares[xOrig][yOrig] = UNOCCUPIED
     # TODO handle pawn advancement, castling, check/mate
@@ -121,24 +152,28 @@ class Board
   move: (xOrig, yOrig, xNew, yNew) ->
     moved = @canMove(xOrig, yOrig, xNew, yNew) && @forceMove(xOrig, yOrig, xNew, yNew)
     if moved
-      # advance turn
-      @turn *= -1
       # keep track of king/rook movement for any future castling
-      color = @color(xNew, yNew)
-      backRow = if color is WHITE then 0 else 7
+      backRow = if @turn is WHITE then 0 else 7
       switch @pieceType(xNew, yNew)
         when ROOK
-          @hasMoved[color].queensRook = true if xOrig == 0 and yOrig == backRow
-          @hasMoved[color].kingsRook  = true if xOrig == 7 and yOrig == backRow
+          @hasMoved[@turn].queensRook = true if xOrig == 0 and yOrig == backRow
+          @hasMoved[@turn].kingsRook  = true if xOrig == 7 and yOrig == backRow
         when KING
-          if !@hasMoved[color].king
+          if !@hasMoved[@turn].king
             if xNew - xOrig == 2
               @forceMove(7, backRow, 5, backRow)
               @options.onForcedMove?(7, backRow, 5, backRow)
             else if xOrig - xNew == 2
               @forceMove(0, backRow, 3, backRow)
               @options.onForcedMove?(0, backRow, 3, backRow)
-          @hasMoved[color].king = true
+          @hasMoved[@turn].king = true
+      # advance turn
+      @turn *= -1
+      # has this move resulted in check?
+      [xKing, yKing] = @findPiece(@turn * KING)
+      if @moveResultsInCheck(xKing, yKing, xKing, yKing)
+        # check to see if king can move, or interpose, or capture
+        @options.onCheck?()
     return moved
 
 module.exports = Board
