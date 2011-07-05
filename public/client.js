@@ -1,4 +1,5 @@
 var Board = require('./board');
+var _ = require('underscore');
 
 $.fn.coordinates = function() {
   var self = $(this[0]);
@@ -14,6 +15,13 @@ var getCell = function(x, y) {
   return $('#board tr').slice(7 - y, 8 - y).children('td').slice(x, x + 1);
 }
 
+function publishMessage(message, className) {
+  $('<div></div>').addClass(className).text(message).appendTo($('#chat'));
+  var chat = $('#chat')[0];
+  var scrollHeight = Math.max(chat.scrollHeight, chat.clientHeight);
+  chat.scrollTop = scrollHeight - chat.clientHeight;
+}
+
 var client = {
   connect: function(name) {
     this.name = name;
@@ -25,7 +33,8 @@ var client = {
         client.loadBoard(board);
         client.room.emit('nickname.set', client.name);
         client.room.on('room.list', function(list) {
-          // console.log('-> room.list', list);
+          var nicknames = _.map(list, function(member){ return member.nickname });
+          publishMessage('in the room: ' + nicknames.join(', '), 'notice');
         });
         client.room.on('sit', function(color, player) {
           if (player.id == client.socket.socket.sessionid) {
@@ -51,17 +60,27 @@ var client = {
             getCell(to.x, to.y).children().remove().end().append(piece);
             client.board.move(from.x, from.y, to.x, to.y);
           }
+          $('#white, #black').toggleClass('active');
         });
       });
     });
   },
   loadBoard: function(board) {
     // board.__proto__ = Board.prototype; // deprecated
-    this.board = new Board({onForcedMove: function(xOrig, yOrig, xNew, yNew) {
-      var piece = getCell(xOrig, yOrig).children('a');
-      var destination = getCell(xNew, yNew);
-      piece.appendTo(destination);
-    }});
+    this.board = new Board({
+      onForcedMove: function(xOrig, yOrig, xNew, yNew) {
+        var piece = getCell(xOrig, yOrig).children('a');
+        var destination = getCell(xNew, yNew);
+        piece.appendTo(destination);
+      },
+      onCheck: function() {
+        publishMessage('Check!', 'check');
+      },
+      onMate: function() {
+        publishMessage('Checkmate.', 'mate');
+        $('.active').addClass('winning').siblings('button').addClass('losing');
+      }
+    });
     for (prop in board) {
       if (this.board.hasOwnProperty(prop))
         this.board.prop = board.prop;
@@ -125,22 +144,32 @@ $(document).ready(function() {
   if ($.cookie('handle')) {
     client.connect($.cookie('handle'));
   } else {
+    var handleInput = function() {
+      if ($('#handle').val() != '') {
+        $.cookie('handle', $('#handle').val());
+        client.connect($.cookie('handle'));
+        $('#connect').dialog("close");
+      }
+    };
     $('#connect').dialog({
       modal: true,
       width: 325,
       resizable: false,
       buttons: {
-        "Let's go!": function() {
-          if ($('#handle').val() != '') {
-            $.cookie('handle', $('#handle').val());
-            client.connect($.cookie('handle'));
-            $(this).dialog("close");
-          }
-          
-        }
+        "Let's go!": handleInput
       }
+    }).submit(function() {
+      handleInput();
+      return false;
     });
   }
+  
+  $('#msg').submit(function() {
+    // FIXME send msg to server
+    publishMessage(client.name + ': ' + $('#chatmsg').val());
+    $('#chatmsg').val('');
+    return false;
+  });
   
   $('.seat').click(function() {
     var color = $(this).attr('id');

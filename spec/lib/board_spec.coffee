@@ -70,9 +70,9 @@ describe "Board", ->
       expect(board.canMove(0, 6, 0, 5)).toBeTruthy()
     
     it "can't be moved if it results in check", ->
-      board.forceMove 3, 0, 4, 1
-      board.forceMove 3, 7, 4, 2
-      expect(board.canMove 4, 1, 3, 2).toBeFalsy()
+      board.forceMove 3, 0, 4, 1 # white queen e2
+      board.forceMove 3, 7, 4, 2 # black queen e3
+      expect(board.canMove 4, 1, 3, 2).toBeFalsy() # can't move white queen out of the way
     
   
   describe "a pawn", ->
