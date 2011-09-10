@@ -1,5 +1,3 @@
-_ = require 'underscore'
-
 class Board
   # FIXME what's the best way to share these values?
   UNOCCUPIED = 0

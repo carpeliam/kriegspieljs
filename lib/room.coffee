@@ -1,51 +1,79 @@
-_ = require 'underscore'
+parseCookie = (require 'connect').utils.parseCookie
 Board = require './board'
+
+getID = (client) ->
+  parseCookie(client.handshake.headers.cookie)['connect.sid']
+
 class Room
   constructor: (@channel) ->
     @white = @black = undefined
     @clients = {}
-    @board = new Board()
-    @inAction = false
+    @createNewBoard()
     
     @channel.on 'connection', (socket) =>
-      @join socket
-      socket.emit 'sit', 'white', {id: @white.id, nickname: @clients[@white.id].nickname} if @white?
-      socket.emit 'sit', 'black', {id: @black.id, nickname: @clients[@black.id].nickname} if @black?
-      
       socket.on "nickname.set", (name) =>
-        socket.set "nickname", name
-        @clients[socket.id].nickname = name
-        @channel.emit 'room.list', ({id: id, nickname: client.nickname} for id, client of @clients when client.nickname?)
+        @clients[getID(socket)] = nickname: name
+        @channel.emit 'room.list', (client.nickname for id, client of @clients)
+        socket.broadcast.emit 'announcement', "#{name} connected"
+        socket.emit 'sit', 'white', @clients[@white].nickname if @white?
+        socket.emit 'sit', 'black', @clients[@black].nickname if @black?
+      
       socket.on 'sit', (color) =>
         canSit = switch color
           when 'white' then @sitAsWhite socket
           when 'black' then @sitAsBlack socket
           else false
-        @channel.emit 'sit', color, {id: socket.id, nickname: @clients[socket.id].nickname} if canSit
+        @channel.emit 'sit', color, {id: socket.id, nickname: @clients[getID(socket)].nickname} if canSit
+      
       socket.on 'stand', (color) =>
         canStand = switch color
           when 'white' then @standAsWhite()
           when 'black' then @standAsBlack()
           else false
         @channel.emit 'stand', color
+        @checkForReset()
+      
+      socket.on 'speak', (msg) =>
+        socket.broadcast.emit 'speak', @clients[getID(socket)].nickname, msg
+      
       socket.on 'board.move', (from, to, callback) =>
-        if @currentPlayer().id == socket.id and @board.move from.x, from.y, to.x, to.y
+        if @currentPlayer() == getID(socket) and @board.move from.x, from.y, to.x, to.y
           callback(true) if callback?
           @channel.emit 'board.move', from, to
+      
+      socket.on 'disconnect', =>
+        identity = getID(socket)
+        if identity is @white
+          @white = undefined
+          @channel.emit 'stand', 'white'
+        else if identity is @black
+          @black = undefined
+          @channel.emit 'stand', 'black'
+        @checkForReset()
+        socket.broadcast.emit 'announcement', "#{@clients[identity].nickname} disconnected"
+        delete @clients[identity]
+        socket.broadcast.emit 'room.list', (client.nickname for id, client of @clients)
   
-  join: (client) ->
-    @clients[client.id] = {socket: client}
-  
-  leave: (client) ->
-    delete @clients[client.id] unless client == @white or client == @black
+  createNewBoard: ->
+    @board = new Board
+      onMate: =>
+        @endGame()
+    @inAction = false
   
   sitAsWhite: (client) ->
-    if !@white? and @clients[client.id]? and @black != client
-      @white = client
+    identity = getID(client)
+    if !@white? and @clients[identity]? and @black isnt identity
+      @white = identity
   
   sitAsBlack: (client) ->
-    if !@black? and @clients[client.id]? and @white != client
-      @black = client
+    identity = getID(client)
+    if !@black? and @clients[identity]? and @white isnt identity
+      @black = identity
+  
+  checkForReset: ->
+    if !@white? and !@black?
+      @createNewBoard()
+      @channel.emit 'board.reset', @board
   
   standAsWhite: ->
     unless @inAction
@@ -62,7 +90,7 @@ class Room
     switch @board.turn
       when 1 then @white
       when -1 then @black
-      else {id: undefined}
+      else undefined
   
   endGame: ->
     @inAction = false

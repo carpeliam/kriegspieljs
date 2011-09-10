@@ -42,6 +42,37 @@ form#connect {
 #board td.active { /*background:#f00 !important;*/ }
 
 
+@-webkit-keyframes highlight {
+  from {
+    opacity: 0;
+    -webkit-animation-timing-function: ease-out;
+  }
+  50% { 
+    background-color: #ff0;
+    opacity: 0.8;
+    -webkit-animation-timing-function: ease-in;
+  }
+  to {
+    opacity: 0;
+    -webkit-animation-timing-function: ease-out;
+  }
+}
+@-moz-keyframes highlight {
+  from {
+    opacity: 0;
+    -moz-animation-timing-function: ease-out;
+  }
+  50% { 
+    background-color: #ff0;
+    opacity: 0.8;
+    -moz-animation-timing-function: ease-in;
+  }
+  to {
+    opacity: 0;
+    -moz-animation-timing-function: ease-out;
+  }
+}
+
 button.seat {
   border: 0;
   -moz-border-radius: 4px;
@@ -153,12 +184,24 @@ button#white.seat:active:not([disabled]) {
 }
 
 button#white.active.seat {
-  -moz-box-shadow: 0px 0px 8px #ff9;
-  -webkit-box-shadow: 0px 0px 8px #ff9;
-  box-shadow: 0px 0px 8px #ff9;
+  -webkit-animation-name: highlight;
+  -webkit-animation-duration: 0.5s;
+  -webkit-animation-iteration-count: 2;
+  -moz-animation-name: highlight;
+  -moz-animation-duration: 0.5s;
+  -moz-animation-iteration-count: 2;
+  -moz-box-shadow: 0px 0px 8px #ff6;
+  -webkit-box-shadow: 0px 0px 8px #ff6;
+  box-shadow: 0px 0px 8px #ff6;
 }
 
 button#black.active.seat {
+  -webkit-animation-name: highlight;
+  -webkit-animation-duration: 0.5s;
+  -webkit-animation-iteration-count: 2;
+  -moz-animation-name: highlight;
+  -moz-animation-duration: 0.5s;
+  -moz-animation-iteration-count: 2;
   -moz-box-shadow: 0px 0px 8px #993;
   -webkit-box-shadow: 0px 0px 8px #993;
   box-shadow: 0px 0px 8px #993;
@@ -176,10 +219,52 @@ button.losing.seat {
   box-shadow: 0px 0px 8px red !important;
 }
 
+#room details, #room div, #room form {
+  margin: 2px 8px;
+}
+
+details p#people {
+  background-color: lightgray;
+  margin: 2px 0px;
+  padding: 4px;
+}
+
+details p#people span {
+  background-color: #52a8e8;
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#52a8e8), to(#377ad0));
+  /* Saf4+, Chrome */
+  background-image: -webkit-linear-gradient(top, #52a8e8, #377ad0);
+  background-image: -moz-linear-gradient(top, #52a8e8, #377ad0);
+  background-image: -ms-linear-gradient(top, #52a8e8, #377ad0);
+  background-image: -o-linear-gradient(top, #52a8e8, #377ad0);
+  background-image: linear-gradient(top, #52a8e8, #377ad0);
+  border-top: 1px solid #4081af;
+  border-right: 1px solid #2e69a3;
+  border-bottom: 1px solid #20559a;
+  border-left: 1px solid #2e69a3;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  -o-border-radius: 8px;
+  border-radius: 8px;
+  -webkit-box-shadow: inset 0 1px 0 0 #72b9eb, 0 1px 2px 0 #b3b3b3;
+  -moz-box-shadow: inset 0 1px 0 0 #72b9eb, 0 1px 2px 0 #b3b3b3;
+  -ms-box-shadow: inset 0 1px 0 0 #72b9eb, 0 1px 2px 0 #b3b3b3;
+  -o-box-shadow: inset 0 1px 0 0 #72b9eb, 0 1px 2px 0 #b3b3b3;
+  box-shadow: inset 0 1px 0 0 #72b9eb, 0 1px 2px 0 #b3b3b3;
+  color: #fff;
+  font: normal 11px "lucida grande", sans-serif;
+  line-height: 1;
+  margin: 2px;
+  padding: 3px 6px;
+  text-align: center;
+  text-shadow: 0 -1px 1px #3275bc;
+  -webkit-background-clip: padding-box;
+}
+
 #chat {
   border: 1px solid #ccc;
   height: 400px;
-  margin: 2px 8px;
   overflow-y: auto;
   padding: 4px;
   color: #999;
@@ -187,7 +272,6 @@ button.losing.seat {
 }
 
 #chatmsg {
-  margin: 2px 8px;
   width: 300px;
 }
 

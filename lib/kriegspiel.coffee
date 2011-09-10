@@ -1,6 +1,5 @@
 sys = require 'sys'
 connect = require 'connect'
-sio = require 'socket.io'
 
 # Board = require './board'
 Room = require './room'
@@ -12,6 +11,7 @@ Kriegspiel = (options = {}) ->
   settings = port: options.port or 8124
   sockets = {}
   rooms = []
+  # rooms = {lobby: new Room('lobby')}
   
   
   
@@ -19,18 +19,18 @@ Kriegspiel = (options = {}) ->
     server = connect.createServer()
     server.use connect.static(process.cwd() + '/public')
     server.use connect.logger()
+    server.use connect.cookieParser()
+    server.use connect.session(secret: 'WarGames')
     server.use require("browserify")
       mount:   '/require.js'
       base:    __dirname
       require: ['underscore']
     
-    io = sio.listen server
+    io = (require 'socket.io').listen server
     
     createRoom = ->
       roomNumber = rooms.length + 1
       channel = io.of('/rooms/' + roomNumber)
-      channel.on 'disconnect', ->
-        console.log 'room disconnect'
       room = new Room(channel)
       rooms.push room
     
@@ -41,14 +41,11 @@ Kriegspiel = (options = {}) ->
       
       socket.on "room.create", ->
         createRoom(io)
-        
-      
-      socket.on "nickname.set", (name) ->
-        socket.set "nickname", name
     
     return server
   
   server = createServer()
+  # (require './comm').initialize server
   server.listen settings.port
   
   sys.log 'Server started on port ' + settings.port

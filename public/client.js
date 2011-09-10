@@ -1,5 +1,4 @@
 var Board = require('./board');
-var _ = require('underscore');
 
 $.fn.coordinates = function() {
   var self = $(this[0]);
@@ -9,11 +8,11 @@ $.fn.coordinates = function() {
   var x = self.siblings().andSelf().index(self);
   var y = 7 - $('#board tr').index(self.parent());
   return {'x':x, 'y':y};
-}
+};
 
 var getCell = function(x, y) {
   return $('#board tr').slice(7 - y, 8 - y).children('td').slice(x, x + 1);
-}
+};
 
 function publishMessage(message, className) {
   $('<div></div>').addClass(className).text(message).appendTo($('#chat'));
@@ -25,6 +24,7 @@ function publishMessage(message, className) {
 var client = {
   connect: function(name) {
     this.name = name;
+    this.gameInProgress = false;
     this.socket = io.connect();
     this.socket.on('connect', function() {
       client.socket.emit('nickname.set', client.name);
@@ -32,29 +32,51 @@ var client = {
         client.room = io.connect(room);
         client.loadBoard(board);
         client.room.emit('nickname.set', client.name);
-        client.room.on('room.list', function(list) {
-          var nicknames = _.map(list, function(member){ return member.nickname });
-          publishMessage('in the room: ' + nicknames.join(', '), 'notice');
+        
+        client.room.on('announcement', function(message) {
+          publishMessage(message, 'notice');
         });
+        
+        client.room.on('speak', function(speaker, message) {
+          publishMessage(speaker + ': ' + message);
+        });
+        
+        client.room.on('room.list', function(nicknames) {
+          $('#people').empty();
+          for (var i in nicknames) {
+            $('#people').append($('<span>').text(nicknames[i]));
+          }
+        });
+        
         client.room.on('sit', function(color, player) {
+          publishMessage(player.nickname + ' sat down as ' + color, 'notice');
           if (player.id == client.socket.socket.sessionid) {
             client.playingAs = color;
             var oppositeColor = (color == 'white') ? 'black' : 'white';
             $('#board a').draggable('option', 'cancel', '.' + oppositeColor).draggable('enable');
+            $('#board a.' + oppositeColor).css('display', 'none');
             $('#' + color).text('leave ' + color).siblings('.seat').attr('disabled', true);
           } else {
             $('#' + color).text(color + ': ' + player.nickname).attr('disabled', true);
           }
+          if ($('#white').text().indexOf('sit as white') !== 0 && $('#black').text().indexOf('sit as black') !== 0) {
+            $('#white').addClass('active');
+            publishMessage("Let's get started!", 'notice');
+          }
         });
+        
         client.room.on('stand', function(color) {
+          publishMessage(color + ' stood up', 'notice');
+          var oppositeColor = (color == 'white') ? 'black' : 'white';
+          $('#' + color).text('sit as ' + color).attr('disabled', client.playingAs == oppositeColor);
+          $('#' + oppositeColor).attr('disabled', client.playingAs != oppositeColor && $('#' + oppositeColor).text().indexOf(oppositeColor) === 0);
+          
           if (client.playingAs == color)
             delete client.playingAs;
-          $('#' + color).text('sit as ' + color);
-          $('.seat').each(function() {
-            $(this).attr('disabled', client.playingAs == $(this).attr('id'));
-          });
         });
+        
         client.room.on('board.move', function(from, to) {
+          client.gameInProgress = true;
           var piece = getCell(from.x, from.y).children('a');
           if (piece.size() == 1) {
             getCell(to.x, to.y).children().remove().end().append(piece);
@@ -62,8 +84,17 @@ var client = {
           }
           $('#white, #black').toggleClass('active');
         });
+        
+        client.room.on('board.reset', function(board) {
+          client.loadBoard(board);
+          $('.seat').removeClass('active winning losing');
+        });
       });
     });
+  },
+  speak: function(message) {
+    this.room.emit('speak', message);
+    publishMessage(this.name + ': ' + message);
   },
   loadBoard: function(board) {
     // board.__proto__ = Board.prototype; // deprecated
@@ -77,18 +108,19 @@ var client = {
         publishMessage('Check!', 'check');
       },
       onMate: function() {
+        client.gameInProgress = false;
         publishMessage('Checkmate.', 'mate');
         $('.active').addClass('winning').siblings('button').addClass('losing');
       }
     });
-    for (prop in board) {
+    for (var prop in board) {
       if (this.board.hasOwnProperty(prop))
         this.board.prop = board.prop;
     }
     $('#board td').each(function() {
       var coords = $(this).coordinates();
       var val = client.board.valueAt(coords.x, coords.y);
-      if (val != 0) {
+      if (val !== 0) {
         var link = $('<a href="#"></a>');
         var isWhite = val > 0;
         link.addClass(isWhite ? 'white' : 'black');
@@ -118,6 +150,8 @@ var client = {
             link.html(isWhite ? '&#9812;' : '&#9818;');
         }
         $(this).empty().append(link);
+      } else {
+        $(this).empty();
       }
     });
     $('#board a').draggable({
@@ -138,14 +172,14 @@ var client = {
   standAs: function(color) {
     this.room.emit('stand', color);
   }
-}
+};
 
 $(document).ready(function() {
   if ($.cookie('handle')) {
     client.connect($.cookie('handle'));
   } else {
     var handleInput = function() {
-      if ($('#handle').val() != '') {
+      if ($('#handle').val() !== '') {
         $.cookie('handle', $('#handle').val());
         client.connect($.cookie('handle'));
         $('#connect').dialog("close");
@@ -165,8 +199,7 @@ $(document).ready(function() {
   }
   
   $('#msg').submit(function() {
-    // FIXME send msg to server
-    publishMessage(client.name + ': ' + $('#chatmsg').val());
+    client.speak($('#chatmsg').val());
     $('#chatmsg').val('');
     return false;
   });
