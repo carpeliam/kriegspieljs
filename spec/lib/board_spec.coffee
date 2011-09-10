@@ -4,7 +4,7 @@ describe "Board", ->
   onCheck      = jasmine.createSpy('onCheck')
   onMate       = jasmine.createSpy('onMate')
   beforeEach ->
-    Board = require("../../lib/Board")
+    Board = require("#{__dirname}/../../lib/Board")
     board = new Board(onForcedMove: onForcedMove, onCheck: onCheck, onMate: onMate)
   
   describe "#pieceType", ->
