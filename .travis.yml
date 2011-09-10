@@ -1,2 +1,2 @@
 before_script: "npm install"
-script: "cake spec"
+script: "./node_modules/.bin/cake spec"
