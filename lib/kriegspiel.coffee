@@ -23,7 +23,7 @@ Kriegspiel = (options = {}) ->
     server.use connect.session(secret: 'WarGames')
     server.use require("browserify")
       mount:   '/require.js'
-      require: ['./lib/Board']
+      require: ['./lib/board.coffee']
     
     io = (require 'socket.io').listen server
     
