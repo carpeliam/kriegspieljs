@@ -1,0 +1,146 @@
+<!DOCTYPE html> 
+<html> 
+<head> 
+  <meta charset="utf-8"> 
+  <title>kriegspieljs</title> 
+  <meta name="viewport" content="width=1024, user-scalable=no"> 
+  
+  <!-- Replace path with correct path to deck.core.css. --> 
+  <link rel="stylesheet" href="deck.core.css" type="text/css"> 
+  <link rel="stylesheet" href="themes/style/web-2.0.css">
+  <link rel="stylesheet" href="themes/transition/horizontal-slide.css">
+  <link rel="stylesheet" href="extensions/codemirror/deck.codemirror.css">
+  <link rel="stylesheet" href="extensions/codemirror/themes/default.css">
+  <link rel="stylesheet" href="custom.css">
+  
+  <!-- Any other extension CSS files go here. --> 
+  
+  <!-- Replace path with correct path to Modernizr file. --> 
+  <script src="modernizr.custom.js"></script> 
+</head> 
+<body class="deck-container"> 
+ 
+<!-- Create any number of elements with class slide within the container --> 
+
+<div class="slide">
+  <h1>kriegspieljs</h1>
+</div>
+  
+  <div class="slide">
+    <h2>who are you?</h2>
+    <ul>
+      <li>liam morley</li>
+      <li>software developer, the <span class="mitre">mitre</span> corporation</li>
+      <li>web enthusiast</li>
+    </ul>
+  </div>
+
+<div class="slide">
+  <h2>what's kriegspiel?</h2>
+  <iframe width="750" height="550" src="http://en.wikipedia.org/wiki/Kriegspiel_(chess)" frameborder="0"></iframe>
+</div>
+
+<div class="slide">
+  <h2>rules:</h2>
+  <ul>
+    <li>move-based (like chess)</li>
+    <li>can't see opponent's pieces</li>
+    <li>three boards: white, black, and umpire/spectators</li>
+  </ul>
+</div>
+
+
+<div class="slide">
+  <h2>59 second demo</h2>
+  <video width="95%" id="demo">
+    <source src="video.high.m4v"></source>
+  </video>
+  <div id="demo-notes"></div>
+  <div id="small-notes"></div>
+</div>
+
+<!-- Other extension HTML snippets go here, at the bottom of the deck container. --> 
+ 
+<!-- Update these paths to point to the correct files. --> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
+<script src="deck.core.js"></script>
+<script src="popcorn-complete.min.js"></script>
+<script src="extensions/codemirror/deck.codemirror.js"></script>
+ 
+<!-- Add any other extension JS files here --> 
+ 
+ 
+<!-- Initialize the deck. You can put this in an external file if desired. --> 
+<script> 
+  $(function() {
+    $.deck('.slide');
+    var pop = Popcorn("#demo");
+    
+    pop.footnote({
+      start: 7,
+      end: 11,
+      text: "Jack and Jill sign in",
+      target: "demo-notes"
+    }).footnote({
+      start: 11,
+      end: 14,
+      text: "Spectators can see both sides",
+      target: "demo-notes"
+    }).footnote({
+      start: 14,
+      end: 18,
+      text: "Once you choose a color, you can only see your side.",
+      target: "demo-notes"
+    }).footnote({
+      start: 18,
+      end: 24,
+      text: "How are we going to play an entire game of chess? There's only 40 seconds left in this demo!",
+      target: "demo-notes"
+    }).footnote({
+      start: 24,
+      end: 30,
+      text: "A piece moved to an illegal square just floats back to its starting square (<a href=\"http://jqueryui.com/\">jQuery UI</a> drag+drop)",
+      target: "demo-notes"
+    }).footnote({
+      start: 31,
+      end: 39,
+      text: "Whenever a move is made, the current player's box flashes (<a href=\"http://www.w3.org/TR/css3-animations/\">CSS3 keyframe animation</a>)",
+      target: "demo-notes"
+    }).footnote({
+      start: 40,
+      end: 46,
+      text: "I have no way of knowing where my opponent's pieces are!",
+      target: "demo-notes"
+    }).footnote({
+      start: 43,
+      end: 46,
+      text: "*",
+      target: "demo-notes"
+    }).footnote({
+      start: 43,
+      end: 46,
+      text: "*There are actually a few ways to cheat. Shhh.",
+      target: "small-notes"
+    }).footnote({
+      start: 46,
+      end: 53,
+      text: "Moves are validated on the client, then reported to the server and broadcasted to other clients via <a href=\"http://socket.io/\">socket.io</a>.",
+      target: "demo-notes"
+    }).footnote({
+      start: 54,
+      end: 59,
+      text: "Fool's mate. The client has callbacks for check and mate, and announces the winner/loser.",
+      target: "demo-notes"
+    });
+    
+    $(document).bind('deck.change', function(event, from, to) {
+      if (to === 4) {
+        pop.play();
+      } else if (from === 4) {
+        pop.pause();
+      }
+    });
+  });
+</script> 
+</body> 
+</html>

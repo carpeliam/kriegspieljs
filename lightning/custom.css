@@ -1,0 +1,13 @@
+span.mitre {
+  color: #0b7495;
+}
+
+.slide div.center.slide {
+  position: absolute !important;
+  font-size: 3em;
+  font-weight: bold;
+  left: 0 !important;
+  right: 0 !important;
+  top: 50% !important;
+  text-align: center;
+}
