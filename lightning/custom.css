@@ -1,3 +1,15 @@
+#intro > div {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+#intro > div * {
+  position: static;
+}
+
 span.mitre {
   color: #0b7495;
 }
@@ -10,4 +22,23 @@ span.mitre {
   right: 0 !important;
   top: 50% !important;
   text-align: center;
+}
+
+#small-notes {
+  font-size: 50%;
+}
+
+.csstransforms.boxshadow .deck-container pre:before, .csstransforms.boxshadow .deck-container pre:after {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+.CodeMirror-lines {
+  background: rgba(60, 60, 60, 0.1);
+}
+
+.code-example .CodeMirror {
+  margin-bottom: 4px;
+  max-height: 500px;
 }

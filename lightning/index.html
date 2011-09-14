@@ -8,9 +8,9 @@
   <!-- Replace path with correct path to deck.core.css. --> 
   <link rel="stylesheet" href="deck.core.css" type="text/css"> 
   <link rel="stylesheet" href="themes/style/web-2.0.css">
-  <link rel="stylesheet" href="themes/transition/horizontal-slide.css">
   <link rel="stylesheet" href="extensions/codemirror/deck.codemirror.css">
   <link rel="stylesheet" href="extensions/codemirror/themes/default.css">
+  <link rel="stylesheet" href="themes/transition/horizontal-slide.css">
   <link rel="stylesheet" href="custom.css">
   
   <!-- Any other extension CSS files go here. --> 
@@ -22,33 +22,48 @@
  
 <!-- Create any number of elements with class slide within the container --> 
 
-<div class="slide">
-  <h1>kriegspieljs</h1>
+<div class="slide" id="intro">
+  <div><h1>kriegspieljs</h1>
+  <cite>slides: <a href="http://carpeliam.github.com/kriegspieljs/lightning/">http://carpeliam.github.com/kriegspieljs/lightning</a></cite></div>
 </div>
   
   <div class="slide">
     <h2>who are you?</h2>
     <ul>
-      <li>liam morley</li>
+      <li><a href="http://www.carpeliam.com/">liam morley</a></li>
       <li>software developer, the <span class="mitre">mitre</span> corporation</li>
-      <li>web enthusiast</li>
+      <li>web/open source enthusiast</li>
     </ul>
   </div>
 
 <div class="slide">
   <h2>what's kriegspiel?</h2>
-  <iframe width="750" height="550" src="http://en.wikipedia.org/wiki/Kriegspiel_(chess)" frameborder="0"></iframe>
+  <iframe width="95%" height="380" src="http://en.wikipedia.org/wiki/Kriegspiel_(chess)" frameborder="0"></iframe>
+  <div style="text-align: right; margin-top: 0px; font-size: 80%">
+    <cite><a href="http://en.wikipedia.org/wiki/Kriegspiel_(chess)">http://en.wikipedia.org/wiki/Kriegspiel_(chess)</a></cite>
+  </div>
+  <div width="95%">
+    <ul>
+      <li>move-based (like chess)</li>
+      <li>can't see opponent's pieces</li>
+      <li>three boards: white, black, and umpire/spectators</li>
+    </ul>
+  </div>
 </div>
 
 <div class="slide">
-  <h2>rules:</h2>
+  <h2>that's... pretty nerdy. why?</h2>
   <ul>
-    <li>move-based (like chess)</li>
-    <li>can't see opponent's pieces</li>
-    <li>three boards: white, black, and umpire/spectators</li>
+    <li class="slide">play with friend in Europe (without having to pay)</li>
+    <li class="slide">improve my html5 skillz
+      <ul>
+        <li><a href="http://nodejs.org/">node.js</a></li>
+        <li>Web Sockets (w/<a href="http://socket.io/">socket.io</a>)</li>
+        <li>CSS3</li>
+      </ul>
+    </li>
   </ul>
 </div>
-
 
 <div class="slide">
   <h2>59 second demo</h2>
@@ -57,6 +72,167 @@
   </video>
   <div id="demo-notes"></div>
   <div id="small-notes"></div>
+</div>
+
+<div class="slide code-example">
+  <h2>what's the code look like?</h2>
+  <div class="code" mode="javascript" style="display: none;">class Board
+  # initialize constants, like WHITE, BLACK, QUEEN, ROOK, etc
+  constructor: (@options = {}) ->
+    @squares = []
+    @squares[i] = [] for i in [0..8]
+    @init()
+
+  init: ->
+    @squares[0][0] = @squares[7][0] = WHITE*ROOK
+    # ...
+
+  canMove: (xOrig, yOrig, xNew, yNew) ->
+    return false if !@squares[xNew]? or !@squares[xNew][yNew]?
+    color = @color(xOrig, yOrig)
+    return false if color != @turn or color is @color(xNew, yNew)
+    return false if @moveResultsInCheck(xOrig, yOrig, xNew, yNew)
+    switch @pieceType(xOrig, yOrig)
+      when PAWN
+        # ...
+      when KNIGHT
+        # ...
+      when BISHOP
+        return false if Math.abs(xNew - xOrig) != Math.abs(yNew - yOrig)
+        return false if @passesOverPieces(xOrig, yOrig, xNew, yNew)
+      # when ...
+    true
+
+  # ...
+module.exports = Board</div>
+</div>
+
+<div class="slide code-example">
+  <h2>code, part deux: tests (jasmine)</h2>
+  <div class="code" mode="javascript" style="display: none;">describe "Board", ->
+  board = undefined
+  onCheck = jasmine.createSpy('onCheck')
+  beforeEach ->
+    Board = require("#{__dirname}/../../lib/Board")
+    board = new Board(onCheck: onCheck)
+
+  describe "a piece", ->
+    it "can't move off the board", ->
+      expect(board.canMove(0, 0, 0, -1)).toBeFalsy()
+
+    it "can't capture a piece of the same color", ->
+      expect(board.canMove(4, 0, 4, 1)).toBeFalsy()
+      board.forceMove 4, 1, 4, 3
+      expect(board.canMove(4, 0, 4, 1)).toBeTruthy()
+
+  describe "a knight", ->
+    it "moves in an L shape", ->
+      board.forceMove 1, 0, 4, 4
+      expect(board.canMove(4, 4, 5, 2)).toBeTruthy()
+
+  describe "a king", ->
+    it "fires event when placed in check", ->
+      board.forceMove 3, 0, 5, 3
+      expect(board.move 5, 3, 5, 6).toBeTruthy()
+      expect(onCheck).toHaveBeenCalled()
+
+  # ...</div>
+</div>
+
+<div class="slide code-example">
+  <h2>code, part tres: socket.io</h2>
+  <div class="code" mode="javascript" style="display: none;">@channel.on 'connection', (socket) =>
+  socket.on "nickname.set", (name) =>
+    @clients[getID(socket)] = id: socket.id, nickname: name
+    @channel.emit 'room.list', (client.nickname for id, client of @clients)
+    socket.broadcast.emit 'announcement', "#{name} connected"
+    socket.emit 'sit', 'white', @clients[@white] if @white?
+    socket.emit 'sit', 'black', @clients[@black] if @black?
+
+  socket.on 'sit', (color) =>
+    # is this seat empty? if so...
+    @channel.emit 'sit', color, @clients[getID(socket)] if canSit
+
+  socket.on 'board.move', (from, to, callback) =>
+    if @currentPlayer() == getID(socket) and @board.move from.x, from.y, to.x, to.y
+      callback(true) if callback?
+      @channel.emit 'board.move', from, to
+  
+  # ...</div>
+</div>
+
+<div class="slide code-example">
+  <h2>code, part catorce: client/jQuery</h2>
+  <div class="code" mode="javascript" style="display: none;">var Board = require('./board');
+
+$.fn.coordinates = function() {
+  var self = $(this[0]);
+  if ($('#board td').index(self) == -1) {
+    return undefined;
+  }
+  var x = self.siblings().andSelf().index(self);
+  var y = 7 - $('#board tr').index(self.parent());
+  return {'x':x, 'y':y};
+};
+
+$(document).ready(function() {
+  $('#board td').droppable({
+    drop: function(event, ui) {
+      var tile = $(this);
+      var from = ui.draggable.parent().coordinates();
+      var to = tile.coordinates();
+      client.room.emit('board.move', from, to, function(success) {
+        if (success) {
+          client.board.move(from.x, from.y, to.x, to.y);
+          tile.children().remove().end().append(ui.draggable);
+        }
+      });
+    }
+  });
+});</div>
+</div>
+
+<div class="slide">
+  <h2>so what's so good about this?</h2>
+  <ul>
+    <li>has been a pretty good learning experience</li>
+    <li>socket.io is pretty rockin'</li>
+    <li>also, browserify? lets you use your server-side code on the client? pretty rockin'.</li>
+    <li>node.js was a blast, AAA+++, would use again</li>
+    <li>CoffeeScript felt fresh and clean</li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h2>sounds positive. any negatives?</h2>
+  <ul>
+    <li>not quite sure how to build unit tests around socket.io.</li>
+    <li>found myself wanting to write functions inside of functions as a replacement for private methods, this seems smelly.</li>
+    <li>still not finished:
+      <ul>
+        <li>security is weak</li>
+        <li>some rules haven't been implemented yet</li>
+        <li>would like to add multiple rooms, lobby</li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h2>take-aways</h2>
+  <ul>
+    <li>all of this technology is pretty cool</li>
+    <li>if this is something you're interested in, talk to me</li>
+    <li>if you see any weak spots in this code, talk to me</li>
+    <li>access the code at <a href="https://github.com/carpeliam/kriegspieljs/">https://github.com/carpeliam/kriegspieljs</a></li>
+    <li>access the slides at <a href="http://carpeliam.github.com/kriegspieljs/lightning/">http://carpeliam.github.com/kriegspieljs/lightning</a></li>
+    <li>play a little kriegspiel at <a href="http://kriegspiel.carpeliam.com:8124/">http://kriegspiel.carpeliam.com:8124</a></li>
+  </ul>
+</div>
+
+<div class="slide">
+  <h2>thank you!</h2>
+  <p>Pop Quiz: name the two pieces of open source code contributed in part by members of the Bocoup team in this presentation.</p>
 </div>
 
 <!-- Other extension HTML snippets go here, at the bottom of the deck container. --> 
@@ -76,7 +252,7 @@
     $.deck('.slide');
     var pop = Popcorn("#demo");
     
-    pop.footnote({
+    pop.mute().footnote({
       start: 7,
       end: 11,
       text: "Jack and Jill sign in",
@@ -128,15 +304,14 @@
       target: "demo-notes"
     }).footnote({
       start: 54,
-      end: 59,
       text: "Fool's mate. The client has callbacks for check and mate, and announces the winner/loser.",
       target: "demo-notes"
     });
     
     $(document).bind('deck.change', function(event, from, to) {
-      if (to === 4) {
+      if (to === 7) {
         pop.play();
-      } else if (from === 4) {
+      } else if (from === 7) {
         pop.pause();
       }
     });
