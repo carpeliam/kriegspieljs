@@ -12,18 +12,18 @@ class Room
     
     @channel.on 'connection', (socket) =>
       socket.on "nickname.set", (name) =>
-        @clients[getID(socket)] = nickname: name
+        @clients[getID(socket)] = id: socket.id, nickname: name
         @channel.emit 'room.list', (client.nickname for id, client of @clients)
         socket.broadcast.emit 'announcement', "#{name} connected"
-        socket.emit 'sit', 'white', @clients[@white].nickname if @white?
-        socket.emit 'sit', 'black', @clients[@black].nickname if @black?
+        socket.emit 'sit', 'white', @clients[@white] if @white?
+        socket.emit 'sit', 'black', @clients[@black] if @black?
       
       socket.on 'sit', (color) =>
         canSit = switch color
           when 'white' then @sitAsWhite socket
           when 'black' then @sitAsBlack socket
           else false
-        @channel.emit 'sit', color, {id: socket.id, nickname: @clients[getID(socket)].nickname} if canSit
+        @channel.emit 'sit', color, @clients[getID(socket)] if canSit
       
       socket.on 'stand', (color) =>
         canStand = switch color
