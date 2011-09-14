@@ -66,7 +66,7 @@
 </div>
 
 <div class="slide">
-  <h2>59 second demo</h2>
+  <h2><strike>60</strike> 30 second demo</h2>
   <video width="95%" id="demo">
     <source src="video.high.m4v"></source>
   </video>
@@ -197,7 +197,7 @@ $(document).ready(function() {
   <ul>
     <li>has been a pretty good learning experience</li>
     <li>socket.io is pretty rockin'</li>
-    <li>also, browserify? lets you use your server-side code on the client? pretty rockin'.</li>
+    <li>also, browserify? lets you use your server-side code on the client, and is pretty rockin'.</li>
     <li>node.js was a blast, AAA+++, would use again</li>
     <li>CoffeeScript felt fresh and clean</li>
   </ul>
@@ -252,7 +252,7 @@ $(document).ready(function() {
     $.deck('.slide');
     var pop = Popcorn("#demo");
     
-    pop.mute().footnote({
+    pop.mute().playbackRate(2).footnote({
       start: 7,
       end: 11,
       text: "Jack and Jill sign in",
@@ -270,7 +270,7 @@ $(document).ready(function() {
     }).footnote({
       start: 18,
       end: 24,
-      text: "How are we going to play an entire game of chess? There's only 40 seconds left in this demo!",
+      text: "How are we going to play an entire game of chess? There's only 20 seconds left in this demo!",
       target: "demo-notes"
     }).footnote({
       start: 24,
@@ -279,21 +279,21 @@ $(document).ready(function() {
       target: "demo-notes"
     }).footnote({
       start: 31,
-      end: 39,
+      end: 38,
       text: "Whenever a move is made, the current player's box flashes (<a href=\"http://www.w3.org/TR/css3-animations/\">CSS3 keyframe animation</a>)",
       target: "demo-notes"
     }).footnote({
-      start: 40,
+      start: 38,
       end: 46,
       text: "I have no way of knowing where my opponent's pieces are!",
       target: "demo-notes"
     }).footnote({
-      start: 43,
+      start: 42,
       end: 46,
       text: "*",
       target: "demo-notes"
     }).footnote({
-      start: 43,
+      start: 42,
       end: 46,
       text: "*There are actually a few ways to cheat. Shhh.",
       target: "small-notes"
