@@ -42,3 +42,11 @@ span.mitre {
   margin-bottom: 4px;
   max-height: 500px;
 }
+
+.slide ul {
+  font-size: 30px;
+}
+
+.slide ul.small {
+  font-size: 24px;
+}
