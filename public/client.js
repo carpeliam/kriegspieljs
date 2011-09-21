@@ -83,6 +83,21 @@ var client = {
             client.board.move(from.x, from.y, to.x, to.y);
           }
           $('#white, #black').toggleClass('active');
+          if ($('#' + client.playingAs).hasClass('active')) {
+            var pawnCaptures = client.board.pawnCaptures();
+            // Depending on the rules we want, we can decide how much
+            // information to share.
+            // #1. Tell the player only that pawn captures exist.
+            // if (pawnCaptures.length > 0) {
+            //   publishMessage('There are pawn captures.', 'notice');
+            // }
+            for (pawn in pawnCaptures) {
+              // #2. Tell the player which pawns can make captures.
+              publishMessage('The pawn on ' + pawn + ' can make a capture.', 'notice');
+              // #3. Tell the player which pawns can capture which squares.
+              // publishMessage('The pawn on ' + pawn + ' can capture on ' + pawnCaptures[pawn].join(' and ') + '.', 'notice');
+            }
+          }
         });
         
         client.room.on('board.reset', function(board) {

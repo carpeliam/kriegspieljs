@@ -40,10 +40,29 @@ class Board
   valueAt: (x,y) ->
     @squares[x][y]
   
+  algebraicNotationFor: (x,y) ->
+    "#{['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'][x]}#{y + 1}"
+  
   findPiece: (value) ->
     for x in [0..7]
       for y in [0..7]
         return [x, y] if @valueAt(x, y) is value
+  
+  findPieces: (value) ->
+    pieces = []
+    for x in [0..7]
+      for y in [0..7]
+        pieces.push('x':x, 'y':y) if @valueAt(x, y) is value
+    return pieces
+  
+  pawnCaptures: ->
+    captures = {}
+    for pawn in @findPieces(@turn * PAWN)
+      spaces = []
+      spaces.push @algebraicNotationFor(pawn.x - 1, pawn.y + @turn) if @canMove(pawn.x, pawn.y, pawn.x - 1, pawn.y + @turn)
+      spaces.push @algebraicNotationFor(pawn.x + 1, pawn.y + @turn) if @canMove(pawn.x, pawn.y, pawn.x + 1, pawn.y + @turn)
+      captures[@algebraicNotationFor(pawn.x, pawn.y)] = spaces if spaces.length isnt 0
+    return captures
   
   pieceType: (x, y) ->
     return undefined if @valueAt(x, y) == UNOCCUPIED

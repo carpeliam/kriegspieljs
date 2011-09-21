@@ -7,6 +7,12 @@ describe "Board", ->
     Board = require("#{__dirname}/../../lib/Board")
     board = new Board(onForcedMove: onForcedMove, onCheck: onCheck, onMate: onMate)
   
+  describe "#algebraicNotationFor", ->
+    it "translates x,y to a point", ->
+      expect(board.algebraicNotationFor(0, 0)).toBe 'a1'
+      expect(board.algebraicNotationFor(7, 7)).toBe 'h8'
+    
+  
   describe "#pieceType", ->
     it "should be undefined when unoccupied", ->
       for i in [0...8]
@@ -94,6 +100,21 @@ describe "Board", ->
     it "shouldn't be able to advance onto another piece", ->
       board.forceMove 0, 1, 0, 5
       expect(board.canMove(0, 5, 0, 6)).toBeFalsy()
+    
+    it "should be able to capture a piece diagonally in front of it", ->
+      board.forceMove 4, 1, 4, 3
+      expect(board.canMove(4, 3, 3, 4)).toBeFalsy()
+      board.forceMove 3, 6, 3, 4
+      expect(board.canMove(4, 3, 3, 4)).toBeTruthy()
+    
+    describe "#pawnCaptures", ->
+      it "returns which pawns can capture which squares", ->
+        board.forceMove 4, 1, 4, 3
+        board.forceMove 3, 6, 3, 4
+        expect(board.pawnCaptures().e4).toEqual ['d5']
+        board.forceMove 5, 6, 5, 4
+        expect(board.pawnCaptures().e4).toEqual ['d5', 'f5']
+      
     
   
   describe "a knight", ->
