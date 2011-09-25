@@ -77,7 +77,7 @@
 
 <div class="slide code-example">
   <h2>what's the code look like?</h2>
-  <div class="code" mode="javascript" style="display: none;">class Board
+  <div class="code" mode="coffeescript" style="display: none;">class Board
   # initialize constants, like WHITE, BLACK, QUEEN, ROOK, etc
   constructor: (@options = {}) ->
     @squares = []
@@ -110,7 +110,7 @@ module.exports = Board</div>
 
 <div class="slide code-example">
   <h2>code, part deux: tests (jasmine)</h2>
-  <div class="code" mode="javascript" style="display: none;">describe "Board", ->
+  <div class="code" mode="coffeescript" style="display: none;">describe "Board", ->
   board = undefined
   onCheck = jasmine.createSpy('onCheck')
   beforeEach ->
@@ -142,7 +142,7 @@ module.exports = Board</div>
 
 <div class="slide code-example">
   <h2>code, part tres: socket.io</h2>
-  <div class="code" mode="javascript" style="display: none;">@channel.on 'connection', (socket) =>
+  <div class="code" mode="coffeescript" style="display: none;">@channel.on 'connection', (socket) =>
   socket.on "nickname.set", (name) =>
     @clients[getID(socket)] = id: socket.id, nickname: name
     @channel.emit 'room.list', (client.nickname for id, client of @clients)
@@ -246,6 +246,9 @@ $(document).ready(function() {
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
 <script src="deck.core.js"></script>
 <script src="extensions/navigation/deck.navigation.js"></script>
+<script src="extensions/codemirror/codemirror.js"></script>
+<script src="extensions/codemirror/mode/javascript/javascript.js"></script>
+<script src="extensions/codemirror/mode/coffeescript/coffeescript.js"></script>
 <script src="extensions/codemirror/deck.codemirror.js"></script>
 <script src="popcorn-complete.min.js"></script>
  
