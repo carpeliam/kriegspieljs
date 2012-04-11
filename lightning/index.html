@@ -77,7 +77,7 @@
 
 <div class="slide code-example">
   <h2>what's the code look like?</h2>
-  <div class="code" mode="coffeescript" style="display: none;">class Board
+  <textarea class="code" mode="coffeescript" style="display: none;">class Board
   # initialize constants, like WHITE, BLACK, QUEEN, ROOK, etc
   constructor: (@options = {}) ->
     @squares = []
@@ -105,12 +105,12 @@
     true
 
   # ...
-module.exports = Board</div>
+module.exports = Board</textarea>
 </div>
 
 <div class="slide code-example">
   <h2>code, part deux: tests (jasmine)</h2>
-  <div class="code" mode="coffeescript" style="display: none;">describe "Board", ->
+  <textarea class="code" mode="coffeescript" style="display: none;">describe "Board", ->
   board = undefined
   onCheck = jasmine.createSpy('onCheck')
   beforeEach ->
@@ -137,12 +137,12 @@ module.exports = Board</div>
       expect(board.move 5, 3, 5, 6).toBeTruthy()
       expect(onCheck).toHaveBeenCalled()
 
-  # ...</div>
+  # ...</textarea>
 </div>
 
 <div class="slide code-example">
   <h2>code, part tres: socket.io</h2>
-  <div class="code" mode="coffeescript" style="display: none;">@channel.on 'connection', (socket) =>
+  <textarea class="code" mode="coffeescript" style="display: none;">@channel.on 'connection', (socket) =>
   socket.on "nickname.set", (name) =>
     @clients[getID(socket)] = id: socket.id, nickname: name
     @channel.emit 'room.list', (client.nickname for id, client of @clients)
@@ -159,12 +159,12 @@ module.exports = Board</div>
       callback(true) if callback?
       @channel.emit 'board.move', from, to
   
-  # ...</div>
+  # ...</textarea>
 </div>
 
 <div class="slide code-example">
   <h2>code, part catorce: client/jQuery</h2>
-  <div class="code" mode="javascript" style="display: none;">var Board = require('./board');
+  <textarea class="code" mode="coffeescript" style="display: none;">var Board = require('./board');
 
 $.fn.coordinates = function() {
   var self = $(this[0]);
@@ -190,7 +190,7 @@ $(document).ready(function() {
       });
     }
   });
-});</div>
+});</textarea>
 </div>
 
 <div class="slide">
