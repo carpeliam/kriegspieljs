@@ -1,0 +1,93 @@
+#intro > div {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  text-align: center;
+}
+
+#intro > div * {
+  position: static;
+}
+
+span.mitre {
+  color: #0b7495;
+}
+
+.slide div.center.slide {
+  position: absolute !important;
+  font-size: 3em;
+  font-weight: bold;
+  left: 0 !important;
+  right: 0 !important;
+  top: 50% !important;
+  text-align: center;
+}
+
+#small-notes {
+  font-size: 50%;
+}
+
+.csstransforms.boxshadow .deck-container pre:before, .csstransforms.boxshadow .deck-container pre:after {
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+.CodeMirror-lines {
+  background: rgba(60, 60, 60, 0.1);
+}
+
+.code-example .CodeMirror {
+  margin-bottom: 4px;
+  max-height: 500px;
+}
+
+.slide ul {
+  font-size: 30px;
+}
+
+.slide ul.small {
+  font-size: 24px;
+}
+
+.slide .stamp {
+  text-transform: uppercase;
+  -webkit-transform: translate(0px, -100px) rotate(-27deg);
+  color: red;
+  font-size: 3em;
+  font-weight: bold;
+}
+
+.deck-container canvas {
+  display: block;
+  margin: 0 auto;
+}
+
+#spock, #chess-nerd, #baboon {
+  opacity: 1;
+}
+
+#spock {
+  position: absolute;
+  left: 50px;
+  top: 10px;
+}
+
+#spock * {
+  -webkit-transform: translate(0px, 40px) rotate(-15deg);
+}
+
+.deck-child-current #chess-nerd {
+  position: absolute;
+  -webkit-transform: translate(-20px, 20px) rotate(15deg);
+  top: 10px;
+  right: 0px;
+}
+
+.deck-child-current #baboon:not(.deck-next) {
+  position: absolute;
+  -webkit-transform: translate(-20px, 20px) rotate(5deg);
+  top: 200px;
+  left: 25%;
+}
