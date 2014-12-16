@@ -3,6 +3,9 @@
   "name": "kriegspieljs",
   "description": "Kriegspiel Chess game",
   "version": "0.1.0",
+  "scripts": {
+    "test": "jasmine-node --coffee spec/"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/carpeliam/kriegspieljs"
@@ -17,6 +20,6 @@
     "browserify": "1.5.0"
   },
   "devDependencies": {
-    "jasmine-node": "1.0.6"
+    "jasmine-node": "1.14.3"
   }
 }
