@@ -1,3 +1,6 @@
+kriegspiel.js [![Build Status](https://travis-ci.org/carpeliam/kriegspieljs.svg?branch=master)](https://travis-ci.org/carpeliam/kriegspieljs)
+=============
+
 [Kriegspiel explained][1]. This is an implementation of Kriegspiel as a
 [node.js](http://nodejs.org) application, using [socket.io](http://socket.io)
 for pushing moves from the server to the client and back. The code is written
