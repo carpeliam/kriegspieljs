@@ -32,22 +32,22 @@ var client = {
         client.room = io.connect(room);
         client.loadBoard(board);
         client.room.emit('nickname.set', client.name);
-        
+
         client.room.on('announcement', function(message) {
           publishMessage(message, 'notice');
         });
-        
+
         client.room.on('speak', function(speaker, message) {
           publishMessage(speaker + ': ' + message);
         });
-        
+
         client.room.on('room.list', function(nicknames) {
           $('#people').empty();
           for (var i in nicknames) {
             $('#people').append($('<span>').text(nicknames[i]));
           }
         });
-        
+
         client.room.on('sit', function(color, player) {
           publishMessage(player.nickname + ' sat down as ' + color, 'notice');
           if (player.id == client.socket.socket.sessionid) {
@@ -64,17 +64,17 @@ var client = {
             publishMessage("Let's get started!", 'notice');
           }
         });
-        
+
         client.room.on('stand', function(color) {
           publishMessage(color + ' stood up', 'notice');
           var oppositeColor = (color == 'white') ? 'black' : 'white';
           $('#' + color).text('sit as ' + color).attr('disabled', client.playingAs == oppositeColor);
           $('#' + oppositeColor).attr('disabled', client.playingAs != oppositeColor && $('#' + oppositeColor).text().indexOf(oppositeColor) === 0);
-          
+
           if (client.playingAs == color)
             delete client.playingAs;
         });
-        
+
         client.room.on('board.move', function(from, to) {
           client.gameInProgress = true;
           var piece = getCell(from.x, from.y).children('a');
@@ -82,7 +82,7 @@ var client = {
             getCell(to.x, to.y).children().remove().end().append(piece);
             client.board.move(from.x, from.y, to.x, to.y);
           }
-          $('#white, #black').toggleClass('active');
+          client.toggleTurn();
           if ($('#' + client.playingAs).hasClass('active')) {
             var pawnCaptures = client.board.pawnCaptures();
             // Depending on the rules we want, we can decide how much
@@ -99,7 +99,12 @@ var client = {
             }
           }
         });
-        
+
+        client.room.on('board.promote', function(square, promotionChoice) {
+          client.board.promote(square, promotionChoice);
+          client.toggleTurn();
+        });
+
         client.room.on('board.reset', function(board) {
           client.loadBoard(board);
           $('.seat').removeClass('active winning losing');
@@ -111,8 +116,47 @@ var client = {
     this.room.emit('speak', message);
     publishMessage(this.name + ': ' + message);
   },
+  toggleTurn: function() {
+    if (this.board.turn == 1) {
+      $('#white').addClass('active');
+      $('#black').removeClass('active');
+    } else {
+      $('#white').removeClass('active');
+      $('#black').addClass('active');
+    }
+  },
   loadBoard: function(board) {
     // board.__proto__ = Board.prototype; // deprecated
+    var assignPieceToSquare = function(coords, $square) {
+      var pieceType = client.board.pieceType(coords.x, coords.y),
+          value = client.board.valueAt(coords.x, coords.y),
+          isWhite = value > 0;
+      switch (pieceType) {
+        case 1: // PAWN
+          $square.addClass('pawn');
+          $square.html(isWhite ? '&#9817;' : '&#9823;');
+          break;
+        case 2: // KNIGHT
+          $square.addClass('knight');
+          $square.html(isWhite ? '&#9816;' : '&#9822;');
+          break;
+        case 3: // BISHOP
+          $square.addClass('bishop');
+          $square.html(isWhite ? '&#9815;' : '&#9821;');
+          break;
+        case 4: // ROOK
+          $square.addClass('rook');
+          $square.html(isWhite ? '&#9814;' : '&#9820;');
+          break;
+        case 5: // QUEEN
+          $square.addClass('queen');
+          $square.html(isWhite ? '&#9813;' : '&#9819;');
+          break;
+        case 6: // KING
+          $square.addClass('king');
+          $square.html(isWhite ? '&#9812;' : '&#9818;');
+      }
+    };
     this.board = new Board({
       onForcedMove: function(xOrig, yOrig, xNew, yNew) {
         var piece = getCell(xOrig, yOrig).children('a');
@@ -126,6 +170,31 @@ var client = {
         client.gameInProgress = false;
         publishMessage('Checkmate.', 'mate');
         $('.active').addClass('winning').siblings('button').addClass('losing');
+      },
+      onAdvancement: function(x, y) {
+        var sqColor = client.board.color(x, y),
+            isCurrentPlayer = client.playingAs == 'white' ? sqColor == 1 : sqColor == -1;
+        if (isCurrentPlayer) {
+          var handlePromotion = function() {
+            var choice = parseInt($('#promotion_choice').val());
+            client.room.emit('board.promote', {x: x, y: y}, choice);
+            $('#promotion').dialog("close");
+          };
+          $('#promotion').dialog({
+            modal: true,
+            width: 325,
+            resizable: false,
+            buttons: {
+              "Promote": handlePromotion
+            }
+          }).submit(function() {
+            handlePromotion();
+            return false;
+          });
+        }
+      },
+      onPromotion: function(x, y, choice) {
+        assignPieceToSquare({x: x, y: y}, getCell(x, y).children('a'));
       }
     });
     for (var prop in board) {
@@ -139,31 +208,7 @@ var client = {
         var link = $('<a href="#"></a>');
         var isWhite = val > 0;
         link.addClass(isWhite ? 'white' : 'black');
-        switch (client.board.pieceType(coords.x, coords.y)) {
-          case 1: // PAWN
-            link.addClass('pawn');
-            link.html(isWhite ? '&#9817;' : '&#9823;');
-            break;
-          case 2: // KNIGHT
-            link.addClass('knight');
-            link.html(isWhite ? '&#9816;' : '&#9822;');
-            break;
-          case 3: // BISHOP
-            link.addClass('bishop');
-            link.html(isWhite ? '&#9815;' : '&#9821;');
-            break;
-          case 4: // ROOK
-            link.addClass('rook');
-            link.html(isWhite ? '&#9814;' : '&#9820;');
-            break;
-          case 5: // QUEEN
-            link.addClass('queen');
-            link.html(isWhite ? '&#9813;' : '&#9819;');
-            break;
-          case 6: // KING
-            link.addClass('king');
-            link.html(isWhite ? '&#9812;' : '&#9818;');
-        }
+        assignPieceToSquare(coords, link);
         $(this).empty().append(link);
       } else {
         $(this).empty();
@@ -212,13 +257,13 @@ $(document).ready(function() {
       return false;
     });
   }
-  
+
   $('#msg').submit(function() {
     client.speak($('#chatmsg').val());
     $('#chatmsg').val('');
     return false;
   });
-  
+
   $('.seat').click(function() {
     var color = $(this).attr('id');
     if (client.playingAs == color) {
@@ -227,7 +272,7 @@ $(document).ready(function() {
       client.sitAs(color);
     }
   });
-  
+
   $('#board td').droppable({
     accept: function(draggable) {
       var from = draggable.parent().coordinates();
