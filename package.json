@@ -4,8 +4,8 @@
   "description": "Kriegspiel Chess game",
   "version": "0.1.0",
   "scripts": {
-    "start": "coffee server.coffee",
-    "test": "jasmine-node --coffee spec/"
+    "start": "./node_modules/.bin/coffee server.coffee",
+    "test": "./node_modules/.bin/jasmine-node --coffee spec/"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,6 @@
     "browserify": "1.5.0"
   },
   "devDependencies": {
-    "jasmine-node": "1.14.3"
+    "jasmine-node": "1.14.5"
   }
 }

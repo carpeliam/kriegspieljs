@@ -6,7 +6,7 @@ describe "Board", ->
   onAdvancement = jasmine.createSpy('onAdvancement')
   onPromotion   = jasmine.createSpy('onPromotion')
   beforeEach ->
-    Board = require("#{__dirname}/../../lib/Board")
+    Board = require("#{__dirname}/../../lib/board")
     board = new Board {onForcedMove, onCheck, onMate, onAdvancement, onPromotion}
 
   describe "#algebraicNotationFor", ->
