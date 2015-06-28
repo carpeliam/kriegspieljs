@@ -2,6 +2,7 @@
   "author": "Liam Morley <liam@carpeliam.com> (http://www.carpeliam.com)",
   "name": "kriegspieljs",
   "description": "Kriegspiel Chess game",
+  "license": "MIT",
   "version": "0.1.0",
   "scripts": {
     "start": "./node_modules/.bin/coffee server.coffee",
