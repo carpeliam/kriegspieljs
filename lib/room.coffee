@@ -1,4 +1,4 @@
-parseCookie = (require 'connect').utils.parseCookie
+parseCookie = (require 'cookie').parse
 Board = require './board'
 
 getID = (client) ->
@@ -11,7 +11,7 @@ class Room
     @createNewBoard()
 
     @channel.on 'connection', (socket) =>
-      socket.on "nickname.set", (name) =>
+      socket.on 'nickname.set', (name) =>
         @clients[getID(socket)] = id: socket.id, nickname: name
         @channel.emit 'room.list', (client.nickname for id, client of @clients)
         socket.broadcast.emit 'announcement', "#{name} connected"

@@ -1,4 +1,4 @@
-var Board = require('./board');
+var Board = require('./board.coffee');
 
 $.fn.coordinates = function() {
   var self = $(this[0]);
@@ -25,11 +25,11 @@ var client = {
   connect: function(name) {
     this.name = name;
     this.gameInProgress = false;
-    this.socket = io.connect();
+    this.socket = io(location.origin);
     this.socket.on('connect', function() {
       client.socket.emit('nickname.set', client.name);
       client.socket.on('room.join', function(room, board) {
-        client.room = io.connect(room);
+        client.room = io.connect(location.origin + room);
         client.loadBoard(board);
         client.room.emit('nickname.set', client.name);
 
@@ -50,7 +50,7 @@ var client = {
 
         client.room.on('sit', function(color, player) {
           publishMessage(player.nickname + ' sat down as ' + color, 'notice');
-          if (player.id == client.socket.socket.sessionid) {
+          if (player.id == client.socket.id) {
             client.playingAs = color;
             var oppositeColor = (color == 'white') ? 'black' : 'white';
             $('#board a').draggable('option', 'cancel', '.' + oppositeColor).draggable('enable');
