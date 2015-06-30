@@ -1,4 +1,4 @@
 process.chdir __dirname
 
 Kriegspiel = require './lib/kriegspiel'
-new Kriegspiel()
+new Kriegspiel port: process.env.PORT
