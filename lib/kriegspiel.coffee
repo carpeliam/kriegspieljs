@@ -3,8 +3,7 @@ connect = require 'connect'
 
 serveStatic = require 'serve-static'
 logger = require 'connect-logger'
-Cookies = require 'cookies'
-session = require 'cookie-session'
+session = require 'express-session'
 browserify = require 'browserify-middleware'
 
 # Board = require './board'
@@ -26,13 +25,8 @@ Kriegspiel = (options = {}) ->
     http = require('http').createServer(server)
     server.use serveStatic(process.cwd() + '/public')
     server.use logger()
-    server.use Cookies.connect()
     server.use session(secret: 'WarGames')
-    # server.use require('connect-browserify')
-    #   mount:   '/require.js'
-    #   require: ['./lib/board.coffee']
     server.use '/require.js', browserify ['./board.coffee'], basedir: './lib', transform: [require('coffeeify')]
-    # server.use '/board.js', browserify entry: './lib/board.coffee', transforms: [require('coffeeify')], extensions: ['.js', '.coffee']
 
     io = (require 'socket.io')(http)
 
