@@ -13,7 +13,7 @@
     "url": "https://github.com/carpeliam/kriegspieljs"
   },
   "engines": {
-    "node": "~v0.4.5"
+    "node": "0.12.2"
   },
   "dependencies": {
     "browserify": "^10.2.4",
