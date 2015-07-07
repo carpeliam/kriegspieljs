@@ -30,7 +30,7 @@ class Board
     for y in [2...6]
       @squares[x][y] = UNOCCUPIED for x in [0...8]
 
-    @hasMoved = []
+    @hasMoved = {}
     @hasMoved[WHITE] = king: false, kingsRook: false, queensRook: false
     @hasMoved[BLACK] = king: false, kingsRook: false, queensRook: false
 

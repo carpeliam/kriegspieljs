@@ -224,52 +224,64 @@ describe "Board", ->
 
     describe "when castling", ->
       beforeEach ->
-        board.forceMove 1, 0, 1, 5 # move knight out of the way
-        board.forceMove 2, 0, 2, 5 # move bishop out of the way
-        board.forceMove 3, 0, 3, 5 # move queen out of the way
-        board.forceMove 5, 0, 5, 5 # move bishop out of the way
-        board.forceMove 6, 0, 6, 5 # move knight out of the way
+        for row in [0, 7] # white, black
+          for col in [1, 2, 3, 5, 6] # knight, bishop, queen, bishop, knight
+            board.squares[col][row] = 0 # unoccupied
 
       it "can castle king-side", ->
-        expect(board.move(4, 0, 6, 0)).toBeTruthy()
-        expect(board.valueAt(7, 0)).toBe 0
-        expect(board.valueAt(5, 0)).toBe 4
-        expect(onForcedMove).toHaveBeenCalledWith(7, 0, 5, 0)
+        for row in [0, 7]
+          board.turn = if row is 0 then 1 else -1
+          expect(board.move(4, row, 6, row)).toBeTruthy()
+          expect(board.pieceType(7, row)).toBeUndefined()
+          expect(board.pieceType(5, row)).toBe 4
+          expect(onForcedMove).toHaveBeenCalledWith(7, row, 5, row)
 
       it "can't castle king-side if the king's rook has moved", ->
-        expect(board.canMove(4, 0, 6, 0)).toBeTruthy()
-        board.move 7, 0, 5, 0
-        board.move 0, 6, 0, 5 # advance turn
-        board.move 5, 0, 7, 0
-        board.move 0, 5, 0, 4 # advance turn
-        expect(board.canMove(4, 0, 6, 0)).toBeFalsy()
+        for row in [0, 7]
+          board.turn = if row is 0 then 1 else -1
+          expect(board.canMove(4, row, 6, row)).toBeTruthy()
+          board.move 7, row, 5, row
+          board.turn *= -1 # advance turn
+          board.move 5, row, 7, row
+          board.turn *= -1 # advance turn
+          expect(board.canMove(4, row, 6, row)).toBeFalsy()
 
       it "can castle queen-side", ->
-        expect(board.move(4, 0, 2, 0)).toBeTruthy()
-        expect(board.valueAt(0, 0)).toBe 0
-        expect(board.valueAt(3, 0)).toBe 4
-        expect(onForcedMove).toHaveBeenCalledWith(0, 0, 3, 0)
+        for row in [0, 7]
+          board.turn = if row is 0 then 1 else -1
+          expect(board.move(4, row, 2, row)).toBeTruthy()
+          expect(board.pieceType(0, row)).toBeUndefined()
+          expect(board.pieceType(3, row)).toBe 4
+          expect(onForcedMove).toHaveBeenCalledWith(0, row, 3, row)
 
       it "can't castle queen-side if the queen's rook has moved", ->
-        expect(board.canMove(4, 0, 2, 0)).toBeTruthy()
-        board.move 0, 0, 1, 0
-        board.move 0, 6, 0, 5 # advance turn
-        expect(board.move(4, 0, 2, 0)).toBeFalsy()
+        for row in [0, 7]
+          board.turn = if row is 0 then 1 else -1
+          expect(board.canMove(4, row, 2, row)).toBeTruthy()
+          board.move 0, row, 1, row
+          board.turn *= -1 # advance turn
+          expect(board.move(4, row, 2, row)).toBeFalsy()
 
       it "can't castle out of check", ->
-        board.forceMove 4, 1, 4, 5 # displace white pawn
-        board.forceMove 3, 7, 4, 3 # place black queen on same column as white king
-        expect(board.canMove(4, 0, 6, 0)).toBeFalsy()
+        for row in [0, 7]
+          board.turn = if row is 0 then 1 else -1
+          board.forceMove 4, row + board.turn, 0, 5 # displace pawn
+          board.squares[4][3] = -5 * board.turn # place other queen on same column as white king
+          expect(board.canMove(4, row, 6, row)).toBeFalsy()
 
       it "can't castle through check", ->
-        board.forceMove 5, 1, 5, 5 # displace white pawn
-        board.forceMove 3, 7, 5, 3 # place black queen on column king will pass through
-        expect(board.canMove(4, 0, 6, 0)).toBeFalsy()
+        for row in [0, 7]
+          board.turn = if row is 0 then 1 else -1
+          board.forceMove 5, row + board.turn, 0, 5 # displace pawn
+          board.squares[5][3] = -5 * board.turn # place other queen on column king will pass through
+          expect(board.canMove(4, row, 6, row)).toBeFalsy()
 
       it "can't castle into check", ->
-        board.forceMove 6, 1, 6, 5 # displace white pawn
-        board.forceMove 3, 7, 6, 3 # place black queen on column king will pass into
-        expect(board.canMove(4, 0, 6, 0)).toBeFalsy()
+        for row in [0, 7]
+          board.turn = if row is 0 then 1 else -1
+          board.forceMove 6, row + board.turn, 0, 5 # displace pawn
+          board.squares[6][3] = -5 * board.turn # place other queen on column king will pass into
+          expect(board.canMove(4, row, 6, row)).toBeFalsy()
 
 
 
