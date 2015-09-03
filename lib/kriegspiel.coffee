@@ -1,10 +1,12 @@
 sys = require 'sys'
 connect = require 'connect'
+path = require 'path'
 
 serveStatic = require 'serve-static'
 logger = require 'connect-logger'
 session = require 'express-session'
-browserify = require 'browserify-middleware'
+proxy = require('http-proxy').createProxyServer()
+proxyMiddleware = require('http-proxy-middleware')
 
 # Board = require './board'
 Room = require './room'
@@ -23,10 +25,14 @@ Kriegspiel = (options = {}) ->
   createServer = ->
     server = connect()
     http = require('http').createServer(server)
-    server.use serveStatic(process.cwd() + '/public')
+    server.use serveStatic(process.cwd() + '/pub')
     server.use logger()
     server.use session(secret: 'WarGames')
-    server.use '/require.js', browserify ['./board.coffee'], basedir: './lib', transform: [require('coffeeify')]
+
+    # dev
+    bundle = require '../bundle'
+    bundle()
+    server.use proxyMiddleware('/build', target: 'http://127.0.0.1:3001')
 
     io = (require 'socket.io')(http)
 
