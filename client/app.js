@@ -1,10 +1,13 @@
-console.log('bam');
-
 import React from 'react';
 import $ from 'jquery';
 import 'jquery.cookie';
-import Greeting from './greeting';
+import Square from './square';
 import Board from '../lib/board.coffee';
+import Kriegspiel from './kriegspiel';
+
+import './style/index.scss';
+
+React.render(<Kriegspiel/>, document.getElementById('game'));
 
 $.fn.coordinates = function() {
   var self = $(this[0]);
