@@ -5,12 +5,10 @@ import { DropTarget } from 'react-dnd';
 
 const squareTarget = {
   canDrop(props, monitor) {
-    console.log('canDrop', arguments, monitor.getItem());
-    return props.canDrop();
+    return props.canDrop(monitor.getItem(), {x: props.x, y: props.y});
   },
-  drop(props) {
-    console.log('drop', props);
-    props.drop();
+  drop(props, monitor) {
+    props.drop(monitor.getItem(), {x: props.x, y: props.y});
   }
 }
 

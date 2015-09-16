@@ -22,7 +22,7 @@ function character(props) {
 
 const spec = {
   beginDrag(props) {
-    return {pieceId: character(props)};
+    return {x: props.x, y: props.y};
   },
   canDrag(props) {
     return props.canDrag(props.color);
