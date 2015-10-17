@@ -1,6 +1,6 @@
 import React from 'react';
 import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd/modules/backends/HTML5';
+import HTML5Backend from 'react-dnd-html5-backend';
 import Square from './square';
 import Piece from './piece';
 import Board from '../lib/board.coffee';
