@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import 'jquery.cookie';
 import Square from './square';
@@ -7,7 +8,7 @@ import Kriegspiel from './kriegspiel';
 
 import './style/index.scss';
 
-React.render(<Kriegspiel/>, document.getElementById('game'));
+ReactDOM.render(<Kriegspiel/>, document.getElementById('game'));
 
 $.fn.coordinates = function() {
   var self = $(this[0]);
