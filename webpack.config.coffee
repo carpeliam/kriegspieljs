@@ -23,6 +23,10 @@ config =
       loader: 'babel'
       exclude: [ nodeModulesPath ]
     }
+    # {
+    #   test: require.resolve('react')
+    #   loader: 'expose?React'
+    # }
     {
       test: /\.coffee$/
       loader: 'coffee-loader'

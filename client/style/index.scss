@@ -28,3 +28,11 @@ $icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
     }
   }
 }
+
+.btn-white {
+  @extend .btn-default;
+}
+
+.btn-black {
+  @include button-variant(invert($btn-default-color), invert($btn-default-bg), invert($btn-default-border));
+}

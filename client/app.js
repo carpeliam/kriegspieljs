@@ -10,6 +10,8 @@ import './style/index.scss';
 
 ReactDOM.render(<Kriegspiel/>, document.getElementById('game'));
 
+return;
+// TODO delete everything below as soon as migration is done
 $.fn.coordinates = function() {
   var self = $(this[0]);
   if ($('#board td').index(self) == -1) {

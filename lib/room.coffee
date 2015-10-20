@@ -38,8 +38,10 @@ class Room
 
       socket.on 'board.move', (from, to, callback) =>
         if @currentPlayer() == getID(socket) and @board.move from.x, from.y, to.x, to.y
-          callback(true) if callback?
+          callback?(true)
           @channel.emit 'board.move', from, to
+        else
+          callback?(false)
 
       socket.on 'board.promote', ({x, y}, promotionChoice) =>
         if @board.promote {x, y}, promotionChoice
@@ -54,7 +56,8 @@ class Room
           @black = undefined
           @channel.emit 'stand', 'black'
         @checkForReset()
-        socket.broadcast.emit 'announcement', "#{@clients[identity].nickname} disconnected"
+        if @clients[identity]?
+          socket.broadcast.emit 'announcement', "#{@clients[identity].nickname} disconnected"
         delete @clients[identity]
         socket.broadcast.emit 'room.list', (client.nickname for id, client of @clients)
 

@@ -11,6 +11,7 @@ module.exports = function(config) {
     files: ['spec/client/*_spec.js'],
 
     webpack: {
+      // devtool: 'eval-source-map',
       output: {
         path: path.resolve(webpackConfig.output.path, 'test'),
         filename: 'bundle.js'
