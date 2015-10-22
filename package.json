@@ -58,6 +58,7 @@
     "mocket-io": "carpeliam/mocket-io",
     "node-sass": "^3.3.2",
     "phantomjs": "^1.9.18",
+    "react-addons-perf": "^0.14.0",
     "react-addons-test-utils": "^0.14.0",
     "react-dnd-test-backend": "^1.0.0",
     "sass-loader": "^2.0.1",

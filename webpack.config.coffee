@@ -11,6 +11,7 @@ config =
   entry: [
     "webpack-dev-server/client?http://localhost:#{port}"
     'webpack/hot/dev-server'
+    path.resolve appPath, '_dev.js'
     path.resolve appPath, 'app.js'
   ]
   output:
@@ -23,10 +24,11 @@ config =
       loader: 'babel'
       exclude: [ nodeModulesPath ]
     }
-    # {
-    #   test: require.resolve('react')
-    #   loader: 'expose?React'
-    # }
+    {
+      # development only
+      test: require.resolve('react-addons-perf')
+      loader: 'expose?Perf'
+    }
     {
       test: /\.coffee$/
       loader: 'coffee-loader'
