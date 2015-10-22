@@ -91,19 +91,39 @@ import BoardCommunicator from '../../client/board-communicator';
 describe('BoardCommunicator', () => {
   var server = new Server();
   var client = new Client(server);
-  client.connect.connect = client.connect;
   var communicator;
+  var noop = () => {}
+  function newBoardCommunicator(props = {}) {
+    var boardProps = {}
+    boardProps.onBoardUpdate = (props.onBoardUpdate === undefined) ? noop : props.onBoardUpdate;
+    boardProps.onRoomUpdate = (props.onRoomUpdate === undefined) ? noop : props.onRoomUpdate;
+    boardProps.onRemoteMove = (props.onRemoteMove === undefined) ? noop : props.onRemoteMove;
+    boardProps.onPlayerSit = (props.onPlayerSit === undefined) ? noop : props.onPlayerSit;
+    return new BoardCommunicator(client, boardProps);
+  }
   beforeEach(() => {
-    communicator = new BoardCommunicator(client.connect);
+    communicator = newBoardCommunicator();
   });
 
+  it('expects valid onBoardUpdate', () => {
+    expect(function() { newBoardCommunicator({onBoardUpdate: null}) }).toThrow(new Error('onBoardUpdate not defined'));
+  });
+  it('expects valid onRoomUpdate', () => {
+    expect(function() { newBoardCommunicator({onRoomUpdate: null}) }).toThrow(new Error('onRoomUpdate not defined'));
+  });
+  it('expects valid onRemoteMove', () => {
+    expect(function() { newBoardCommunicator({onRemoteMove: null}) }).toThrow(new Error('onRemoteMove not defined'));
+  });
+  it('expects valid onPlayerSit', () => {
+    expect(function() { newBoardCommunicator({onPlayerSit: null}) }).toThrow(new Error('onPlayerSit not defined'));
+  });
   describe('when a user connects', () => {
     it('sends a connect message to the server', (done) => {
       server.on('connection', done);
       communicator.connectAs('jim');
     });
   });
-  describe('when a user connects to a room', () => {
+  xdescribe('when a user connects to a room', () => {
     var socket;
     beforeEach((done) => {
       let clientConnected = false;

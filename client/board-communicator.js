@@ -1,13 +1,14 @@
 export default class BoardCommunicator {
-  constructor(io, args = {}) {
+  constructor(io, args) {
     this.io = io;
-    this.updateBoard = args.onBoardUpdate;
-    this.updateRoomList = args.onRoomUpdate;
-    this.processMove = args.onRemoteMove;
-    this.onPlayerSit = args.onPlayerSit;
+
+    this.updateBoard = args.onBoardUpdate || (() => { throw new Error('onBoardUpdate not defined') })();
+    this.updateRoomList = args.onRoomUpdate || (() => { throw new Error('onRoomUpdate not defined') })();
+    this.processMove = args.onRemoteMove || (() => { throw new Error('onRemoteMove not defined') })();
+    this.onPlayerSit = args.onPlayerSit || (() => { throw new Error('onPlayerSit not defined') })();
   }
   connectAs(name) {
-    this.socket = this.io(location.origin);
+    this.socket = this.io.connect(location.origin);
     this.socket.on('room.join', (room, board) => {
       console.log('room.join', room, board);
       this.room = this.io.connect(location.origin + room);

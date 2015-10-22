@@ -89,8 +89,8 @@ class Kriegspiel extends React.Component {
     }
   }
   render() {
-    return <div>
-      <div className="board">
+    return <div className="row">
+      <div className="board col-md-8">
         {[7,6,5,4,3,2,1,0].map((y) =>
           [0,1,2,3,4,5,6,7].map((x) =>
             <Square x={x} y={y} canDrop={this.canDrop.bind(this)} drop={this.drop.bind(this)}>
@@ -100,12 +100,15 @@ class Kriegspiel extends React.Component {
         )}
       </div>
 
-      <SeatList playerColor={this.state.playerColor}
-                white={this.state.playingAs.white}
-                black={this.state.playingAs.black}
-                sitOrStandAs={this.sitOrStandAs.bind(this)} />
+      <div className="col-md-4">
+        <SeatList playerColor={this.state.playerColor}
+                  white={this.state.playingAs.white}
+                  black={this.state.playingAs.black}
+                  sitOrStandAs={this.sitOrStandAs.bind(this)} />
 
-      <RoomList members={this.state.members} />
+        <RoomList members={this.state.members} />
+      </div>
+      
       <UserNamePrompter user={this.state.user} onEnter={this.logIn.bind(this)} />
     </div>;
   }

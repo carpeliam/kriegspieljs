@@ -40,7 +40,7 @@ class Piece extends React.Component {
   render() {
     const { connectDragSource, isDragging } = this.props;
     return connectDragSource(
-      <a style={{opacity: isDragging ? 0.5 : 1}}>{character(this.props)}</a>
+      <span style={{opacity: isDragging ? 0.5 : 1}}>{character(this.props)}</span>
     );
   }
 }
