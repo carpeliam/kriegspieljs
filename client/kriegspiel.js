@@ -1,14 +1,17 @@
 import $ from 'jquery';
 import 'jquery.cookie';
+
 import React from 'react';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
+
 import Square from './square';
 import Piece from './piece';
 import SeatList from './seat-list';
 import RoomList from './room-list';
 import BoardCommunicator from './board-communicator';
 import UserNamePrompter from './username-prompter';
+
 import Board from '../lib/board.coffee';
 
 class Kriegspiel extends React.Component {
