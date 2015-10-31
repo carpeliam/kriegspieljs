@@ -5,8 +5,9 @@
   "license": "MIT",
   "version": "0.1.0",
   "scripts": {
-    "start": "./node_modules/.bin/coffee server.coffee",
-    "test": "./node_modules/.bin/jasmine-node --coffee spec/"
+    "start": "coffee server.coffee",
+    "test": "jasmine-node --coffee spec/",
+    "deploy": "cf push kriegspiel -c 'npm start'"
   },
   "repository": {
     "type": "git",
