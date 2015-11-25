@@ -1,3 +1,4 @@
+Board = require('./board')
 parseCookie = require('cookie').parse
 
 getID = (client) ->
@@ -46,6 +47,26 @@ module.exports = class RoomManager
           else
             cb?(false)
 
+      socket.on 'board.move', (from, to, cb) =>
+        client = @clients[getID(socket)]
+        room = @getRoomByName(roomFor(socket))
+        board = room.board
+        color = if board.turn is 1 then 'white' else 'black'
+        if room[color] is client and board.move(from.x, from.y, to.x, to.y)
+          cb?(true)
+          socket.emit 'board.move', from, to
+        else
+          cb?(false)
+
+      socket.on 'board.promote', ({x, y}, newPieceType, cb) =>
+        client = @clients[getID(socket)]
+        room = @getRoomByName(roomFor(socket))
+        board = room.board
+        if board.promote {x, y}, newPieceType
+          cb?(true)
+          socket.emit 'board.promote', {x, y}, newPieceType
+        else
+          cb?(false)
 
   namesIn: (room) ->
     names = []
@@ -59,3 +80,4 @@ module.exports = class RoomManager
     @rooms[name] ?=
       white: undefined
       black: undefined
+      board: new Board()

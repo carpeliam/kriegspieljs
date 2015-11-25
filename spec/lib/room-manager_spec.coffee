@@ -89,3 +89,53 @@ describe 'Room Manager', ->
         expect(success).toBe false
         done()
 
+    it 'resets the board if all players stand'
+
+  describe 'moving', ->
+    newClientSocket = undefined
+    beforeEach (done) ->
+      clientSocket.emit 'nickname.set', 'Bobby'
+      clientSocket.emit 'sit', 'white', (success) ->
+        expect(success).toBe true
+      newClientSocket = new mocket.Client(server).connect()
+      newClientSocket.emit 'nickname.set', 'Boris'
+      newClientSocket.emit 'sit', 'black', (success) ->
+        expect(success).toBe true
+        done()
+    it 'allows a player to move on their turn', (done) ->
+      clientSocket.emit 'board.move', {x: 0, y: 1}, {x: 0, y: 2}, (success) ->
+        expect(success).toBe true
+        done()
+    it 'does not allow illegal moves', (done) ->
+      clientSocket.emit 'board.move', {x: 0, y: 1}, {x: 0, y: 7}, (success) ->
+        expect(success).toBe false
+        done()
+    it 'can only be done on the player\'s turn', (done) ->
+      newClientSocket.emit 'board.move', {x: 0, y: 1}, {x: 0, y: 2}, (success) ->
+        expect(success).toBe false
+        done()
+    it 'reports moves', (done) ->
+      clientSocket.on 'board.move', (from, to) ->
+        expect(from).toEqual({x: 0, y: 1})
+        expect(to).toEqual({x: 0, y: 2})
+        done()
+      clientSocket.emit 'board.move', {x: 0, y: 1}, {x: 0, y: 2}, (success) ->
+        expect(success).toBe true
+
+  describe 'board promotion', ->
+    promotionSpy = undefined
+    beforeEach ->
+      promotionSpy = spyOn(mgr.getRoomByName('Lobby').board, 'promote')
+    it 'allows a player to promote a piece if valid', (done) ->
+      promotionSpy.andReturn(true)
+      clientSocket.on 'board.promote', (coords, newPieceType) ->
+        expect(coords).toEqual {x: 0, y: 0}
+        expect(newPieceType).toEqual 5
+        done()
+      clientSocket.emit 'board.promote', {x: 0, y: 0}, 5, (success) ->
+        expect(success).toBe true
+    it 'does not a player to promote a piece if invalid', (done) ->
+      promotionSpy.andReturn(false)
+      clientSocket.emit 'board.promote', {x: 0, y: 0}, 5, (success) ->
+        expect(success).toBe false
+        done()
