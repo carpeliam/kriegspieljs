@@ -16,11 +16,11 @@ wrapSocket = (mgr, socket) ->
       client = mgr.addClientFor socket, nickname
       room = mgr.roomFor socket
       ['white', 'black'].forEach (color) =>
-        if room[color]?
-          room[color] = client if room[color].abandoned and room[color].id is getID(socket)
+        if room[color]?.abandoned and room[color]?.id is getID(socket)
+          room[color] = client
           socket.emit 'sit', color, client
-      # socket.to(room.name).emit 'room.list', mgr.namesIn(room.name)
       socket.emit 'room.list', mgr.namesIn(room.name)
+      # @server.to(room.name).emit 'room.list', mgr.namesIn(room.name)
 
     onSit: (color, cb) ->
       client = mgr.clientFor socket
@@ -56,6 +56,7 @@ wrapSocket = (mgr, socket) ->
       if room[color] is client and board.move(from.x, from.y, to.x, to.y)
         cb?(true)
         socket.emit 'board.move', from, to
+        # @server.to(room.name).emit 'board.move', from, to
       else
         cb?(false)
 
@@ -74,6 +75,8 @@ wrapSocket = (mgr, socket) ->
       room = mgr.roomFor socket
       if color = ['white', 'black'].find((c) => room[c]?.id is socket.id)
         room[color] = {id: getID(socket), name: client.name, abandoned: true}
+        socket.emit 'stand', color
+        # @server.to(room.name).emit 'stand', color
       mgr.removeClientFor socket
       socket.emit 'room.list', mgr.namesIn(room.name)
       # @server.to(room.name).emit 'room.list', mgr.namesIn(room.name)

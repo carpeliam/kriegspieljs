@@ -155,3 +155,8 @@ describe 'Room Manager', ->
     it 'keeps track of cookie IDs if a player was sitting', ->
       session.disconnect()
       expect(mgr.getRoomByName('Lobby').white).toEqual {id: session.cookieId, name: 'Bobby', abandoned: true}
+    it 'stands a player up if a player was sitting', (done) ->
+      session.clientSocket.on 'stand', (color) ->
+        expect(color).toEqual 'white'
+        done()
+      session.disconnect()
