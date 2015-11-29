@@ -6,30 +6,42 @@ export default class BoardCommunicator {
     this.updateRoomList = args.onRoomUpdate || (() => { throw new Error('onRoomUpdate not defined') })();
     this.processMove = args.onRemoteMove || (() => { throw new Error('onRemoteMove not defined') })();
     this.onPlayerSit = args.onPlayerSit || (() => { throw new Error('onPlayerSit not defined') })();
+    this.onPlayerStand = args.onPlayerStand || (() => { throw new Error('onPlayerStand not defined') })();
   }
   connectAs(name) {
     this.socket = this.io.connect(location.origin);
-    this.socket.on('room.join', (room, board) => {
-      console.log('room.join', room, board);
-      this.room = this.io.connect(location.origin + room);
-      this.room.emit('nickname.set', name);
+    this.socket.on('room.join', ({white, black, board}) => {
+      this.socket.emit('nickname.set', name);
+      if (white) {
+        this.onPlayerSit(white, 'white', white.id === this.socket.id);
+      }
+      if (black) {
+        this.onPlayerSit(black, 'black', black.id === this.socket.id);
+      }
       this.updateBoard(board);
       this._registerForRoomEvents();
     });
   }
   move(origCoords, newCoords, cb) {
-    console.log('move attempt');
-    this.room.emit('board.move', origCoords, newCoords, cb);
+    this.socket.emit('board.move', origCoords, newCoords, cb);
   }
   seat(player, color) {
-    this.room.emit('sit', color, player);
+    this.socket.emit('sit', color, (success) => {
+      console.log(success);
+    });
+  }
+  stand() {
+    this.socket.emit('stand');
   }
   _registerForRoomEvents() {
-    this.room.on('room.list', this.updateRoomList);
-    this.room.on('board.move', this.processMove);
-    this.room.on('sit', (color, player) => {
-      this._publishMessage(player.nickname + ' sat down as ' + color, 'notice');
-      this.onPlayerSit(player, color, player.id == this.socket.id);
+    this.socket.on('room.list', this.updateRoomList);
+    this.socket.on('board.move', this.processMove);
+    this.socket.on('sit', (color, player) => {
+      this._publishMessage(`${player.name} sat down as ${color}`, 'notice');
+      this.onPlayerSit(player, color, player.id === this.socket.id);
+    });
+    this.socket.on('stand', (color) => {
+      this.onPlayerStand(color);
     });
   }
   _publishMessage(msg, level) {

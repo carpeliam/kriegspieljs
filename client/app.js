@@ -1,9 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import $ from 'jquery';
-import 'jquery.cookie';
-import Square from './square';
-import Board from '../lib/board.coffee';
 import Kriegspiel from './kriegspiel';
 
 import './style/index.scss';

@@ -28,7 +28,8 @@ class Kriegspiel extends React.Component {
       onBoardUpdate: this.updateBoard.bind(this),
       onRoomUpdate: this.updateRoomList.bind(this),
       onRemoteMove: this.processMove.bind(this),
-      onPlayerSit: this.seatPlayer.bind(this)
+      onPlayerSit: this.seatPlayer.bind(this),
+      onPlayerStand: this.standPlayer.bind(this)
     });
     if (this.state.user) {
       this.room.connectAs(this.state.user);
@@ -62,9 +63,17 @@ class Kriegspiel extends React.Component {
   }
   seatPlayer(player, color, isCurrentClient) {
     let playerState = {playingAs: this.state.playingAs}
-    playerState.playingAs[color] = player.nickname;
+    playerState.playingAs[color] = player.name;
     if (isCurrentClient) {
       playerState.playerColor = color;
+    }
+    this.setState(playerState);
+  }
+  standPlayer(color) {
+    let playerState = {playingAs: this.state.playingAs};
+    playerState.playingAs[color] = undefined;
+    if (color === this.state.playerColor) {
+      playerState.playerColor = null;
     }
     this.setState(playerState);
   }
@@ -85,8 +94,7 @@ class Kriegspiel extends React.Component {
   }
   sitOrStandAs(color) {
     if (this.state.playerColor) {
-      // this.room.
-      // stand
+      this.room.stand();
     } else {
       this.room.seat(this.state.user, color);
     }

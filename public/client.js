@@ -25,6 +25,7 @@ var client = {
   connect: function(name) {
     this.name = name;
     this.gameInProgress = false;
+    console.log('connect');
     this.socket = io(location.origin);
     this.socket.on('connect', function() {
       client.socket.emit('nickname.set', client.name);

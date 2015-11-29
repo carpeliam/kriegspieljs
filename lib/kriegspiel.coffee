@@ -9,15 +9,15 @@ proxy = require('http-proxy').createProxyServer()
 proxyMiddleware = require('http-proxy-middleware')
 
 # Board = require './board'
-Room = require './room'
+RoomManager = require './room-manager'
 
 
 Kriegspiel = (options = {}) ->
   return new arguments.callee arguments unless (this instanceof arguments.callee)
 
   settings = port: options.port or 8124
-  sockets = {}
-  rooms = []
+  # sockets = {}
+  # rooms = []
   # rooms = {lobby: new Room('lobby')}
 
 
@@ -36,19 +36,20 @@ Kriegspiel = (options = {}) ->
 
     io = (require 'socket.io')(http)
 
-    createRoom = ->
-      roomNumber = rooms.length + 1
-      channel = io.of('/rooms/' + roomNumber)
-      room = new Room(channel)
-      rooms.push room
+    # createRoom = ->
+    #   roomNumber = rooms.length + 1
+    #   channel = io.of('/rooms/' + roomNumber)
+    #   room = new Room(channel)
+    #   rooms.push room
 
-    createRoom(io)
-    io.sockets.on 'connection', (socket) ->
-      # join first room when connected
-      socket.emit "room.join", rooms[0].channel.name, rooms[0].board
+    # createRoom(io)
+    # io.sockets.on 'connection', (socket) ->
+    #   # join first room when connected
+    #   socket.emit "room.join", rooms[0].channel.name, rooms[0].board
 
-      socket.on "room.create", ->
-        createRoom(io)
+    #   socket.on "room.create", ->
+    #     createRoom(io)
+    new RoomManager(io.sockets)
 
     return http
 
