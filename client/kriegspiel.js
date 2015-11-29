@@ -9,6 +9,7 @@ import Square from './square';
 import Piece from './piece';
 import SeatList from './seat-list';
 import RoomList from './room-list';
+import MessageLog from './message-log';
 import BoardCommunicator from './board-communicator';
 import UserNamePrompter from './username-prompter';
 
@@ -21,6 +22,7 @@ class Kriegspiel extends React.Component {
       board: new Board(),
       user: $.cookie('handle'),
       members: [],
+      messages: [],
       playerColor: null,
       playingAs: {white: undefined, black: undefined}
     };
@@ -29,7 +31,8 @@ class Kriegspiel extends React.Component {
       onRoomUpdate: this.updateRoomList.bind(this),
       onRemoteMove: this.processMove.bind(this),
       onPlayerSit: this.seatPlayer.bind(this),
-      onPlayerStand: this.standPlayer.bind(this)
+      onPlayerStand: this.standPlayer.bind(this),
+      onLogMessage: this.logMessage.bind(this)
     });
     if (this.state.user) {
       this.room.connectAs(this.state.user);
@@ -77,6 +80,13 @@ class Kriegspiel extends React.Component {
     }
     this.setState(playerState);
   }
+  logMessage(msg) {
+    let messages = [...this.state.messages, msg];
+    this.setState({messages});
+  }
+  speak(msg) {
+    this.room.logMessage(msg);
+  }
   logIn(name) {
     $.cookie('handle', name);
     this.setState({user: name});
@@ -118,6 +128,7 @@ class Kriegspiel extends React.Component {
                   sitOrStandAs={this.sitOrStandAs.bind(this)} />
 
         <RoomList members={this.state.members} />
+        <MessageLog messages={this.state.messages} onMessageSubmit={this.speak.bind(this)} />
       </div>
       
       <UserNamePrompter user={this.state.user} onEnter={this.logIn.bind(this)} />

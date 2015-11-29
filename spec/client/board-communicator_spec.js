@@ -10,6 +10,7 @@ describe('BoardCommunicator', () => {
   var noop = () => {};
   var onPlayerSitSpy = jasmine.createSpy('onPlayerSit');
   var onPlayerStandSpy = jasmine.createSpy('onPlayerStand');
+  var onLogMessageSpy = jasmine.createSpy('onLogMessage');
   function newBoardCommunicator(props = {}) {
     var boardProps = {}
     boardProps.onBoardUpdate = (props.onBoardUpdate === undefined) ? noop : props.onBoardUpdate;
@@ -17,6 +18,7 @@ describe('BoardCommunicator', () => {
     boardProps.onRemoteMove = (props.onRemoteMove === undefined) ? noop : props.onRemoteMove;
     boardProps.onPlayerSit = (props.onPlayerSit === undefined) ? onPlayerSitSpy : props.onPlayerSit;
     boardProps.onPlayerStand = (props.onPlayerStand === undefined) ? onPlayerStandSpy : props.onPlayerStand;
+    boardProps.onLogMessage = (props.onLogMessage === undefined) ? onLogMessageSpy : props.onLogMessage;
     return new BoardCommunicator(client, boardProps);
   }
   function establishConnection() {
@@ -41,6 +43,12 @@ describe('BoardCommunicator', () => {
   });
   it('expects valid onPlayerSit', () => {
     expect(function() { newBoardCommunicator({onPlayerSit: null}) }).toThrow(new Error('onPlayerSit not defined'));
+  });
+  it('expects valid onPlayerStand', () => {
+    expect(function() { newBoardCommunicator({onPlayerStand: null}) }).toThrow(new Error('onPlayerStand not defined'));
+  });
+  it('expects valid onLogMessage', () => {
+    expect(function() { newBoardCommunicator({onLogMessage: null}) }).toThrow(new Error('onLogMessage not defined'));
   });
   describe('when a user connects', () => {
     it('sends a connect message to the server', (done) => {
@@ -82,7 +90,9 @@ describe('BoardCommunicator', () => {
       it('informs the client that a player has sat down', () => {
         expect(onPlayerSitSpy).toHaveBeenCalled();
       });
-      it('sends a message to the room');
+      it('sends a message to the room', () => {
+        expect(onLogMessageSpy).toHaveBeenCalledWith({msg: 'Bobby sat down as white'});
+      });
     });
   });
 
@@ -105,6 +115,24 @@ describe('BoardCommunicator', () => {
       });
     });
   });
+
+  describe('when a person sends a chat message', () => {
+    beforeEach(() => {
+      communicator.connectAs('Bobby');
+      socket.emit('room.join', {});
+    });
+    it('sends messages to the room', (done) => {
+      socket.on('speak', (msg) => {
+        expect(msg).toEqual('Jolly good move, sir');
+        done();
+      })
+      communicator.logMessage('Jolly good move, sir');
+    });
+    it('listens to messages from the room', () => {
+      socket.emit('speak', 'Jolly good move, sir');
+      expect(onLogMessageSpy).toHaveBeenCalledWith('Jolly good move, sir');
+    });
+  })
 
   describe('when a player makes a move', () => {
     it('raises an error if there is no current connection');

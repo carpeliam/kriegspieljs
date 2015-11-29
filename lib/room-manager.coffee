@@ -48,6 +48,11 @@ wrapSocket = (mgr, socket) ->
         else
           cb?(false)
 
+    onSpeak: (msg) ->
+      author = mgr.clientFor(socket).name
+      socket.emit 'speak', {author, msg}
+      # @server.to(mgr.roomFor(socket).name).emit 'speak', {author, msg}
+
     onBoardMove: (from, to, cb) ->
       client = mgr.clientFor socket
       room = mgr.roomFor socket
@@ -95,6 +100,8 @@ module.exports = class RoomManager
 
       socket.on 'board.move', wrapSocket(this, socket).onBoardMove
       socket.on 'board.promote', wrapSocket(this, socket).onBoardPromote
+
+      socket.on 'speak', wrapSocket(this, socket).onSpeak
 
       socket.on 'disconnect', wrapSocket(this, socket).onDisconnect
 

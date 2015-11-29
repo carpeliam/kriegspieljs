@@ -26,6 +26,9 @@ class Session
     @clientSocket.emit 'stand', (success) ->
       expect(success).toBe expectSuccess
     return this
+  speak: (msg) ->
+    @clientSocket.emit 'speak', msg
+    return this
   move: (from, to, expectSuccess = true, cb = undefined) ->
     @clientSocket.emit 'board.move', from, to, (success) ->
       expect(success).toBe expectSuccess
@@ -139,6 +142,14 @@ describe 'Room Manager', ->
     it 'does not a player to promote a piece if invalid', (done) ->
       promotionSpy.andReturn(false)
       session.promote({x: 0, y: 0}, 5, false, done)
+
+  describe 'chat', ->
+    beforeEach -> session.connect().joinAs('Bobby')
+    it 'sends out a message', (done) ->
+      session.clientSocket.on 'speak', (msg) ->
+        expect(msg).toEqual {author: 'Bobby', msg: 'Jolly good move, sir'}
+        done()
+      session.speak('Jolly good move, sir')
 
   describe 'disconnecting', ->
     beforeEach ->

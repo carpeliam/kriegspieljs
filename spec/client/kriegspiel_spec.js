@@ -100,5 +100,21 @@ describe('Kriegspiel', () => {
         });
       })
     });
+
+    describe('messages', () => {
+      it('logs messages to the server', () => {
+        spyOn(kriegspiel.room, 'logMessage');
+        kriegspiel.speak('Jolly good move, sir');
+        expect(kriegspiel.room.logMessage).toHaveBeenCalledWith('Jolly good move, sir');
+      });
+      it('acts on messages from the server', () => {
+        let setStateSpy = spyOn(kriegspiel, 'setState');
+        expect(kriegspiel.state.messages).toEqual([]);
+        kriegspiel.logMessage('Jolly good move, sir');
+        expect(setStateSpy).toHaveBeenCalledWith({
+          messages: ['Jolly good move, sir']
+        });
+      });
+    });
   });
 });

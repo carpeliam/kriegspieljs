@@ -7,6 +7,7 @@ export default class BoardCommunicator {
     this.processMove = args.onRemoteMove || (() => { throw new Error('onRemoteMove not defined') })();
     this.onPlayerSit = args.onPlayerSit || (() => { throw new Error('onPlayerSit not defined') })();
     this.onPlayerStand = args.onPlayerStand || (() => { throw new Error('onPlayerStand not defined') })();
+    this.onLogMessage = args.onLogMessage || (() => { throw new Error('onLogMessage not defined') })();
   }
   connectAs(name) {
     this.socket = this.io.connect(location.origin);
@@ -33,18 +34,21 @@ export default class BoardCommunicator {
   stand() {
     this.socket.emit('stand');
   }
+  logMessage(msg) {
+    this.socket.emit('speak', msg);
+  }
   _registerForRoomEvents() {
     this.socket.on('room.list', this.updateRoomList);
     this.socket.on('board.move', this.processMove);
     this.socket.on('sit', (color, player) => {
-      this._publishMessage(`${player.name} sat down as ${color}`, 'notice');
+      this.onLogMessage({msg: `${player.name} sat down as ${color}`});
       this.onPlayerSit(player, color, player.id === this.socket.id);
     });
     this.socket.on('stand', (color) => {
       this.onPlayerStand(color);
     });
-  }
-  _publishMessage(msg, level) {
-
+    this.socket.on('speak', (msg) => {
+      this.onLogMessage(msg);
+    });
   }
 }
