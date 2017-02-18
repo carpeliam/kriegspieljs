@@ -118,6 +118,7 @@ module.exports = class RoomManager
   namesIn: (room) ->
     names = []
     for socket in @server.sockets
+      console.log 'SERVER adapter.rooms', socket.adapter.rooms
       if room in socket.rooms
         names.push(@clientFor(socket)) unless names.some (n) -> n.id is socket.id
     return names

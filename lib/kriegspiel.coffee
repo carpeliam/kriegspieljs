@@ -1,12 +1,14 @@
-sys = require 'sys'
+util = require 'util'
 connect = require 'connect'
 path = require 'path'
 
 serveStatic = require 'serve-static'
 logger = require 'connect-logger'
 session = require 'express-session'
-proxy = require('http-proxy').createProxyServer()
-proxyMiddleware = require('http-proxy-middleware')
+
+webpackDevMiddleware = require 'webpack-dev-middleware'
+webpack = require 'webpack'
+webpackConfig = require '../webpack.config'
 
 # Board = require './board'
 RoomManager = require './room-manager'
@@ -30,9 +32,7 @@ Kriegspiel = (options = {}) ->
     server.use session(secret: 'WarGames')
 
     # dev
-    bundle = require '../bundle'
-    bundle()
-    server.use proxyMiddleware('/build', target: 'http://127.0.0.1:3001')
+    server.use webpackDevMiddleware(webpack(webpackConfig), publicPath: '/assets/')
 
     io = (require 'socket.io')(http)
 
@@ -57,6 +57,6 @@ Kriegspiel = (options = {}) ->
   # (require './comm').initialize server
   server.listen settings.port
 
-  sys.log 'Server started on port ' + settings.port
+  util.log 'Server started on port ' + settings.port
 
 module.exports = Kriegspiel

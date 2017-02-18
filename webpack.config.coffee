@@ -3,31 +3,28 @@ path = require 'path'
 appPath = path.resolve __dirname, 'client'
 nodeModulesPath = path.resolve __dirname, 'node_modules'
 buildPath = path.resolve __dirname, 'pub', 'build'
-port = process.env.PORT or 8124
 
 config =
   context: __dirname
   devtool: 'eval-source-map'
   entry: [
-    "webpack-dev-server/client?http://localhost:#{port}"
-    'webpack/hot/dev-server'
     path.resolve appPath, '_dev.js'
     path.resolve appPath, 'app.js'
   ]
   output:
     path: buildPath
     filename: 'bundle.js'
-    publicPath: '/build/'
+    publicPath: '/assets/'
   module: loaders: [
     {
       test: /\.js$/
-      loader: 'babel'
+      loaders: ['react-hot-loader', 'babel-loader']
       exclude: [ nodeModulesPath ]
     }
     {
       # development only
       test: require.resolve('react-addons-perf')
-      loader: 'expose?Perf'
+      loader: 'expose-loader?Perf'
     }
     {
       test: /\.coffee$/
@@ -35,23 +32,23 @@ config =
     }
     {
       test: /\.css$/
-      loader: 'style!css'
+      loader: 'style-loader!css-loader'
     }
     {
       test: /\.less$/
-      loader: 'style!css!less'
+      loader: 'style-loader!css-loader!less-loader'
     }
     {
       test: /\.scss$/
-      loader: 'style!css!sass'
+      loader: 'style-loader!css-loader!sass-loader'
     }
     {
       test: /\.(woff|woff2)$/
-      loader: "url?limit=10000&minetype=application/font-woff"
+      loader: "url-loader?limit=10000&minetype=application/font-woff"
     }
-    {test: /\.eot$/,  loader: "file" }
-    {test: /\.svg$/,  loader: "url?limit=10000&mimetype=image/svg+xml" }
-    {test: /\.ttf$/,  loader: "url?limit=10000&mimetype=application/octet-stream" }
+    {test: /\.eot$/,  loader: "file-loader" }
+    {test: /\.svg$/,  loader: "url-loader?limit=10000&mimetype=image/svg+xml" }
+    {test: /\.ttf$/,  loader: "url-loader?limit=10000&mimetype=application/octet-stream" }
   ]
   plugins: [ new (Webpack.HotModuleReplacementPlugin) ]
 
