@@ -1,6 +1,6 @@
 import '../client_helper';
 import React from 'react';
-import ReactTestUtils from 'react/lib/ReactTestUtils';
+import ReactTestUtils from 'react-addons-test-utils';
 import TestBackend from 'react-dnd-test-backend';
 import { DragDropContext } from 'react-dnd';
 import Piece from '../../client/piece';
@@ -31,7 +31,7 @@ describe('Piece', () => {
     var piece = createPiece();
     expect(piece.render().props.children).toEqual('♙');
   });
-  
+
   it('renders the appropriate color', () => {
     var piece = createPiece({color: -1});
     expect(piece.render().props.children).toEqual('♟');

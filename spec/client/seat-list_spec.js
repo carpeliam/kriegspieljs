@@ -1,6 +1,6 @@
 import '../client_helper';
 import React from 'react';
-import ReactTestUtils from 'react/lib/ReactTestUtils';
+import ReactTestUtils from 'react-addons-test-utils';
 import SeatList from '../../client/seat-list';
 
 describe('SeatList', () => {
@@ -35,7 +35,7 @@ describe('SeatList', () => {
     ReactTestUtils.Simulate.click(btn);
     expect(sitOrStandAs).not.toHaveBeenCalled();
   });
-  
+
   it('does not allow a player to sit in an unoccupied seat', () => {
     var seatList = createSeatList({playerColor: 'white', white: 'Gen', black: undefined});
     let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-black');
