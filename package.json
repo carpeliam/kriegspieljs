@@ -16,7 +16,7 @@
     "url": "https://github.com/carpeliam/kriegspieljs"
   },
   "engines": {
-    "node": "0.12.2"
+    "node": "~6.0"
   },
   "dependencies": {
     "bootstrap-sass": "^3.3.7",
