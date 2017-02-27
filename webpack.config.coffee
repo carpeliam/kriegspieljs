@@ -9,7 +9,7 @@ config =
   devtool: 'eval-source-map'
   entry: [
     path.resolve appPath, '_dev.js'
-    path.resolve appPath, 'app.js'
+    path.resolve appPath, 'index.js'
   ]
   output:
     path: buildPath

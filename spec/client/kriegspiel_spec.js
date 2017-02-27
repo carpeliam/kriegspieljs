@@ -1,29 +1,36 @@
-import '../client_helper';
+import React from 'react';
+import { shallow } from 'enzyme';
+import KriegspielDragDropContext from '../../client/kriegspiel';
+import UserNamePrompter from '../../client/username-prompter';
 
-import {Client, Server} from 'mocket-io';
-
-import $ from 'jquery';
-import 'jquery.cookie';
-
-import Kriegspiel from '../../client/kriegspiel';
-
+const Kriegspiel = KriegspielDragDropContext.DecoratedComponent;
 
 describe('Kriegspiel', () => {
-  var server = new Server();
-  // TODO no global objects, mock io properly
-  window.io = new Client(server);
+  // var server = new Server();
+  // // TODO no global objects, mock io properly
+  // window.io = new Client(server);
 
-  var kriegspiel;
+  let kriegspiel;
+  let setUserSpy;
 
-  describe('without an existing user cookie', () => {
-    beforeEach(() => {
-      kriegspiel = new Kriegspiel.DecoratedComponent();
-    });
+  beforeEach(() => {
+    setUserSpy = jasmine.createSpy('setUser');
+    kriegspiel = shallow(<Kriegspiel user={{ id: 1 }} setUser={setUserSpy} />);
+  });
 
+  it('passes user to UserNamePrompter', () => {
+    const userNamePrompter = kriegspiel.find('UserNamePrompter');
+    expect(userNamePrompter).toHaveProp('user', { id: 1 });
+  });
+
+  it('passes setUser action to UserNamePrompter', () => {
+    const userNamePrompter = kriegspiel.find(UserNamePrompter);
+    userNamePrompter.props().onEnter('margaret');
+    expect(setUserSpy).toHaveBeenCalledWith('margaret');
   });
 
 
-  describe('with an existing handle cookie', () => {
+  xdescribe('with an existing handle cookie', () => {
     beforeEach(() => {
       spyOn($, 'cookie').and.returnValue('jim');
       kriegspiel = new Kriegspiel.DecoratedComponent();

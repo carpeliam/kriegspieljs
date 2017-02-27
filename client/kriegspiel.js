@@ -15,7 +15,11 @@ import UserNamePrompter from './username-prompter';
 
 import Board from '../lib/board.coffee';
 
-class Kriegspiel extends React.Component {
+import io from 'socket.io-client';
+
+import './subscribe';
+
+/*class Kriegspiel extends React.Component {
   constructor() {
     super();
     this.state = {
@@ -130,10 +134,16 @@ class Kriegspiel extends React.Component {
         <RoomList members={this.state.members} />
         <MessageLog messages={this.state.messages} onMessageSubmit={this.speak.bind(this)} />
       </div>
-      
+
       <UserNamePrompter user={this.state.user} onEnter={this.logIn.bind(this)} />
     </div>;
   }
+}*/
+
+function Kriegspiel({ user, setUser }) {
+  return (
+    <UserNamePrompter user={user} onEnter={setUser} />
+  );
 }
 
 export default DragDropContext(HTML5Backend)(Kriegspiel);

@@ -8,21 +8,31 @@ module.exports = function(config) {
     frameworks: ['jasmine'],
 
     // list of files / patterns to load in the browser
-    files: ['spec/client/*_spec.js'],
+    files: [
+      'spec/client_helper.js',
+      { pattern: 'spec/client/*_spec.js', watched: false },
+    ],
 
     webpack: {
       // devtool: 'eval-source-map',
+      devtool: 'inline-source-map',
       output: {
         path: path.resolve(webpackConfig.output.path, 'test'),
         filename: 'bundle.js'
       },
-      module: webpackConfig.module
+      module: webpackConfig.module,
+      externals: {
+        'cheerio': 'window',
+        'react/addons': 'react',
+        'react/lib/ExecutionEnvironment': 'react',
+        'react/lib/ReactContext': 'react'
+      }
     },
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        'spec/client/*.js': ['webpack'],
+      'spec/**/*.js': ['webpack', 'sourcemap'],
         '**/*.coffee': ['coffee']
     },
 
@@ -39,13 +49,5 @@ module.exports = function(config) {
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: ['PhantomJS'],
     // browsers: ['Chrome'],
-
-    plugins: [
-      'karma-coffee-preprocessor',
-      'karma-jasmine',
-      'karma-chrome-launcher',
-      'karma-phantomjs-launcher',
-      'karma-webpack'
-    ]
   });
 }

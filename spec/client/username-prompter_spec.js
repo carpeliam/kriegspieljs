@@ -1,4 +1,3 @@
-import '../client_helper';
 import React from 'react';
 import ReactTestUtils from 'react-addons-test-utils';
 import { Modal } from 'react-bootstrap';
