@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 
+const W = wrapPromiseInTimeout;
 class Player {
   async visitHomepage() {
     console.log('visiting homepage...');
@@ -14,9 +15,9 @@ class Player {
     // await this.page.waitFor('input#handle');
     // await this.page.type('input#handle', name);
     // await this.page.click('.ui-dialog-buttonpane button');
-    await this.page.waitFor('input[name="username"]');
-    await this.page.type('input[name="username"]', name);
-    await this.page.click('.modal-footer button');
+    await W(this.page.waitFor('input[name="username"]'));
+    await W(this.page.type('input[name="username"]', name));
+    await W(this.page.click('.modal-footer button'));
   }
 
   async chooseColor(color) {
@@ -24,8 +25,8 @@ class Player {
     this.color = color;
     // const buttonSelector = `#${color}`;
     const buttonSelector = `.btn-${color}`;
-    await this.page.waitFor(buttonSelector);
-    await this.page.click(buttonSelector);
+    await W(this.page.waitFor(buttonSelector));
+    await W(this.page.click(buttonSelector));
   }
 
   async move(from, to) {
@@ -60,8 +61,9 @@ class Player {
   }
 
   async hasTurn() {
-    const buttonSelector = `#${this.color}.active`;
-    await this.page.waitFor(buttonSelector);
+    console.log(`${this.color} has a turn...`);
+    const buttonSelector = `.btn-${this.color}.active`;
+    await W(this.page.waitFor(buttonSelector));
   }
 
   async hasWon() {
@@ -69,6 +71,7 @@ class Player {
       return await this.page.evaluate(() => document.querySelector('#white').classList.contains('winning'));
     }
     return await this.page.evaluate(() => document.querySelector('#black').classList.contains('winning'));
+    // return await this.page.evaluate((color) => document.querySelector(`#${color}`).classList.contains('winning'), this.color);
   }
 
   async hasLost() {
@@ -76,6 +79,7 @@ class Player {
       return await this.page.evaluate(() => document.querySelector('#white').classList.contains('losing'));
     }
     return await this.page.evaluate(() => document.querySelector('#black').classList.contains('losing'));
+    // return await this.page.evaluate((color) => document.querySelector(`#${color}`).classList.contains('losing'), this.color);
   }
 }
 
@@ -83,7 +87,7 @@ describe('fools mate', () => {
   let white;
   let black;
   beforeEach(() => {
-    jasmine.getEnv().defaultTimeoutInterval = 35000;
+    jasmine.getEnv().defaultTimeoutInterval = 5000;
   });
   it('can be played', SX(async () => {
     white = new Player();
@@ -125,6 +129,21 @@ describe('fools mate', () => {
   });
 });
 
+function wrapPromiseInTimeout(promise) {
+  const possibleError = new Error();
+  return new Promise((resolve, reject) => {
+    const timeoutID = setTimeout(() => reject(possibleError), 1000);
+    promise.then((a) => {
+      resolve(a);
+      clearTimeout(timeoutID);
+    }).catch((e) => {
+      console.log('error', e);
+      reject(e);
+      clearTimeout(timeoutID);
+    });
+  });
+}
+
 function SX(fun) {
-  return done => Promise.resolve(fun()).then(done).catch(done.fail);
+  return done => fun().then(done).catch(done.fail);
 }
