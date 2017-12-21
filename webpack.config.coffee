@@ -1,7 +1,6 @@
 Webpack = require 'webpack'
 path = require 'path'
 appPath = path.resolve __dirname, 'client'
-nodeModulesPath = path.resolve __dirname, 'node_modules'
 buildPath = path.resolve __dirname, 'pub', 'build'
 
 config =
@@ -19,7 +18,7 @@ config =
     {
       test: /\.js$/
       loaders: ['react-hot-loader', 'babel-loader']
-      exclude: [ nodeModulesPath ]
+      exclude: [ /node_modules/ ]
     }
     {
       # development only

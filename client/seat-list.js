@@ -2,8 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { sitAs, standAs } from './actions';
 
-export function Seat(props) {
-  const { color, user, players, sitAs, standAs } = props;
+export function Seat({ color, user, players, sitAs, standAs }) {
   const className = `btn btn-block btn-${color}`;
   const occupant = players[color];
   const disabled = occupant && occupant.id !== user.id;
