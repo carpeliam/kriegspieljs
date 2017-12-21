@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactTestUtils from 'react-addons-test-utils';
+import { shallow } from 'enzyme';
 import { Modal } from 'react-bootstrap';
 
 import UserNamePrompter from '../../client/username-prompter';
@@ -7,20 +7,24 @@ import UserNamePrompter from '../../client/username-prompter';
 describe('UserNamePrompter', () => {
   const onEnter = jasmine.createSpy('onEnter');
   function createUserNamePrompter(props = {}) {
-    return ReactTestUtils.renderIntoDocument(<UserNamePrompter
-      user={props.user || null} onEnter={props.onEnter || onEnter} />);
+    return shallow(
+      <UserNamePrompter
+        user={props.user || null}
+        onEnter={props.onEnter || onEnter}
+      />
+    );
   }
   it('is visible if the username is undefined', () => {
     const component = createUserNamePrompter({user: undefined});
     // TODO test via class name
-    const modal = ReactTestUtils.findRenderedComponentWithType(component, Modal);
-    expect(modal.props.show).toBe(true);
+    const modal = component.find(Modal);
+    expect(modal).toHaveProp('show', true);
   });
 
   it('is hidden if the username is present', () => {
     const component = createUserNamePrompter({user: 'jim'});
-    const modal = ReactTestUtils.findRenderedComponentWithType(component, Modal);
-    expect(modal.props.show).toBe(false);
+    const modal = component.find(Modal);
+    expect(modal).toHaveProp('show', false);
   });
 
   describe('when the button is clicked', () => {

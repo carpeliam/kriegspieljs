@@ -11,6 +11,9 @@ describe('Kriegspiel Container', () => {
   beforeEach(() => {
     store = createStore(state => state, {
       user: { name: 'margaret', id: 'abc123' },
+      game: {
+        players: {},
+      },
     });
     spyOn(store, 'dispatch');
     container = shallow(<KriegspielContainer store={store} />);
@@ -29,6 +32,10 @@ describe('Kriegspiel Container', () => {
     container.props().setUser('margaret');
     expect(actions.setUser).toHaveBeenCalledWith('margaret');
     expect(store.dispatch).toHaveBeenCalledWith('set user');
+  });
+
+  it('passes game state to child component', () => {
+    expect(container).toHaveProp('game', { players: { } });
   });
 
   // it('passes onReserveTable to child component', () => {

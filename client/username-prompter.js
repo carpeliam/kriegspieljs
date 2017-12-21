@@ -7,7 +7,8 @@ export default class UserNamePrompter extends React.Component {
     this.props.onEnter(this.refs.username.value);
   }
   render() {
-    return <Modal show={this.props.user == undefined} onHide={this._noop.bind(this)}>
+    return (
+      <Modal show={this.props.user == undefined} onHide={this._noop.bind(this)}>
         <Modal.Header><Modal.Title>Log In</Modal.Title></Modal.Header>
         <Modal.Body>
           <form className="form-horizontal">
@@ -22,6 +23,7 @@ export default class UserNamePrompter extends React.Component {
         <Modal.Footer>
           <Button bsStyle="primary" onClick={this.logIn.bind(this)}>Let's go!</Button>
         </Modal.Footer>
-      </Modal>;
+      </Modal>
+    );
   }
 }

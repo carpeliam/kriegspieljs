@@ -140,9 +140,12 @@ import './subscribe';
   }
 }*/
 
-function Kriegspiel({ user, setUser }) {
+function Kriegspiel({ user, setUser, game }) {
   return (
-    <UserNamePrompter user={user} onEnter={setUser} />
+    <div>
+      <SeatList />
+      <UserNamePrompter user={user} onEnter={setUser} />
+    </div>
   );
 }
 

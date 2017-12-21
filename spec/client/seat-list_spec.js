@@ -1,45 +1,138 @@
 import '../client_helper';
 import React from 'react';
 import ReactTestUtils from 'react-addons-test-utils';
-import SeatList from '../../client/seat-list';
+import { shallow } from 'enzyme';
+import { SeatList, Seat } from '../../client/seat-list';
 
-describe('SeatList', () => {
-  var sitOrStandAs;
+describe('Seat', () => {
+  let onSitOrStandSpy;
+  let sitAsSpy;
+  let standAsSpy;
   beforeEach(() => {
-    sitOrStandAs = jasmine.createSpy('sitOrStandAs');
+    onSitOrStandSpy = jasmine.createSpy();
+    sitAsSpy = jasmine.createSpy('sitAs');
+    standAsSpy = jasmine.createSpy('standAs');
   });
-  function createSeatList(props = {}) {
-    return ReactTestUtils.renderIntoDocument(<SeatList
-            playerColor={props.playerColor || null}
-            white={props.white || undefined}
-            black={props.black || undefined}
-            sitOrStandAs={sitOrStandAs} />);
-  }
-  it('allows a user to sit in an open seat', () => {
-    var seatList = createSeatList();
-    let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-white');
-    ReactTestUtils.Simulate.click(btn);
-    expect(sitOrStandAs).toHaveBeenCalled();
+  describe('when the user is not currently sitting', () => {
+    it('allows the user to sit in an open seat', () => {
+      const seat = shallow(<Seat
+        color="white"
+        user={{ id: 1 }}
+        players={{}}
+        sitAs={sitAsSpy}
+        standAs={standAsSpy}
+      />);
+      expect(seat.find('.btn-white')).toHaveProp('disabled', false);
+      expect(seat.find('.btn-white')).toHaveText('sit as white');
+      seat.find('.btn-white').simulate('click');
+      expect(sitAsSpy).toHaveBeenCalledWith('white', { id: 1 });
+      expect(standAsSpy).not.toHaveBeenCalled();
+    });
+    it('does not allow the user to sit in an occupied seat', () => {
+      const seat = shallow(<Seat
+        color="white"
+        user={{ id: 1 }}
+        players={{ white: { id: 2, name: 'Bobby' } }}
+        sitAs={sitAsSpy}
+        standAs={standAsSpy}
+      />);
+      expect(seat.find('.btn-white')).toHaveProp('disabled', true);
+      expect(seat.find('.btn-white')).toHaveText('white: Bobby');
+    });
   });
 
-  it('allows a player to stand if they are already sitting', () => {
-    var seatList = createSeatList({playerColor: 'white', white: 'Gen'});
-    let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-white');
-    ReactTestUtils.Simulate.click(btn);
-    expect(sitOrStandAs).toHaveBeenCalled();
+  describe('when the user is currently sitting', () => {
+    it('allows the user to stand from their seat', () => {
+      const seat = shallow(<Seat
+        color="white"
+        user={{ id: 1 }}
+        players={{ white: { id: 1, name: 'Frank' } }}
+        sitAs={sitAsSpy}
+        standAs={standAsSpy}
+      />);
+      expect(seat.find('.btn-white')).toHaveProp('disabled', false);
+      expect(seat.find('.btn-white')).toHaveText('leave white');
+      seat.find('.btn-white').simulate('click');
+      expect(standAsSpy).toHaveBeenCalledWith('white');
+      expect(sitAsSpy).not.toHaveBeenCalled();
+    });
+  });
+});
+
+xdescribe('SeatList', () => {
+//   var sitOrStandAs;
+  let seatList;
+  let sitAs;
+  let standAs;
+  beforeEach(() => {
+    sitAs = jasmine.createSpy('sitAs');
+    standAs = jasmine.createSpy('standAs');
+    const props = { sitAs, standAs };
+    seatList = shallow(<SeatList {...props} />);
   });
 
-  it('does not allow a user to sit in an occupied seat', () => {
-    var seatList = createSeatList({playerColor: null, white: 'Gen', black: 'Liam'});
-    let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-white');
-    ReactTestUtils.Simulate.click(btn);
-    expect(sitOrStandAs).not.toHaveBeenCalled();
+  describe('when the user is playing as white', () => {
+    beforeEach(() => seatList.setProps({ players: { white: { id: 1 } }, user: { id: 1 } }));
+    it('lets the player stand as white', () => {
+      const white = seatList.find(Seat).filter({ color: 'white '});
+      white.sitAsOrStand();
+    });
   });
 
-  it('does not allow a player to sit in an unoccupied seat', () => {
-    var seatList = createSeatList({playerColor: 'white', white: 'Gen', black: undefined});
-    let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-black');
-    ReactTestUtils.Simulate.click(btn);
-    expect(sitOrStandAs).not.toHaveBeenCalled();
-  });
+//   xdescribe('when the user is a guest', () => {
+//     beforeEach(() => {
+//       seatList = shallow(<SeatList
+//         user={{ id: 1 }}
+//         players={{ white: { id: 2 } }}
+//         sitOrStandAs={sitOrStandAs}
+//       />);
+//     });
+//     it('allows the user to sit in an open seat', () => {
+//       seatList.find('.btn-black').simulate('click');
+//       expect(sitOrStandAs).toHaveBeenCalledWith('black');
+//     });
+//     it('does not allow the user to sit in an occupied seat', () => {
+//       // seatList.find('.btn-white').simulate('click');
+//       // expect(sitOrStandAs).not.toHaveBeenCalled();
+//       expect(seatList.find('.btn-white')).toHaveProp('disabled', true);
+//     });
+//   });
+
+//   function createSeatList(props = {}) {
+//     return shallow(<SeatList {...props} />);
+//     // return ReactTestUtils.renderIntoDocument(<SeatList
+//     //         playerColor={props.playerColor || null}
+//     //         white={props.white || undefined}
+//     //         black={props.black || undefined}
+//     //         sitOrStandAs={sitOrStandAs} />);
+//   }
+//   xit('allows a user to sit in an open seat', () => {
+//     // var seatList = createSeatList({ user: });
+//     const seatList = shallow(<SeatList sitOrStandAs={sitOrStandAs} />);
+//     // let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-white');
+//     seatList.find('.btn-white').simulate('click');
+//     // ReactTestUtils.Simulate.click(btn);
+//     expect(sitOrStandAs).toHaveBeenCalled();
+//   });
+
+//   xit('allows a player to stand if they are already sitting', () => {
+//     var seatList = createSeatList({playerColor: 'white', white: 'Gen'});
+//     let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-white');
+//     ReactTestUtils.Simulate.click(btn);
+//     expect(sitOrStandAs).toHaveBeenCalled();
+//   });
+
+//   xit('does not allow a user to sit in an occupied seat', () => {
+//     var seatList = createSeatList({playerColor: null, white: 'Gen', black: 'Liam'});
+//     let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-white');
+//     ReactTestUtils.Simulate.click(btn);
+//     expect(sitOrStandAs).not.toHaveBeenCalled();
+//   });
+
+//   xit('does not allow a player to sit in an unoccupied seat', () => {
+//     var seatList = createSeatList({playerColor: 'white', white: 'Gen', black: undefined});
+//     let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-black');
+//     ReactTestUtils.Simulate.click(btn);
+//     expect(sitOrStandAs).not.toHaveBeenCalled();
+//   });
 });

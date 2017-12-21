@@ -2,6 +2,7 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import KriegspielDragDropContext from '../../client/kriegspiel';
 import UserNamePrompter from '../../client/username-prompter';
+import SeatList from '../../client/seat-list';
 
 const Kriegspiel = KriegspielDragDropContext.DecoratedComponent;
 
@@ -15,7 +16,14 @@ describe('Kriegspiel', () => {
 
   beforeEach(() => {
     setUserSpy = jasmine.createSpy('setUser');
-    kriegspiel = shallow(<Kriegspiel user={{ id: 1 }} setUser={setUserSpy} />);
+    kriegspiel = shallow(
+      <Kriegspiel
+        user={{ id: 1 }}
+        setUser={setUserSpy}
+        game={{
+          players: { white: 1, black: 2 },
+        }}
+      />);
   });
 
   it('passes user to UserNamePrompter', () => {
@@ -27,6 +35,14 @@ describe('Kriegspiel', () => {
     const userNamePrompter = kriegspiel.find(UserNamePrompter);
     userNamePrompter.props().onEnter('margaret');
     expect(setUserSpy).toHaveBeenCalledWith('margaret');
+  });
+
+  it('contains the seat list', () => {
+    const seatList = kriegspiel.find(SeatList);
+    // expect(seatList).toHaveProp('white', { id: 2 });
+    // expect(seatList).toHaveProp('black', { id: 3 });
+    // expect(seatList).toHaveProp('players', { white: 1, black: 2 });
+    expect(seatList).toBePresent();
   });
 
 

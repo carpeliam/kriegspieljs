@@ -2,8 +2,8 @@ import { connect } from 'react-redux';
 import Kriegspiel from './kriegspiel';
 import { setUser } from './actions';
 
-function mapStateToProps({ user }) {
-  return { user };
+function mapStateToProps({ user, game }) {
+  return { user, game };
 }
 
 function mapDispatchToProps(dispatch) {

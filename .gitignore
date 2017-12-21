@@ -1,3 +1,4 @@
 .DS_Store
 Capfile
-node_modules
+node_modules*
+.vscode
