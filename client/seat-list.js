@@ -2,12 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { sitAs, standAs } from './actions';
 
+const oppositeColorOf = { white: 'black', black: 'white' };
+
 export function Seat({ color, user, players, sitAs, standAs }) {
   const className = `btn btn-block btn-${color}`;
   const occupant = players[color];
-  const disabled = occupant && occupant.id !== user.id;
+  const opponent = players[oppositeColorOf[color]];
+  const disabled = (occupant && occupant.id !== user.id) || (opponent && opponent.id === user.id);
   let seatText;
-  let onClick = () => {};
+  let onClick;
   if (occupant) {
     seatText = (occupant.id === user.id) ? `leave ${color}` : `${color}: ${occupant.name}`;
     onClick = () => standAs(color);
@@ -17,9 +20,9 @@ export function Seat({ color, user, players, sitAs, standAs }) {
   }
   return (
     <span className="col-md-6">
-      <a className={className} onClick={onClick} disabled={!!disabled}>
+      <button className={className} onClick={onClick} disabled={!!disabled}>
         {seatText}
-      </a>
+      </button>
     </span>
   );
 }
@@ -29,15 +32,10 @@ function mapStateToProps({ user, game: { players } }) {
 }
 
 function mapDispatchToProps(dispatch) {
-  // return {
-  //   sitAs(color, user) { dispatch(sitAs(color, user)); },
-  //   standAs(color) { dispatch(standAs(color)); },
-  // }
-  console.log('mdtp', sitAs);
   return {
-    sitAs: (color, user) => dispatch(sitAs(color, user)),
-    standAs: (color) => dispatch(standAs(color)),
-  };
+    sitAs(color, user) { dispatch(sitAs(color, user)); },
+    standAs(color) { dispatch(standAs(color)); },
+  }
 }
 
 const SeatContainer = connect(mapStateToProps, mapDispatchToProps)(Seat);

@@ -56,6 +56,16 @@ describe('Seat', () => {
       expect(standAsSpy).toHaveBeenCalledWith('white');
       expect(sitAsSpy).not.toHaveBeenCalled();
     });
+    it('does not allow them to sit in the other seat', () => {
+      const seat = shallow(<Seat
+        color="white"
+        user={{ id: 1 }}
+        players={{ black: { id: 1, name: 'Frank' } }}
+        sitAs={sitAsSpy}
+        standAs={standAsSpy}
+      />);
+      expect(seat.find('.btn-white')).toHaveProp('disabled', true);
+    });
   });
 });
 
