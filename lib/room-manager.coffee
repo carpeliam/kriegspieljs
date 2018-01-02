@@ -2,7 +2,12 @@ Board = require('./board')
 parseCookie = require('cookie').parse
 
 getID = (client) ->
+  # console.log client.request?.headers?.cookie, client.handshake.headers.cookie
   parseCookie(client.handshake.headers.cookie)['connect.sid']
+
+getKriegspielId = (client) ->
+  kriegspielUser = parseCookie(client.handshake.headers.cookie)['kriegspiel.user']
+  JSON.parse(kriegspielUser).id
 
 oppositeColor = (color) -> if color is 'white' then 'black' else 'white'
 
@@ -28,7 +33,8 @@ wrapSocket = (mgr, socket) ->
       if !room[color]? and client? and room[oppositeColor(color)] isnt client
         room[color] = client
         cb?(true)
-        socket.emit 'sit', color, client
+        socket.emit 'sit', color, client # passes tests, but doesn't work in real world
+        # mgr.server.emit 'sit', color, client # works in real world, but doesn't pass tests
         # @server.to(room.name).emit 'sit', color, client
       else
         cb?(false)
@@ -60,7 +66,8 @@ wrapSocket = (mgr, socket) ->
       color = if board.turn is 1 then 'white' else 'black'
       if room[color] is client and board.move(from.x, from.y, to.x, to.y)
         cb?(true)
-        socket.emit 'board.move', from, to
+        socket.emit 'board.move', from, to # passes tests, but doesn't work in real world
+        # mgr.server.emit 'board.move', from, to # works in real world, but doesn't pass tests
         # @server.to(room.name).emit 'board.move', from, to
       else
         cb?(false)
@@ -78,8 +85,8 @@ wrapSocket = (mgr, socket) ->
     onDisconnect: ->
       client = mgr.clientFor socket
       room = mgr.roomFor socket
-      if color = ['white', 'black'].find((c) => room[c]?.id is socket.id)
-        room[color] = {id: getID(socket), name: client.name, abandoned: true}
+      if color = ['white', 'black'].find((c) => room[c]?.socketId is socket.id)
+        room[color] = {id: getKriegspielId(socket), name: client.name, abandoned: true}
         socket.emit 'stand', color
         # @server.to(room.name).emit 'stand', color
       mgr.removeClientFor socket
@@ -106,7 +113,7 @@ module.exports = class RoomManager
       socket.on 'disconnect', wrapSocket(this, socket).onDisconnect
 
   addClientFor: (socket, nickname) ->
-    client = {id: socket.id, name: nickname}
+    client = {id: getKriegspielId(socket), socketId: socket.id, name: nickname}
     @clients[getID(socket)] = client
     return client
   clientFor: (socket) -> @clients[getID(socket)]

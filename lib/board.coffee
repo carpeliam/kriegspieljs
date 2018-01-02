@@ -10,9 +10,12 @@ class Board
   QUEEN = 5
   KING = 6
   constructor: (@options = {}) ->
-    @squares = []
-    @squares[i] = [] for i in [0..8]
-    @init()
+    if @options.gameState
+      @loadState @options.gameState
+    else
+      @squares = []
+      @squares[i] = [] for i in [0..8]
+      @init()
 
   init: ->
     @squares[0][0] = @squares[7][0] = WHITE*ROOK
@@ -35,6 +38,11 @@ class Board
     @hasMoved[BLACK] = king: false, kingsRook: false, queensRook: false
 
     @turn = WHITE
+
+  loadState: (state) ->
+    @squares = state.squares
+    @hasMoved = state.hasMoved
+    @turn = state.turn
 
   valueAt: (x,y) ->
     @squares[x][y]
@@ -70,6 +78,15 @@ class Board
   color: (x, y) ->
     return undefined if @valueAt(x, y) == UNOCCUPIED
     @valueAt(x, y) / Math.abs(@valueAt(x, y))
+
+  gameState: ->
+    state = {squares: []}
+    state.squares[x] = [@squares[x]...] for x in [0..7]
+    state.hasMoved =
+      "#{WHITE}": king: @hasMoved[WHITE].king, kingsRook: @hasMoved[WHITE].kingsRook, queensRook: @hasMoved[WHITE].queensRook
+      "#{BLACK}": king: @hasMoved[BLACK].king, kingsRook: @hasMoved[BLACK].kingsRook, queensRook: @hasMoved[BLACK].queensRook
+    state.turn = @turn
+    state
 
   # forces a given move, detects if a check exists, and then undoes the move
   moveResultsInCheck: (xOrig, yOrig, xNew, yNew) ->

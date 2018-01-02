@@ -15,14 +15,14 @@ describe('UserNamePrompter', () => {
     );
   }
   it('is visible if the username is undefined', () => {
-    const component = createUserNamePrompter({user: undefined});
+    const component = createUserNamePrompter({user: { id: 1 }});
     // TODO test via class name
     const modal = component.find(Modal);
     expect(modal).toHaveProp('show', true);
   });
 
   it('is hidden if the username is present', () => {
-    const component = createUserNamePrompter({user: 'jim'});
+    const component = createUserNamePrompter({user: { id: 1, name: 'jim' }});
     const modal = component.find(Modal);
     expect(modal).toHaveProp('show', false);
   });

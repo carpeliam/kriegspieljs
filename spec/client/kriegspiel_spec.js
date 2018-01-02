@@ -3,6 +3,7 @@ import { shallow } from 'enzyme';
 import KriegspielDragDropContext from '../../client/kriegspiel';
 import UserNamePrompter from '../../client/username-prompter';
 import SeatList from '../../client/seat-list';
+import Board from '../../client/board';
 
 const Kriegspiel = KriegspielDragDropContext.DecoratedComponent;
 
@@ -43,6 +44,9 @@ describe('Kriegspiel', () => {
     // expect(seatList).toHaveProp('black', { id: 3 });
     // expect(seatList).toHaveProp('players', { white: 1, black: 2 });
     expect(seatList).toBePresent();
+  });
+  it('contains the board', () => {
+    expect(kriegspiel.find(Board)).toBePresent();
   });
 
 

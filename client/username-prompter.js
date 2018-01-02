@@ -8,7 +8,7 @@ export default class UserNamePrompter extends React.Component {
   }
   render() {
     return (
-      <Modal show={this.props.user == undefined} onHide={this._noop.bind(this)}>
+      <Modal show={this.props.user.name == undefined} onHide={this._noop.bind(this)}>
         <Modal.Header><Modal.Title>Log In</Modal.Title></Modal.Header>
         <Modal.Body>
           <form className="form-horizontal">

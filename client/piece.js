@@ -2,9 +2,9 @@ import React, { PropTypes } from 'react';
 import { DragSource } from 'react-dnd';
 
 function character(props) {
-  let {pieceType, color} = props;
+  let { type, color } = props;
   let isWhite = color > 0;
-  switch (pieceType) {
+  switch (type) {
     case 1: // PAWN
       return isWhite ? '♙' : '♟';
     case 2: // KNIGHT
@@ -25,7 +25,7 @@ const spec = {
     return {x: props.x, y: props.y};
   },
   canDrag(props) {
-    return props.canDrag(props.color);
+    return props.canDrag;
   }
 };
 

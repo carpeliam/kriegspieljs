@@ -1,4 +1,5 @@
 describe "Board", ->
+  Board = require("#{__dirname}/../../lib/board")
   board = undefined
   onForcedMove  = jasmine.createSpy('onForcedMove')
   onCheck       = jasmine.createSpy('onCheck')
@@ -6,8 +7,27 @@ describe "Board", ->
   onAdvancement = jasmine.createSpy('onAdvancement')
   onPromotion   = jasmine.createSpy('onPromotion')
   beforeEach ->
-    Board = require("#{__dirname}/../../lib/board")
     board = new Board {onForcedMove, onCheck, onMate, onAdvancement, onPromotion}
+
+  it "can serialize the game state", ->
+    gameState = board.gameState()
+    for i in [0...8]
+      expect(gameState.squares[i]).toEqual board.squares[i]
+      expect(gameState.squares[i]).not.toBe board.squares[i]
+    expect(gameState.hasMoved).toEqual board.hasMoved
+    expect(gameState.hasMoved).not.toBe board.hasMoved
+    expect(gameState.turn).toEqual board.turn
+
+  it "can deserialize game state", ->
+    board.forceMove 3, 0, 4, 1 # white queen e2
+    board.forceMove 3, 7, 4, 2 # black queen e3
+    gameState = board.gameState()
+    newBoard = new Board {gameState}
+    for i in [0...8]
+      expect(newBoard.squares[i]).toEqual board.squares[i]
+    expect(newBoard.hasMoved).toEqual board.hasMoved
+    expect(newBoard.turn).toEqual board.turn
+
 
   describe "#algebraicNotationFor", ->
     it "translates x,y to a point", ->

@@ -42,10 +42,10 @@ class Player {
     await this.page.mouse.move(toBox.x + toBox.width / 2, toBox.y + toBox.height / 2);
 
     await this.page.screenshot({ path: `${this.color}-${from}.png`, clip: {
-        x: Math.min(fromBox.x, toBox.x),
-        y: Math.min(fromBox.y, toBox.y),
-        width: Math.max(fromBox.x, toBox.x) - Math.min(fromBox.x, toBox.x) + toBox.width,
-        height: Math.max(fromBox.y, toBox.y) - Math.min(fromBox.y, toBox.y) + toBox.height
+        x: Math.min(fromBox.x, toBox.x) - toBox.width,
+        y: Math.min(fromBox.y, toBox.y) - toBox.height,
+        width: Math.max(fromBox.x, toBox.x) - Math.min(fromBox.x, toBox.x) + 3 * toBox.width,
+        height: Math.max(fromBox.y, toBox.y) - Math.min(fromBox.y, toBox.y) + 3 * toBox.height
       }
     });
 
@@ -53,11 +53,11 @@ class Player {
   }
 
   async getSquare(notation) {
-    const rows = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
-    const row = rows.indexOf(notation[0]);
-    const col = parseInt(notation[1], 10);
-    // return await this.page.$(`.board :nth-child(${8 * row + col})`);
-    return await this.page.$(`#board tr:nth-child(${8 - col + 1}) td:nth-child(${row + 1})`);
+    const cols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+    const col = cols.indexOf(notation[0]);
+    const row = parseInt(notation[1], 10);
+    return await this.page.$(`.board :nth-child(${(8 - row) * 8 + 1 + col})`);
+    // return await this.page.$(`#board tr:nth-child(${8 - col + 1}) td:nth-child(${row + 1})`);
   }
 
   async hasTurn() {
@@ -113,13 +113,14 @@ describe('fools mate', () => {
 
     await white.page.waitFor('#white.losing');
     await black.page.waitFor('#black.winning');
-
-    await white.page.screenshot({ path: 'white.png' });
-    await black.page.screenshot({ path: 'black.png' });
-
-    // success!!
   }));
   afterEach(async () => {
+    if (white.page) {
+      await white.page.screenshot({ path: 'white.png' });
+    }
+    if (black.page) {
+      await black.page.screenshot({ path: 'black.png' });
+    }
     if (white.browser) {
       await white.browser.close();
     }

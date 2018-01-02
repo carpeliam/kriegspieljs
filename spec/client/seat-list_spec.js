@@ -1,8 +1,8 @@
-import '../client_helper';
 import React from 'react';
 import ReactTestUtils from 'react-addons-test-utils';
+import { createStore } from 'redux';
 import { shallow } from 'enzyme';
-import { SeatList, Seat } from '../../client/seat-list';
+import { SeatList, Seat, SeatContainer } from '../../client/seat-list';
 
 describe('Seat', () => {
   let onSitOrStandSpy;
@@ -13,6 +13,19 @@ describe('Seat', () => {
     sitAsSpy = jasmine.createSpy('sitAs');
     standAsSpy = jasmine.createSpy('standAs');
   });
+
+  it('shows when a current seat has an active move', () => {
+    const activeSeat = shallow(<Seat
+      color="white"
+      active
+      user={{ id: 1 }}
+      players={{}}
+      sitAs={sitAsSpy}
+      standAs={standAsSpy}
+    />);
+    expect(activeSeat.find('.btn-white')).toHaveClassName('active');
+  });
+
   describe('when the user is not currently sitting', () => {
     it('allows the user to sit in an open seat', () => {
       const seat = shallow(<Seat
@@ -66,6 +79,47 @@ describe('Seat', () => {
       />);
       expect(seat.find('.btn-white')).toHaveProp('disabled', true);
     });
+  });
+});
+
+describe('SeatContainer', () => {
+  let container;
+  let store;
+  const user = { name: 'margaret', id: 'abc123' };
+  const allPlayers = {
+    white: user,
+    black: { name: 'jim', id: '123abc' }
+  };
+  beforeEach(() => {
+    store = createStore(state => state, {
+      user,
+      game: {
+        players: allPlayers,
+        board: { turn: 1 },
+      },
+    });
+    spyOn(store, 'dispatch');
+    container = shallow(<SeatContainer store={store} color="white" />);
+  });
+
+  it('passes user and game state to the seat', () => {
+    const seat = container.find(Seat);
+    expect(seat).toHaveProp('user', user);
+    expect(seat).toHaveProp('players', allPlayers);
+    expect(seat).toHaveProp('active', true);
+  });
+
+  it('does not pass active color if at least one seat is empty', () => {
+    store = createStore(state => state, {
+      user,
+      game: {
+        players: { white: user },
+        board: { turn: 1 },
+      },
+    });
+    container = shallow(<SeatContainer store={store} color="white" />);
+    const seat = container.find(Seat);
+    expect(seat).not.toHaveProp('active');
   });
 });
 

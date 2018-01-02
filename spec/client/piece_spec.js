@@ -21,7 +21,7 @@ describe('Piece', () => {
 
   function createPiece(props = {}) {
     return ReactTestUtils.renderIntoDocument(<OrigPiece
-            pieceType={props.pieceType || 1}
+            type={props.type || 1}
             color={props.color || 1}
             connectDragSource={props.connectDragSource || identity}
             isDragging={props.isDragging || false} />);
@@ -50,8 +50,8 @@ describe('Piece', () => {
   it('can be dragged if a drag source allows it', () => {
     const PieceContext = wrapInTestContext(Piece);
     const root = ReactTestUtils.renderIntoDocument(<PieceContext
-      pieceType={1} color={1}
-      canDrag={(color) => { return true; }} />);
+      type={1} color={1}
+      canDrag={true} />);
     const backend = root.getManager().getBackend();
 
     const piece = ReactTestUtils.findRenderedComponentWithType(root, Piece);
@@ -62,8 +62,8 @@ describe('Piece', () => {
   it('can not be dragged if a drag source prohibits it', () => {
     const PieceContext = wrapInTestContext(Piece);
     const root = ReactTestUtils.renderIntoDocument(<PieceContext
-      pieceType={1} color={1}
-      canDrag={(color) => { return false; }} />);
+      type={1} color={1}
+      canDrag={false} />);
     const backend = root.getManager().getBackend();
 
     const piece = ReactTestUtils.findRenderedComponentWithType(root, Piece);

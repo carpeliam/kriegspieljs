@@ -11,7 +11,7 @@ class Session
       @cookieId ?= "abc#{Session.count++}"
       @serverSocket.handshake =
         headers:
-          cookie: "connect.sid=#{@cookieId}"
+          cookie: "connect.sid=#{@cookieId}; kriegspiel.user=#{JSON.stringify(id: @cookieId)}"
     @clientSocket = @client.connect()
     return this
   joinAs: (name) ->
@@ -61,14 +61,14 @@ describe 'Room Manager', ->
     beforeEach -> session.connect()
     it 'updates the room list', (done) ->
       session.clientSocket.on 'room.list', (names) ->
-        expect(names).toContain {id: session.serverSocket.id, name: 'Bobby'}
+        expect(names).toContain {id: session.cookieId, socketId: session.serverSocket.id, name: 'Bobby'}
         done()
       session.joinAs 'Bobby'
     it 'seats the player if they had previously disconnected while sitting', (done) ->
       session.joinAs('Bobby').sit('white').disconnect().connect()
       session.clientSocket.on 'sit', (color, name) ->
         expect(color).toEqual 'white'
-        expect(name).toEqual id: session.serverSocket.id, name: 'Bobby'
+        expect(name).toEqual id: session.cookieId, socketId: session.serverSocket.id, name: 'Bobby'
         done()
       session.joinAs('Bobby')
 
@@ -79,7 +79,7 @@ describe 'Room Manager', ->
     it 'allows a player to sit in an unoccupied seat if they are not already seated', (done) ->
       session.clientSocket.on 'sit', (color, name) ->
         expect(color).toEqual('white')
-        expect(name).toEqual(id: session.serverSocket.id, name: 'Bobby')
+        expect(name).toEqual(id: session.cookieId, socketId: session.serverSocket.id, name: 'Bobby')
         done()
       session.sit('white')
 
@@ -160,7 +160,7 @@ describe 'Room Manager', ->
     it 'sends a new room list', (done) ->
       newSession = new Session(server).connect().joinAs('Boris')
       session.clientSocket.on 'room.list', (names) ->
-        expect(names).toEqual [{id: newSession.serverSocket.id, name: 'Boris'}]
+        expect(names).toEqual [{id: newSession.cookieId, socketId: newSession.serverSocket.id, name: 'Boris'}]
         done()
       session.disconnect()
     it 'keeps track of cookie IDs if a player was sitting', ->

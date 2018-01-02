@@ -18,6 +18,7 @@
   },
   "dependencies": {
     "bootstrap-sass": "^3.3.7",
+    "classnames": "^2.2.5",
     "coffee-script": "1.9.3",
     "coffeeify": "^1.1.0",
     "connect": "3.3.5",
@@ -69,6 +70,7 @@
     "mocket-io": "carpeliam/mocket-io",
     "node-sass": "^4.5.0",
     "phantomjs": "^1.9.18",
+    "prop-types": "^15.6.0",
     "puppeteer": "^0.13.0",
     "react-addons-perf": "^15.4.2",
     "react-addons-test-utils": "^15.4.2",

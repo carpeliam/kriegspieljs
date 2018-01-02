@@ -1,4 +1,5 @@
 import Cookie from 'js-cookie';
+import shortid from 'shortid';
 import { fetchUser, setUser } from '../../client/cookie-monster';
 
 describe('cookieMonster', () => {
@@ -10,9 +11,10 @@ describe('cookieMonster', () => {
       expect(Cookie.get).toHaveBeenCalledWith('kriegspiel.user');
     });
 
-    it('returns undefined when a cookie is not present', () => {
+    it('returns a new ID when a cookie is not present', () => {
+      spyOn(shortid, 'generate').and.returnValue('abc123');
       spyOn(Cookie, 'get').and.returnValue(undefined);
-      expect(fetchUser()).toEqual(undefined);
+      expect(fetchUser()).toEqual({ id: 'abc123' });
       expect(Cookie.get).toHaveBeenCalledWith('kriegspiel.user');
     });
   });
