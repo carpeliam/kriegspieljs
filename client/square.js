@@ -25,7 +25,7 @@ function collect(connect, monitor) {
 
 export class Square extends React.Component {
   render() {
-    const { x, y, connectDropTarget, isOver, canDrop, piece } = this.props;
+    const { connectDropTarget, piece } = this.props;
     return connectDropTarget(
       <div>
         {piece && <Piece {...piece} />}
@@ -50,14 +50,11 @@ function mapStateToProps({ user, game }, { x, y }) {
     activePlayer = (game.board.turn === 1) ? game.players.white : game.players.black;
   }
   const type = board.pieceType(x, y);
-  const canDrag = (!!activePlayer && activePlayer.id === user.id);
-  const piece = type && {
-    type,
-    color: board.color(x, y),
-    x,
-    y,
-    canDrag
-  };
+  const color = board.color(x, y);
+  const opposingPieceOwner = game.players[(color === 1) ? 'black' : 'white'];
+  const userIsOpposingPieceOwner = !!opposingPieceOwner && opposingPieceOwner.id === user.id;
+  const canDrag = !!activePlayer && activePlayer.id === user.id;
+  const piece = type && !userIsOpposingPieceOwner && { type, color, x, y, canDrag };
   return {
     piece,
     canDrop: (origCoords, newCoords) => board.canMove(origCoords.x, origCoords.y, newCoords.x, newCoords.y)
