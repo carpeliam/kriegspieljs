@@ -249,4 +249,6 @@ class Board
         return true
       if isMate() then @options.onMate?(pieces) else @options.onCheck?(pieces)
 
-module.exports = Board
+module.exports = exports = Board
+Object.defineProperty exports, '__esModule', value: true
+exports.default = exports

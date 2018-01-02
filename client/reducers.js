@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { SET_USER, UPDATE_PLAYER, UPDATE_BOARD } from './actions';
+import { SET_USER, UPDATE_PLAYER, UPDATE_BOARD, GAME_EVENT } from './actions';
 import Board from '../lib/board.coffee';
 
 export function user(state = null, action) {
@@ -11,7 +11,7 @@ export function user(state = null, action) {
   }
 }
 
-export function game(state = { players: {}, board: new Board().gameState() }, action) {
+export function game(state = { players: {}, board: new Board().gameState(), check: false, mate: false }, action) {
   switch (action.type) {
     case UPDATE_PLAYER:
       const user = action.user && Object.assign({}, action.user);
@@ -21,7 +21,9 @@ export function game(state = { players: {}, board: new Board().gameState() }, ac
       };
       return Object.assign({}, state, { players });
     case UPDATE_BOARD:
-      return Object.assign({}, state, { board: action.board });
+      return Object.assign({}, state, { board: action.board, check: false });
+    case GAME_EVENT:
+      return Object.assign({}, state, { [action.name]: true });
     default:
       return state;
   }

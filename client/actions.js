@@ -5,6 +5,7 @@ import Board from '../lib/board.coffee';
 export const SET_USER = 'SET_USER';
 export const UPDATE_PLAYER = 'UPDATE_PLAYER';
 export const UPDATE_BOARD = 'UPDATE_BOARD';
+export const GAME_EVENT = 'GAME_EVENT';
 
 export function setUser(name) {
   const user = { id: fetchUser().id, name };
@@ -36,10 +37,16 @@ export function updateBoard(board) {
 
 export function updateBoardWithMove(origCoords, newCoords) {
   return (dispatch, getState) => {
-    const board = new Board({ gameState: getState().game.board });
+    const postMoveActions = [];
+    const board = new Board({
+      gameState: getState().game.board,
+      onCheck: () => postMoveActions.push({ type: GAME_EVENT, name: 'check' }),
+      onMate: () => postMoveActions.push({ type: GAME_EVENT, name: 'mate' }),
+    });
     board.move(origCoords.x, origCoords.y, newCoords.x, newCoords.y);
     const gameState = board.gameState();
     dispatch(updateBoard(gameState));
+    postMoveActions.forEach(action => dispatch(action));
   }
 }
 
