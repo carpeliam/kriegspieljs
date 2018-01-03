@@ -199,7 +199,7 @@ var client = {
     });
     for (var prop in board) {
       if (this.board.hasOwnProperty(prop))
-        this.board[prop] = board[prop];
+        Object.assign(this.board[prop], board[prop])
     }
     $('#board td').each(function() {
       var coords = $(this).coordinates();
