@@ -33,31 +33,31 @@ class Player {
     console.log(`moving from ${from} to ${to}...`);
     await this.page.waitFor(800);
     const fromElem = await this.getSquare(from);
-    const fromBox = await fromElem.boundingBox();
+    const fromBox = await W(fromElem.boundingBox());
     const toElem = await this.getSquare(to);
-    const toBox = await toElem.boundingBox();
+    const toBox = await W(toElem.boundingBox());
 
-    await this.page.mouse.move(fromBox.x + fromBox.width / 2, fromBox.y + fromBox.height / 2);
-    await this.page.mouse.down();
-    await this.page.mouse.move(toBox.x + toBox.width / 2, toBox.y + toBox.height / 2);
+    await W(this.page.mouse.move(fromBox.x + fromBox.width / 2, fromBox.y + fromBox.height / 2));
+    await W(this.page.mouse.down());
+    await W(this.page.mouse.move(toBox.x + toBox.width / 2, toBox.y + toBox.height / 2));
 
-    await this.page.screenshot({ path: `${this.color}-${from}.png`, clip: {
+    await W(this.page.screenshot({ path: `${this.color}-${from}.png`, clip: {
         x: Math.min(fromBox.x, toBox.x) - toBox.width,
         y: Math.min(fromBox.y, toBox.y) - toBox.height,
         width: Math.max(fromBox.x, toBox.x) - Math.min(fromBox.x, toBox.x) + 3 * toBox.width,
         height: Math.max(fromBox.y, toBox.y) - Math.min(fromBox.y, toBox.y) + 3 * toBox.height
       }
-    });
+    }));
 
-    await this.page.mouse.up();
+    await W(this.page.mouse.up());
   }
 
   async getSquare(notation) {
     const cols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const col = cols.indexOf(notation[0]);
     const row = parseInt(notation[1], 10);
-    return await this.page.$(`.board :nth-child(${(8 - row) * 8 + 1 + col})`);
-    // return await this.page.$(`#board tr:nth-child(${8 - col + 1}) td:nth-child(${row + 1})`);
+    return W(this.page.$(`.board :nth-child(${(8 - row) * 8 + 1 + col})`));
+    // return W(this.page.$(`#board tr:nth-child(${8 - col + 1}) td:nth-child(${row + 1})`));
   }
 
   async hasTurn() {
@@ -66,20 +66,12 @@ class Player {
     await W(this.page.waitFor(buttonSelector));
   }
 
-  async hasWon() {
-    if (this.color == 'white') {
-      return await this.page.evaluate(() => document.querySelector('#white').classList.contains('winning'));
-    }
-    return await this.page.evaluate(() => document.querySelector('#black').classList.contains('winning'));
-    // return await this.page.evaluate((color) => document.querySelector(`#${color}`).classList.contains('winning'), this.color);
+  async wins() {
+    return W(this.page.waitFor(`#${this.color}.winning`));
   }
 
-  async hasLost() {
-    if (this.color == 'white') {
-      return await this.page.evaluate(() => document.querySelector('#white').classList.contains('losing'));
-    }
-    return await this.page.evaluate(() => document.querySelector('#black').classList.contains('losing'));
-    // return await this.page.evaluate((color) => document.querySelector(`#${color}`).classList.contains('losing'), this.color);
+  async loses() {
+    return W(this.page.waitFor(`#${this.color}.losing`));
   }
 }
 
@@ -87,7 +79,7 @@ describe('fools mate', () => {
   let white;
   let black;
   beforeEach(() => {
-    jasmine.getEnv().defaultTimeoutInterval = 5000;
+    jasmine.getEnv().defaultTimeoutInterval = 10000;
   });
   it('can be played', SX(async () => {
     white = new Player();
@@ -111,8 +103,8 @@ describe('fools mate', () => {
     await black.hasTurn();
     await black.move('d8', 'h4');
 
-    await white.page.waitFor('#white.losing');
-    await black.page.waitFor('#black.winning');
+    await white.loses();
+    await black.wins();
   }));
   afterEach(async () => {
     if (white.page) {
@@ -146,5 +138,5 @@ function wrapPromiseInTimeout(promise) {
 }
 
 function SX(fun) {
-  return done => fun().then(done).catch(done.fail);
+  return done => fun().then(done).catch(done);
 }
