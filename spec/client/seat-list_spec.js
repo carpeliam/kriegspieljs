@@ -26,6 +26,30 @@ describe('Seat', () => {
     expect(activeSeat.find('.btn-white')).toHaveClassName('active');
   });
 
+  it('shows when a current seat is occupied by the winning player', () => {
+    const activeSeat = shallow(<Seat
+      color="white"
+      winning
+      user={{ id: 1 }}
+      players={{}}
+      sitAs={sitAsSpy}
+      standAs={standAsSpy}
+    />);
+    expect(activeSeat.find('.btn-white')).toHaveClassName('winning');
+  });
+
+  it('shows when a current seat is occupied by the losing player', () => {
+    const activeSeat = shallow(<Seat
+      color="white"
+      losing
+      user={{ id: 1 }}
+      players={{}}
+      sitAs={sitAsSpy}
+      standAs={standAsSpy}
+    />);
+    expect(activeSeat.find('.btn-white')).toHaveClassName('losing');
+  });
+
   describe('when the user is not currently sitting', () => {
     it('allows the user to sit in an open seat', () => {
       const seat = shallow(<Seat
@@ -107,6 +131,38 @@ describe('SeatContainer', () => {
     expect(seat).toHaveProp('user', user);
     expect(seat).toHaveProp('players', allPlayers);
     expect(seat).toHaveProp('active', true);
+  });
+
+  it('passes winning state if game is in mate and current player does not turn', () => {
+    store = createStore(state => state, {
+      user,
+      game: {
+        players: allPlayers,
+        board: { turn: -1 },
+        mate: true,
+      },
+    });
+    spyOn(store, 'dispatch');
+    container = shallow(<SeatContainer store={store} color="white" />);
+    const seat = container.find(Seat);
+    expect(seat).toHaveProp('winning', true);
+    expect(seat).toHaveProp('losing', false);
+  });
+
+  it('passes losing state if game is in mate and current player has turn', () => {
+    store = createStore(state => state, {
+      user,
+      game: {
+        players: allPlayers,
+        board: { turn: 1 },
+        mate: true,
+      },
+    });
+    spyOn(store, 'dispatch');
+    container = shallow(<SeatContainer store={store} color="white" />);
+    const seat = container.find(Seat);
+    expect(seat).toHaveProp('winning', false);
+    expect(seat).toHaveProp('losing', true);
   });
 
   it('does not pass active color if at least one seat is empty', () => {

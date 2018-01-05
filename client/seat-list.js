@@ -5,8 +5,8 @@ import { sitAs, standAs } from './actions';
 
 const oppositeColorOf = { white: 'black', black: 'white' };
 
-export function Seat({ color, active, user, players, sitAs, standAs }) {
-  const className = cx([`btn btn-block btn-${color}`, { active }]);
+export function Seat({ color, active, winning, losing, user, players, sitAs, standAs }) {
+  const className = cx(`btn btn-block btn-seat btn-${color}`, { active, winning, losing });
   const occupant = players[color];
   const opponent = players[oppositeColorOf[color]];
   const disabled = (occupant && occupant.id !== user.id) || (opponent && opponent.id === user.id);
@@ -28,12 +28,13 @@ export function Seat({ color, active, user, players, sitAs, standAs }) {
   );
 }
 
-function mapStateToProps({ user, game: { players, board: { turn } } }, { color }) {
-  const state = { user, players };
+function mapStateToProps({ user, game: { players, board: { turn }, mate } }, { color }) {
+  const active = (turn < 0) ? color === 'black' : color === 'white';
+  const props = { user, players, winning: mate && !active, losing: mate && active };
   if (players.white && players.black) {
-    state.active = (turn < 0) ? color === 'black' : color === 'white';
+    props.active = active;
   }
-  return state;
+  return props;
 }
 
 function mapDispatchToProps(dispatch) {
