@@ -1,7 +1,7 @@
 import '../client_helper';
 
 import React from 'react';
-import ReactTestUtils from 'react-addons-test-utils';
+import ReactTestUtils from 'react-dom/test-utils';
 
 import MessageLog from '../../client/message-log';
 

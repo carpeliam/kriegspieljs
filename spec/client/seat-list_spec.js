@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactTestUtils from 'react-addons-test-utils';
 import { createStore } from 'redux';
 import { shallow } from 'enzyme';
 import { SeatList, Seat, SeatContainer } from '../../client/seat-list';
@@ -198,61 +197,4 @@ xdescribe('SeatList', () => {
       white.sitAsOrStand();
     });
   });
-
-//   xdescribe('when the user is a guest', () => {
-//     beforeEach(() => {
-//       seatList = shallow(<SeatList
-//         user={{ id: 1 }}
-//         players={{ white: { id: 2 } }}
-//         sitOrStandAs={sitOrStandAs}
-//       />);
-//     });
-//     it('allows the user to sit in an open seat', () => {
-//       seatList.find('.btn-black').simulate('click');
-//       expect(sitOrStandAs).toHaveBeenCalledWith('black');
-//     });
-//     it('does not allow the user to sit in an occupied seat', () => {
-//       // seatList.find('.btn-white').simulate('click');
-//       // expect(sitOrStandAs).not.toHaveBeenCalled();
-//       expect(seatList.find('.btn-white')).toHaveProp('disabled', true);
-//     });
-//   });
-
-//   function createSeatList(props = {}) {
-//     return shallow(<SeatList {...props} />);
-//     // return ReactTestUtils.renderIntoDocument(<SeatList
-//     //         playerColor={props.playerColor || null}
-//     //         white={props.white || undefined}
-//     //         black={props.black || undefined}
-//     //         sitOrStandAs={sitOrStandAs} />);
-//   }
-//   xit('allows a user to sit in an open seat', () => {
-//     // var seatList = createSeatList({ user: });
-//     const seatList = shallow(<SeatList sitOrStandAs={sitOrStandAs} />);
-//     // let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-white');
-//     seatList.find('.btn-white').simulate('click');
-//     // ReactTestUtils.Simulate.click(btn);
-//     expect(sitOrStandAs).toHaveBeenCalled();
-//   });
-
-//   xit('allows a player to stand if they are already sitting', () => {
-//     var seatList = createSeatList({playerColor: 'white', white: 'Gen'});
-//     let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-white');
-//     ReactTestUtils.Simulate.click(btn);
-//     expect(sitOrStandAs).toHaveBeenCalled();
-//   });
-
-//   xit('does not allow a user to sit in an occupied seat', () => {
-//     var seatList = createSeatList({playerColor: null, white: 'Gen', black: 'Liam'});
-//     let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-white');
-//     ReactTestUtils.Simulate.click(btn);
-//     expect(sitOrStandAs).not.toHaveBeenCalled();
-//   });
-
-//   xit('does not allow a player to sit in an unoccupied seat', () => {
-//     var seatList = createSeatList({playerColor: 'white', white: 'Gen', black: undefined});
-//     let btn = ReactTestUtils.findRenderedDOMComponentWithClass(seatList, 'btn-black');
-//     ReactTestUtils.Simulate.click(btn);
-//     expect(sitOrStandAs).not.toHaveBeenCalled();
-//   });
 });
