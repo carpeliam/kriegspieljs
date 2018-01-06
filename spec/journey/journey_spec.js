@@ -2,18 +2,28 @@ const puppeteer = require('puppeteer');
 
 const W = wrapPromiseInTimeout;
 
+const host = process.env.CI_SERVER || 'http://localhost:8124';
+
 class Player {
   async visitHomepage() {
     this.browser = await puppeteer.launch();
     this.page = await this.browser.newPage();
     await this.page.setViewport({ width: 1600, height: 1200 });
-    await this.page.goto('http://localhost:8124');
+    await this.page.goto(host);
   }
 
   async setUsername(name) {
     await W(this.page.waitFor('input#handle'));
     await W(this.page.type('input#handle', name));
     await W(this.page.click('.ui-dialog-buttonpane button'));
+    await W(this.page.waitFor(() => {
+      const modal = document.querySelector('.ui-dialog');
+      if (!modal) {
+        return true;
+      }
+      const style = window.getComputedStyle(modal);
+      return style && style.display === 'none';
+    }));
     // await W(this.page.waitFor('input[name="username"]'));
     // await W(this.page.type('input[name="username"]', name));
     // await W(this.page.click('.modal-footer button'));
@@ -23,8 +33,12 @@ class Player {
     this.color = color;
     const buttonSelector = `#${color}`;
     // const buttonSelector = `.btn-${color}`;
+    await this.page.waitFor(200);
     await W(this.page.waitFor(buttonSelector));
     await W(this.page.click(buttonSelector));
+    await W(this.page.waitFor((selector) => {
+      return document.querySelector(selector).innerText.includes('leave');
+    }, {}, buttonSelector));
   }
 
   async move(from, to) {
@@ -69,6 +83,15 @@ class Player {
   async loses() {
     return W(this.page.waitFor(`#${this.color}.losing`));
   }
+
+  async standsUp() {
+    const buttonSelector = `#${this.color}`;
+    // const buttonSelector = `.btn-${color}`;
+    await W(this.page.click(buttonSelector));
+    await W(this.page.waitFor((selector) => {
+      return document.querySelector(selector).innerText.includes('sit');
+    }, {}, buttonSelector));
+  }
 }
 
 describe('fools mate', () => {
@@ -91,7 +114,7 @@ describe('fools mate', () => {
     await black.chooseColor('black');
 
     await white.hasTurn();
-    await white.move('f2', 'f3');
+    await white.move('f2', 'f4');
     await black.hasTurn();
     await black.move('e7', 'e5');
     await white.hasTurn();
@@ -101,6 +124,9 @@ describe('fools mate', () => {
 
     await white.loses();
     await black.wins();
+
+    await white.standsUp();
+    await black.standsUp();
   }));
   afterEach(async () => {
     if (white.page) {

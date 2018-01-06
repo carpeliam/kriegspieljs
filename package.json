@@ -7,7 +7,7 @@
   "scripts": {
     "start": "coffee server.coffee",
     "test": "jasmine-node --coffee spec/",
-    "deploy": "cf push kriegspiel -c 'npm start' -b nodejs_buildpack"
+    "deploy": "cf push kriegspiel-ci-master -c 'npm start' -b nodejs_buildpack"
   },
   "repository": {
     "type": "git",
