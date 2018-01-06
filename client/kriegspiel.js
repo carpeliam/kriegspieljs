@@ -9,12 +9,26 @@ import Board from './board';
 // import Square from './square';
 // import Piece from './piece';
 import SeatList from './seat-list';
+import Room from './room';
 // import RoomList from './room-list';
 // import MessageLog from './message-log';
 // import BoardCommunicator from './board-communicator';
 import UserNamePrompter from './username-prompter';
 
 // import Board from '../lib/board.coffee';
+
+function Kriegspiel({ user, setUser, game }) {
+  return (
+    <div>
+      <Board />
+      <SeatList />
+      <Room />
+      <UserNamePrompter user={user} onEnter={setUser} />
+    </div>
+  );
+}
+
+export default DragDropContext(HTML5Backend)(Kriegspiel);
 
 /*class Kriegspiel extends React.Component {
   constructor() {
@@ -136,15 +150,3 @@ import UserNamePrompter from './username-prompter';
     </div>;
   }
 }*/
-
-function Kriegspiel({ user, setUser, game }) {
-  return (
-    <div>
-      <Board />
-      <SeatList />
-      <UserNamePrompter user={user} onEnter={setUser} />
-    </div>
-  );
-}
-
-export default DragDropContext(HTML5Backend)(Kriegspiel);

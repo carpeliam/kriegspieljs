@@ -1,5 +1,11 @@
-import { SET_USER, UPDATE_PLAYER, UPDATE_BOARD, GAME_EVENT } from '../../client/actions';
-import { user, game } from '../../client/reducers';
+import {
+  SET_USER,
+  UPDATE_PLAYER,
+  UPDATE_BOARD,
+  GAME_EVENT,
+  UPDATE_MEMBERS
+} from '../../client/actions';
+import { user, game, members } from '../../client/reducers';
 import Board from '../../lib/board.coffee';
 
 describe('user reducer', () => {
@@ -40,5 +46,15 @@ describe('game reducer', () => {
     const updateBoardAction = { type: UPDATE_BOARD, board: { turn: 2 } };
     const state = game(initialState, updateBoardAction);
     expect(state).toEqual({ players: { black: { id: 2 } }, board: { turn: 2 }, check: false, mate: false });
+  });
+});
+
+describe('members', () => {
+  it('has no members by default', () => {
+    expect(members(undefined, { type: 'SOME ACTION' })).toEqual([]);
+  });
+  it('processes UPDATE_MEMBERS actions', () => {
+    const newMembers = [{ id: 'abc123' }];
+    expect(members([], { type: UPDATE_MEMBERS, members: newMembers })).toEqual(newMembers);
   });
 });

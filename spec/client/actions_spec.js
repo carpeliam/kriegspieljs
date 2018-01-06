@@ -6,12 +6,14 @@ import {
   UPDATE_PLAYER,
   UPDATE_BOARD,
   GAME_EVENT,
+  UPDATE_MEMBERS,
   setUser,
   sitAs,
   standAs,
   updateBoard,
   move,
   updateBoardWithMove,
+  updateMembers,
 } from '../../client/actions';
 
 describe('actions', () => {
@@ -120,6 +122,13 @@ describe('actions', () => {
 
       expect(dispatchSpy.calls.argsFor(0)).toEqual([jasmine.objectContaining({ type: UPDATE_BOARD })]);
       expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'mate' }]);
+    });
+  });
+
+  describe('updateMembers', () => {
+    it('updates the members list', () => {
+      const action = updateMembers([{ id: 'abc123' }]);
+      expect(action).toEqual({ type: UPDATE_MEMBERS, members: [{ id: 'abc123' }] });
     });
   });
 });
