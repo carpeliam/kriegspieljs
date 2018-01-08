@@ -12,9 +12,6 @@ class Player {
 
   async setUsername(name) {
     console.log(`setting username to ${name}...`);
-    // await this.page.waitFor('input#handle');
-    // await this.page.type('input#handle', name);
-    // await this.page.click('.ui-dialog-buttonpane button');
     await W(this.page.waitFor('input[name="username"]'));
     await W(this.page.type('input[name="username"]', name));
     await W(this.page.click('.modal-footer button'));
@@ -23,10 +20,13 @@ class Player {
   async chooseColor(color) {
     console.log(`choosing color ${color}...`);
     this.color = color;
-    // const buttonSelector = `#${color}`;
     const buttonSelector = `.btn-${color}`;
+    await this.page.waitFor(200);
     await W(this.page.waitFor(buttonSelector));
     await W(this.page.click(buttonSelector));
+    await W(this.page.waitFor((selector) => {
+      return document.querySelector(selector).innerText.includes('leave');
+    }, {}, buttonSelector));
   }
 
   async move(from, to) {
@@ -57,7 +57,6 @@ class Player {
     const col = cols.indexOf(notation[0]);
     const row = parseInt(notation[1], 10);
     return W(this.page.$(`.board :nth-child(${(8 - row) * 8 + 1 + col})`));
-    // return W(this.page.$(`#board tr:nth-child(${8 - col + 1}) td:nth-child(${row + 1})`));
   }
 
   async hasTurn() {
@@ -78,10 +77,7 @@ class Player {
 describe('fools mate', () => {
   let white;
   let black;
-  beforeEach(() => {
-    jasmine.getEnv().defaultTimeoutInterval = 10000;
-  });
-  it('can be played', SX(async () => {
+  it('can be played', async () => {
     white = new Player();
     black = new Player();
 
@@ -105,7 +101,7 @@ describe('fools mate', () => {
 
     await white.loses();
     await black.wins();
-  }));
+  }, 10000);
   afterEach(async () => {
     if (white.page) {
       await white.page.screenshot({ path: 'white.png' });
@@ -113,30 +109,19 @@ describe('fools mate', () => {
     if (black.page) {
       await black.page.screenshot({ path: 'black.png' });
     }
-    if (white.browser) {
-      await white.browser.close();
-    }
-    if (black.browser) {
-      await black.browser.close();
-    }
   });
 });
 
 function wrapPromiseInTimeout(promise) {
-  const possibleError = new Error();
+  const possibleError = new Error('timeout');
   return new Promise((resolve, reject) => {
     const timeoutID = setTimeout(() => reject(possibleError), 1000);
     promise.then((a) => {
       resolve(a);
       clearTimeout(timeoutID);
     }).catch((e) => {
-      console.log('error', e);
       reject(e);
       clearTimeout(timeoutID);
     });
   });
-}
-
-function SX(fun) {
-  return done => fun().then(done).catch(done);
 }

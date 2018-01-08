@@ -2,16 +2,13 @@ import React from 'react';
 import { shallow } from 'enzyme';
 import KriegspielDragDropContext from '../../client/kriegspiel';
 import UserNamePrompter from '../../client/username-prompter';
-import SeatList from '../../client/seat-list';
 import Board from '../../client/board';
+import SeatList from '../../client/seat-list';
+import Room from '../../client/room';
 
 const Kriegspiel = KriegspielDragDropContext.DecoratedComponent;
 
 describe('Kriegspiel', () => {
-  // var server = new Server();
-  // // TODO no global objects, mock io properly
-  // window.io = new Client(server);
-
   let kriegspiel;
   let setUserSpy;
 
@@ -38,15 +35,10 @@ describe('Kriegspiel', () => {
     expect(setUserSpy).toHaveBeenCalledWith('margaret');
   });
 
-  it('contains the seat list', () => {
-    const seatList = kriegspiel.find(SeatList);
-    // expect(seatList).toHaveProp('white', { id: 2 });
-    // expect(seatList).toHaveProp('black', { id: 3 });
-    // expect(seatList).toHaveProp('players', { white: 1, black: 2 });
-    expect(seatList).toBePresent();
-  });
-  it('contains the board', () => {
+  it('contains the board, seat list, and room details', () => {
     expect(kriegspiel.find(Board)).toBePresent();
+    expect(kriegspiel.find(SeatList)).toBePresent();
+    expect(kriegspiel.find(Room)).toBePresent();
   });
 
 

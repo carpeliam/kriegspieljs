@@ -41,7 +41,7 @@ describe('subcribeToSocketEvents', () => {
   it('updates board state upon joining a room', () => {
     spyOn(actions, 'updateBoard').and.returnValue({ type: 'update board' });
     subcribeToSocketEvents(dispatchSpy, socket);
-    socket.receive('room.join', { board: { turn: 1 } });
+    socket.receive('board.update', { board: { turn: 1 } });
     expect(actions.updateBoard).toHaveBeenCalledWith({ turn: 1 });
     expect(dispatchSpy).toHaveBeenCalledWith({ type: 'update board' });
   });
