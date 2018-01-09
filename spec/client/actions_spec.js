@@ -9,7 +9,7 @@ import {
   UPDATE_MEMBERS,
   setUser,
   sitAs,
-  standAs,
+  stand,
   updateBoard,
   move,
   updateBoardWithMove,
@@ -40,15 +40,14 @@ describe('actions', () => {
   describe('sitAs', () => {
     it('updates the game with the given player sitting in the given color', () => {
       sitAs('white', { id: 'abc123' })(dispatchSpy, undefined, socketSpy);
-      expect(dispatchSpy).toHaveBeenCalledWith({ type: UPDATE_PLAYER, user: { id: 'abc123' }, color: 'white' });
       expect(socketSpy.emit).toHaveBeenCalledWith('sit', 'white');
     });
   });
 
-  describe('standAs', () => {
+  describe('stand', () => {
     it('updates the game with an undefined player in the given color', () => {
-      const action = standAs('white');
-      expect(action).toEqual({ type: UPDATE_PLAYER, user: undefined, color: 'white' });
+      stand()(dispatchSpy, undefined, socketSpy);
+      expect(socketSpy.emit).toHaveBeenCalledWith('stand');
     });
   });
 

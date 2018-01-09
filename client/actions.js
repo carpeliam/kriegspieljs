@@ -22,14 +22,11 @@ export function updatePlayer(color, user) {
 }
 
 export function sitAs(color, user) {
-  return (dispatch, getState, socket) => {
-    socket.emit('sit', color);
-    dispatch(updatePlayer(color, user));
-  }
+  return (dispatch, getState, socket) => socket.emit('sit', color);
 }
 
-export function standAs(color) {
-  return { type: UPDATE_PLAYER, color, user: undefined };
+export function stand() {
+  return (dispatch, getState, socket) => socket.emit('stand');
 }
 
 export function updateBoard(board) {

@@ -52,6 +52,13 @@ describe('subcribeToSocketEvents', () => {
     expect(actions.updatePlayer).toHaveBeenCalledWith('white', { id: 'abc123', name: 'margaret' });
     expect(dispatchSpy).toHaveBeenCalledWith({ type: 'sit' });
   });
+  it('removes a player from their seat upon receiving a stand notification', () => {
+    spyOn(actions, 'updatePlayer').and.returnValue({ type: 'stand' });
+    subcribeToSocketEvents(dispatchSpy, socket);
+    socket.receive('stand', 'white');
+    expect(actions.updatePlayer).toHaveBeenCalledWith('white', undefined);
+    expect(dispatchSpy).toHaveBeenCalledWith({ type: 'stand' });
+  });
   it('updates board state upon moves', () => {
     spyOn(actions, 'updateBoardWithMove').and.returnValue({ type: 'update with move' });
     subcribeToSocketEvents(dispatchSpy, socket);

@@ -1,11 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import cx from 'classnames';
-import { sitAs, standAs } from './actions';
+import { sitAs, stand } from './actions';
 
 const oppositeColorOf = { white: 'black', black: 'white' };
 
-export function Seat({ color, active, winning, losing, user, players, sitAs, standAs }) {
+export function Seat({ color, active, winning, losing, user, players, sitAs, stand }) {
   const className = cx(`btn btn-block btn-seat btn-${color}`, { active, winning, losing });
   const occupant = players[color];
   const opponent = players[oppositeColorOf[color]];
@@ -14,7 +14,7 @@ export function Seat({ color, active, winning, losing, user, players, sitAs, sta
   let onClick;
   if (occupant) {
     seatText = (occupant.id === user.id) ? `leave ${color}` : `${color}: ${occupant.name}`;
-    onClick = () => standAs(color);
+    onClick = () => stand();
   } else {
     seatText = `sit as ${color}`;
     onClick = () => sitAs(color, user);
@@ -40,7 +40,7 @@ function mapStateToProps({ user, game: { players, board: { turn }, mate } }, { c
 function mapDispatchToProps(dispatch) {
   return {
     sitAs(color, user) { dispatch(sitAs(color, user)); },
-    standAs(color) { dispatch(standAs(color)); },
+    stand(color) { dispatch(stand()); },
   }
 }
 

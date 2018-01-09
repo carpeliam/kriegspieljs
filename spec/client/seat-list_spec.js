@@ -6,11 +6,11 @@ import { SeatList, Seat, SeatContainer } from '../../client/seat-list';
 describe('Seat', () => {
   let onSitOrStandSpy;
   let sitAsSpy;
-  let standAsSpy;
+  let standSpy;
   beforeEach(() => {
     onSitOrStandSpy = jasmine.createSpy();
     sitAsSpy = jasmine.createSpy('sitAs');
-    standAsSpy = jasmine.createSpy('standAs');
+    standSpy = jasmine.createSpy('stand');
   });
 
   it('shows when a current seat has an active move', () => {
@@ -20,7 +20,7 @@ describe('Seat', () => {
       user={{ id: 1 }}
       players={{}}
       sitAs={sitAsSpy}
-      standAs={standAsSpy}
+      stand={standSpy}
     />);
     expect(activeSeat.find('.btn-white')).toHaveClassName('active');
   });
@@ -32,7 +32,7 @@ describe('Seat', () => {
       user={{ id: 1 }}
       players={{}}
       sitAs={sitAsSpy}
-      standAs={standAsSpy}
+      stand={standSpy}
     />);
     expect(activeSeat.find('.btn-white')).toHaveClassName('winning');
   });
@@ -44,7 +44,7 @@ describe('Seat', () => {
       user={{ id: 1 }}
       players={{}}
       sitAs={sitAsSpy}
-      standAs={standAsSpy}
+      stand={standSpy}
     />);
     expect(activeSeat.find('.btn-white')).toHaveClassName('losing');
   });
@@ -56,13 +56,13 @@ describe('Seat', () => {
         user={{ id: 1 }}
         players={{}}
         sitAs={sitAsSpy}
-        standAs={standAsSpy}
+        stand={standSpy}
       />);
       expect(seat.find('.btn-white')).toHaveProp('disabled', false);
       expect(seat.find('.btn-white')).toHaveText('sit as white');
       seat.find('.btn-white').simulate('click');
       expect(sitAsSpy).toHaveBeenCalledWith('white', { id: 1 });
-      expect(standAsSpy).not.toHaveBeenCalled();
+      expect(standSpy).not.toHaveBeenCalled();
     });
     it('does not allow the user to sit in an occupied seat', () => {
       const seat = shallow(<Seat
@@ -70,7 +70,7 @@ describe('Seat', () => {
         user={{ id: 1 }}
         players={{ white: { id: 2, name: 'Bobby' } }}
         sitAs={sitAsSpy}
-        standAs={standAsSpy}
+        stand={standSpy}
       />);
       expect(seat.find('.btn-white')).toHaveProp('disabled', true);
       expect(seat.find('.btn-white')).toHaveText('white: Bobby');
@@ -84,12 +84,12 @@ describe('Seat', () => {
         user={{ id: 1 }}
         players={{ white: { id: 1, name: 'Frank' } }}
         sitAs={sitAsSpy}
-        standAs={standAsSpy}
+        stand={standSpy}
       />);
       expect(seat.find('.btn-white')).toHaveProp('disabled', false);
       expect(seat.find('.btn-white')).toHaveText('leave white');
       seat.find('.btn-white').simulate('click');
-      expect(standAsSpy).toHaveBeenCalledWith('white');
+      expect(standSpy).toHaveBeenCalled();
       expect(sitAsSpy).not.toHaveBeenCalled();
     });
     it('does not allow them to sit in the other seat', () => {
@@ -98,7 +98,7 @@ describe('Seat', () => {
         user={{ id: 1 }}
         players={{ black: { id: 1, name: 'Frank' } }}
         sitAs={sitAsSpy}
-        standAs={standAsSpy}
+        stand={standSpy}
       />);
       expect(seat.find('.btn-white')).toHaveProp('disabled', true);
     });
@@ -175,26 +175,5 @@ describe('SeatContainer', () => {
     container = shallow(<SeatContainer store={store} color="white" />);
     const seat = container.find(Seat);
     expect(seat).not.toHaveProp('active');
-  });
-});
-
-xdescribe('SeatList', () => {
-//   var sitOrStandAs;
-  let seatList;
-  let sitAs;
-  let standAs;
-  beforeEach(() => {
-    sitAs = jasmine.createSpy('sitAs');
-    standAs = jasmine.createSpy('standAs');
-    const props = { sitAs, standAs };
-    seatList = shallow(<SeatList {...props} />);
-  });
-
-  describe('when the user is playing as white', () => {
-    beforeEach(() => seatList.setProps({ players: { white: { id: 1 } }, user: { id: 1 } }));
-    it('lets the player stand as white', () => {
-      const white = seatList.find(Seat).filter({ color: 'white '});
-      white.sitAsOrStand();
-    });
   });
 });
