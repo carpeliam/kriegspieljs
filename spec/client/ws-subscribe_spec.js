@@ -1,6 +1,7 @@
 import subcribeToSocketEvents from '../../client/ws-subscribe';
 import * as actions from '../../client/actions';
 import * as cookieMonster from '../../client/cookie-monster';
+import subscribeToSocketEvents from '../../client/ws-subscribe';
 
 describe('subcribeToSocketEvents', () => {
   function fakeSocket() {
@@ -72,5 +73,12 @@ describe('subcribeToSocketEvents', () => {
     socket.receive('room.list', [{ id: 'abc123' }]);
     expect(actions.updateMembers).toHaveBeenCalledWith([{ id: 'abc123' }]);
     expect(dispatchSpy).toHaveBeenCalledWith({ type: 'update members' });
+  });
+  it('adds processes chat messages', () => {
+    spyOn(actions, 'processMessage').and.returnValue({ type: 'process message' });
+    subscribeToSocketEvents(dispatchSpy, socket);
+    socket.receive('speak', { id: 'abc123', name: 'margaret' }, 'I have you now!');
+    expect(actions.processMessage).toHaveBeenCalledWith({ id: 'abc123', name: 'margaret' }, 'I have you now!');
+    expect(dispatchSpy).toHaveBeenCalledWith({ type: 'process message' });
   });
 });

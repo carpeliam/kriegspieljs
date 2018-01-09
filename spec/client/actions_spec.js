@@ -7,6 +7,7 @@ import {
   UPDATE_BOARD,
   GAME_EVENT,
   UPDATE_MEMBERS,
+  ADD_MESSAGE,
   setUser,
   sitAs,
   stand,
@@ -14,6 +15,8 @@ import {
   move,
   updateBoardWithMove,
   updateMembers,
+  sendMessage,
+  processMessage,
 } from '../../client/actions';
 
 describe('actions', () => {
@@ -128,6 +131,26 @@ describe('actions', () => {
     it('updates the members list', () => {
       const action = updateMembers([{ id: 'abc123' }]);
       expect(action).toEqual({ type: UPDATE_MEMBERS, members: [{ id: 'abc123' }] });
+    });
+  });
+
+  describe('sendMessage', () => {
+    it('sends the message via the socket', () => {
+      sendMessage('chess is fun!')(dispatchSpy, undefined, socketSpy);
+      expect(socketSpy.emit).toHaveBeenCalledWith('speak', 'chess is fun!');
+    });
+  });
+
+  describe('processMessage', () => {
+    it('adds the message', () => {
+      const action = processMessage({ id: 'abc123', name: 'Bobby' }, 'you will never mate me!');
+      expect(action).toEqual({
+        type: ADD_MESSAGE, message: {
+          message: 'you will never mate me!',
+          type: 'chat',
+          author: { id: 'abc123', name: 'Bobby' },
+        },
+      });
     });
   });
 });

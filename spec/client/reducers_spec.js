@@ -3,9 +3,10 @@ import {
   UPDATE_PLAYER,
   UPDATE_BOARD,
   GAME_EVENT,
-  UPDATE_MEMBERS
+  UPDATE_MEMBERS,
+  ADD_MESSAGE
 } from '../../client/actions';
-import { user, game, members } from '../../client/reducers';
+import { user, game, members, messages } from '../../client/reducers';
 import Board from '../../lib/board.coffee';
 
 describe('user reducer', () => {
@@ -56,5 +57,18 @@ describe('members', () => {
   it('processes UPDATE_MEMBERS actions', () => {
     const newMembers = [{ id: 'abc123' }];
     expect(members([], { type: UPDATE_MEMBERS, members: newMembers })).toEqual(newMembers);
+  });
+});
+
+describe('messages', () => {
+  it('has no messages by default', () => {
+    expect(messages(undefined, { type: 'SOME ACTION' })).toEqual([]);
+  });
+  it('adds new messages to the end of the list', () => {
+    const newMessage = { type: ADD_MESSAGE, message: { message: 'second one' } };
+    expect(messages([{ message: 'first one' }], newMessage)).toEqual([
+      { message: 'first one' },
+      { message: 'second one' },
+    ]);
   });
 });

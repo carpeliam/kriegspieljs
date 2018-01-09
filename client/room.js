@@ -1,13 +1,57 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { sendMessage } from './actions';
 
-export function Room(props) {
-  const { members } = props;
-  return (
-    <details open>
-      {members.map(({ id, name }) => <span key={id}>{name}</span>)}
-    </details>
-  );
+function chatMessage({ message, type, author }, i) {
+  const msg = (author) ? `${author.name}: ${message}` : message;
+  return <div key={i} className={type}>{msg}</div>;
 }
 
-export default connect(({ members }) => ({ members }))(Room);
+export class Room extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { message: '' };
+    this.onChange = this.onChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+  }
+  onChange(event) {
+    this.setState({ message: event.target.value });
+  }
+  onSubmit(event) {
+    event.preventDefault();
+    if (this.state.message) {
+      this.props.sendMessage(this.state.message);
+      this.setState({ message: '' });
+    }
+  }
+  render() {
+    const { members, messages } = this.props;
+    return (
+      <div>
+        <details open className="members">
+          {members.map(({ id, name }) => <span key={id}>{name}</span>)}
+        </details>
+        <div className="messages">
+          {messages.map(chatMessage)}
+        </div>
+        <form onSubmit={this.onSubmit}>
+          <input type="text" placeholder="Chat!" onChange={this.onChange} value={this.state.message} />
+        </form>
+      </div>
+    );
+  }
+}
+
+function mapStateToProps({ members, messages }) {
+  return { members, messages };
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+    sendMessage(msg) {
+      dispatch(sendMessage(msg));
+    },
+  };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Room);

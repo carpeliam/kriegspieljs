@@ -7,6 +7,7 @@ export const UPDATE_PLAYER = 'UPDATE_PLAYER';
 export const UPDATE_BOARD = 'UPDATE_BOARD';
 export const GAME_EVENT = 'GAME_EVENT';
 export const UPDATE_MEMBERS = 'UPDATE_MEMBERS';
+export const ADD_MESSAGE = 'ADD_MESSAGE';
 
 export function setUser(name) {
   const user = { id: fetchUser().id, name };
@@ -56,4 +57,12 @@ export function move(origCoords, newCoords) {
 
 export function updateMembers(members) {
   return { type: UPDATE_MEMBERS, members };
+}
+
+export function sendMessage(msg) {
+  return (dispatch, getState, socket) => socket.emit('speak', msg);
+}
+
+export function processMessage(author, message) {
+  return { type: ADD_MESSAGE, message: { type: 'chat', message, author } };
 }

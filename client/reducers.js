@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { SET_USER, UPDATE_PLAYER, UPDATE_BOARD, GAME_EVENT, UPDATE_MEMBERS } from './actions';
+import { SET_USER, UPDATE_PLAYER, UPDATE_BOARD, GAME_EVENT, UPDATE_MEMBERS, ADD_MESSAGE } from './actions';
 import Board from '../lib/board.coffee';
 
 export function user(state = null, action) {
@@ -38,4 +38,13 @@ export function members(state = [], action) {
   }
 }
 
-export default combineReducers({ user, game, members });
+export function messages(state = [], action) {
+  switch (action.type) {
+    case ADD_MESSAGE:
+      return [...state, action.message];
+    default:
+      return state;
+  }
+}
+
+export default combineReducers({ user, game, members, messages });
