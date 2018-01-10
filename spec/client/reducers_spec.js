@@ -71,4 +71,8 @@ describe('messages', () => {
       { message: 'second one' },
     ]);
   });
+  it('adds game events to the message log', () => {
+    expect(messages([], { type: GAME_EVENT, name: 'check' })).toEqual([{ message: 'Check!', type: 'check' }]);
+    expect(messages([], { type: GAME_EVENT, name: 'mate' })).toEqual([{ message: 'Checkmate.', type: 'mate' }]);
+  });
 });

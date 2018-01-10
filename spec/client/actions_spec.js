@@ -17,6 +17,7 @@ import {
   updateMembers,
   sendMessage,
   processMessage,
+  processAnnouncement,
 } from '../../client/actions';
 
 describe('actions', () => {
@@ -128,10 +129,40 @@ describe('actions', () => {
   });
 
   describe('updateMembers', () => {
-    it('updates the members list', () => {
-      const action = updateMembers([{ id: 'abc123' }]);
-      expect(action).toEqual({ type: UPDATE_MEMBERS, members: [{ id: 'abc123' }] });
+    let getStateSpy;
+    beforeEach(() => {
+      getStateSpy = jasmine.createSpy('getState').and.returnValue({
+        members: [
+          { id: 'abc123', name: 'Bobby' },
+          { id: 'def456', name: 'Casper' },
+          { id: 'xyz', name: null },
+        ]
+      });
     });
+    it('updates the members list', () => {
+      updateMembers([{ id: 'abc123' }])(dispatchSpy, getStateSpy);
+      expect(dispatchSpy).toHaveBeenCalledWith({ type: UPDATE_MEMBERS, members: [{ id: 'abc123' }] });
+    });
+    it('sends announcements for changes in the members list', () => {
+      updateMembers([
+        { id: 'abc123', name: 'Bobby' },
+        { id: 'n3w', name: null },
+        { id: 'xyz', name: 'Gary' }
+      ])(dispatchSpy, getStateSpy);
+      expect(getStateSpy).toHaveBeenCalledBefore(dispatchSpy);
+      expect(dispatchSpy).toHaveBeenCalledWith({
+        type: ADD_MESSAGE,
+        message: { type: 'event', message: 'Gary connected' }
+      });
+      expect(dispatchSpy).toHaveBeenCalledWith({
+        type: ADD_MESSAGE,
+        message: { type: 'event', message: 'Casper disconnected' }
+      });
+      expect(dispatchSpy).not.toHaveBeenCalledWith({
+        type: ADD_MESSAGE,
+        message: { type: 'event', message: 'null connected' }
+      });
+    })
   });
 
   describe('sendMessage', () => {
@@ -145,11 +176,21 @@ describe('actions', () => {
     it('adds the message', () => {
       const action = processMessage({ id: 'abc123', name: 'Bobby' }, 'you will never mate me!');
       expect(action).toEqual({
-        type: ADD_MESSAGE, message: {
+        type: ADD_MESSAGE,
+        message: {
           message: 'you will never mate me!',
           type: 'chat',
           author: { id: 'abc123', name: 'Bobby' },
         },
+      });
+    });
+  });
+  describe('processEventMessage', () => {
+    it('adds the message', () => {
+      const action = processAnnouncement('Bobby sat down as white.');
+      expect(action).toEqual({
+        type: ADD_MESSAGE,
+        message: { message: 'Bobby sat down as white.', type: 'event' },
       });
     });
   });

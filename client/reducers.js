@@ -39,9 +39,12 @@ export function members(state = [], action) {
 }
 
 export function messages(state = [], action) {
+  const gameEventMessageMap = { check: 'Check!', mate: 'Checkmate.' };
   switch (action.type) {
     case ADD_MESSAGE:
       return [...state, action.message];
+    case GAME_EVENT:
+      return [...state, { message: gameEventMessageMap[action.name], type: action.name }];
     default:
       return state;
   }

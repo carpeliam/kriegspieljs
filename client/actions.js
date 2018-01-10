@@ -56,7 +56,23 @@ export function move(origCoords, newCoords) {
 }
 
 export function updateMembers(members) {
-  return { type: UPDATE_MEMBERS, members };
+  return (dispatch, getState) => {
+    const existingMembers = getState().members;
+    dispatch({ type: UPDATE_MEMBERS, members });
+
+    const currentMemberIds = members.map(m => m.id);
+    const existingMemberIds = existingMembers.filter(m => m.name).map(m => m.id);
+    existingMembers.forEach((member) => {
+      if (!currentMemberIds.includes(member.id)) {
+        dispatch(processAnnouncement(`${member.name} disconnected`));
+      }
+    });
+    members.forEach((member) => {
+      if (member.name && !existingMemberIds.includes(member.id)) {
+        dispatch(processAnnouncement(`${member.name} connected`));
+      }
+    });
+  };
 }
 
 export function sendMessage(msg) {
@@ -65,4 +81,8 @@ export function sendMessage(msg) {
 
 export function processMessage(author, message) {
   return { type: ADD_MESSAGE, message: { type: 'chat', message, author } };
+}
+
+export function processAnnouncement(message) {
+  return { type: ADD_MESSAGE, message: { type: 'event', message } };
 }
