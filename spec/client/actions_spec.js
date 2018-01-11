@@ -107,6 +107,7 @@ describe('actions', () => {
         if (this.shouldCall.onCheck && this.args.onCheck) { this.args.onCheck(); }
         if (this.shouldCall.onMate && this.args.onMate) { this.args.onMate(); }
       }
+      pawnCaptures() { return { e5: ['c5', 'd6'] }; }
     }
     function createFakeBoardWrapper() {
       let instance;
@@ -128,7 +129,7 @@ describe('actions', () => {
     });
     it('updates the board state with the given move', () => {
       const state = { game: { board: { turn: 1 } } };
-      const action = updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
+      updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
 
       const board = boardFaker.instance();
       expect(board.moves).toEqual([[0, 1, 2, 3]]);
@@ -137,7 +138,7 @@ describe('actions', () => {
     it('updates the game state when the given move results in check after updating the board', () => {
       boardFaker.force('onCheck');
       const state = { game: { board: { turn: 1 } } };
-      const action = updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
+      updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
 
       expect(dispatchSpy.calls.argsFor(0)).toEqual([jasmine.objectContaining({ type: UPDATE_BOARD })]);
       expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'check' }]);
@@ -145,10 +146,18 @@ describe('actions', () => {
     it('updates the game state when the given move results in mate after updating the board', () => {
       boardFaker.force('onMate');
       const state = { game: { board: { turn: 1 } } };
-      const action = updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
+      updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
 
       expect(dispatchSpy.calls.argsFor(0)).toEqual([jasmine.objectContaining({ type: UPDATE_BOARD })]);
       expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'mate' }]);
+    });
+    it('dispatches announcements when pawn captures are available', () => {
+      const state = { game: { board: { turn: 1 } } };
+      updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
+      expect(dispatchSpy).toHaveBeenCalledWith({
+        type: ADD_MESSAGE,
+        message: { type: 'event', message: 'The pawn on e5 can make a capture.' },
+      });
     });
   });
 

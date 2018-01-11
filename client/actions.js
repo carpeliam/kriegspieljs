@@ -53,6 +53,9 @@ export function updateBoardWithMove(origCoords, newCoords) {
     const gameState = board.gameState();
     dispatch(updateBoard(gameState));
     postMoveActions.forEach(action => dispatch(action));
+    for (const capture in board.pawnCaptures()) {
+      dispatch(processAnnouncement(`The pawn on ${capture} can make a capture.`));
+    }
   }
 }
 
