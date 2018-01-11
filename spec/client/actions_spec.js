@@ -9,6 +9,7 @@ import {
   UPDATE_MEMBERS,
   ADD_MESSAGE,
   setUser,
+  updatePlayer,
   sitAs,
   stand,
   updateBoard,
@@ -55,7 +56,30 @@ describe('actions', () => {
     });
   });
 
-  describe('updateGameState', () => {
+  describe('updatePlayer', () => {
+    it('dispatches an update to that player color', () => {
+      updatePlayer('white', { id: 'abc123', name: 'Bobby' })(dispatchSpy);
+      expect(dispatchSpy).toHaveBeenCalledWith({
+        type: UPDATE_PLAYER,
+        color: 'white',
+        user: { id: 'abc123', name: 'Bobby' },
+      });
+    });
+    it('posts an announcement if a player has sat or stood up', () => {
+      updatePlayer('white', { id: 'abc123', name: 'Bobby' })(dispatchSpy);
+      expect(dispatchSpy).toHaveBeenCalledWith({
+        type: ADD_MESSAGE,
+        message: { message: 'Bobby sat down as white', type: 'event' },
+      });
+      updatePlayer('white', undefined)(dispatchSpy);
+      expect(dispatchSpy).toHaveBeenCalledWith({
+        type: ADD_MESSAGE,
+        message: { message: 'white stood up', type: 'event' },
+      });
+    });
+  });
+
+  describe('updateBoard', () => {
     it('updates the state of the board', () => {
       const action = updateBoard({ turn: 1 });
       expect(action).toEqual({ type: UPDATE_BOARD, board: { turn: 1 } });

@@ -12,7 +12,7 @@ describe('Room', () => {
   const messages = [
     { message: 'Bishops wear funny hats.', type: 'chat', author: { id: 'abc123', name: 'Bobby' } },
     { message: 'Taste cold steel, rook!', type: 'chat', author: { id: '123abc', name: 'Gary' } },
-    { message: 'Bobby sat down as white.', type: 'event' },
+    { message: 'Bobby sat down as white', type: 'event' },
     { message: 'The pawn on f4 can make a capture.', type: 'event' },
     { message: 'Check!', type: 'check' },
     { message: 'Checkmate.', type: 'mate' },
@@ -37,7 +37,7 @@ describe('Room', () => {
     expect(wrapper.find('.messages .chat').at(1)).toIncludeText('Gary: Taste cold steel, rook!');
   });
   it('displays other events', () => {
-    expect(wrapper.find('.messages .event').at(0)).toHaveText('Bobby sat down as white.');
+    expect(wrapper.find('.messages .event').at(0)).toHaveText('Bobby sat down as white');
     expect(wrapper.find('.messages .event').at(1)).toHaveText('The pawn on f4 can make a capture.');
     expect(wrapper.find('.messages .check')).toHaveText('Check!');
     expect(wrapper.find('.messages .mate')).toHaveText('Checkmate.');

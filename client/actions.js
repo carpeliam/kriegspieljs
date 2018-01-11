@@ -19,7 +19,14 @@ export function setUser(name) {
 }
 
 export function updatePlayer(color, user) {
-  return { type: UPDATE_PLAYER, color, user };
+  return (dispatch) => {
+    dispatch({ type: UPDATE_PLAYER, color, user });
+    if (user) {
+      dispatch(processAnnouncement(`${user.name} sat down as ${color}`));
+    } else {
+      dispatch(processAnnouncement(`${color} stood up`));
+    }
+  };
 }
 
 export function sitAs(color, user) {
