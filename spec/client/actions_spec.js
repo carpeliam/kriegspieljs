@@ -19,7 +19,46 @@ import {
   sendMessage,
   processMessage,
   processAnnouncement,
+  onPromotionSelection,
+  updateBoardWithPromotion,
 } from '../../client/actions';
+
+class FakeBoard {
+  constructor(fields) {
+    this.args = {};
+    this.moves = [];
+    this._gameState = Object.assign({}, fields.gameState);
+    for (const field in fields) { this.args[field] = fields[field]; }
+  }
+  gameState() { return this._gameState; }
+  move(...args) {
+    this.moves.push(args);
+    this._gameState.turn *= -1;
+    if (this.shouldCall.onCheck) { this.args.onCheck(); }
+    if (this.shouldCall.onMate) { this.args.onMate(); }
+    if (this.shouldCall.onAdvancement) { this.args.onAdvancement(1, 2); }
+  }
+  promote(square, newPieceValue) {
+    this.promotion = { square, newPieceValue };
+    this._gameState.turn *= -1;
+    if (this.shouldCall.onCheck) { this.args.onCheck(); }
+    if (this.shouldCall.onMate) { this.args.onMate(); }
+  }
+  pawnCaptures() { return { e5: ['c5', 'd6'] }; }
+}
+function createFakeBoardWrapper() {
+  let instance;
+  const shouldCall = { onCheck: false, onMate: false, onAdvancement: false };
+  return {
+    newFake(...args) {
+      instance = new FakeBoard(...args);
+      instance.shouldCall = shouldCall;
+      return instance;
+    },
+    force(callbackName) { shouldCall[callbackName] = true; },
+    instance: () => instance,
+  };
+}
 
 describe('actions', () => {
   let dispatchSpy;
@@ -93,35 +132,6 @@ describe('actions', () => {
     });
   });
   describe('updateBoardWithMove', () => {
-    class FakeBoard {
-      constructor(fields) {
-        this.args = {};
-        this.moves = [];
-        this._gameState = Object.assign({}, fields.gameState);
-        for (const field in fields) { this.args[field] = fields[field]; }
-      }
-      gameState() { return this._gameState; }
-      move(...args) {
-        this.moves.push(args);
-        this._gameState.turn *= -1;
-        if (this.shouldCall.onCheck && this.args.onCheck) { this.args.onCheck(); }
-        if (this.shouldCall.onMate && this.args.onMate) { this.args.onMate(); }
-      }
-      pawnCaptures() { return { e5: ['c5', 'd6'] }; }
-    }
-    function createFakeBoardWrapper() {
-      let instance;
-      const shouldCall = { onCheck: false, onMate: false };
-      return {
-        newFake(...args) {
-          instance = new FakeBoard(...args);
-          instance.shouldCall = shouldCall;
-          return instance;
-        },
-        force(callbackName) { shouldCall[callbackName] = true; },
-        instance: () => instance,
-      };
-    }
     let boardFaker;
     beforeEach(() => {
       boardFaker = createFakeBoardWrapper();
@@ -151,6 +161,14 @@ describe('actions', () => {
       expect(dispatchSpy.calls.argsFor(0)).toEqual([jasmine.objectContaining({ type: UPDATE_BOARD })]);
       expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'mate' }]);
     });
+    it('updates the game state when the given move results in pawn advancement', () => {
+      boardFaker.force('onAdvancement');
+      const state = { game: { board: { turn: 1 } } };
+      updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
+
+      expect(dispatchSpy.calls.argsFor(0)).toEqual([jasmine.objectContaining({ type: UPDATE_BOARD })]);
+      expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'pawnAdvance', square: { x: 1, y: 2 } }]);
+    });
     it('dispatches announcements when pawn captures are available', () => {
       const state = { game: { board: { turn: 1 } } };
       updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
@@ -158,6 +176,45 @@ describe('actions', () => {
         type: ADD_MESSAGE,
         message: { type: 'event', message: 'The pawn on e5 can make a capture.' },
       });
+    });
+  });
+
+  describe('updateBoardWithPromotion', () => {
+    let boardFaker;
+    beforeEach(() => {
+      boardFaker = createFakeBoardWrapper();
+      spyOn(board, 'default').and.callFake(boardFaker.newFake);
+    });
+    it('updates the board state with the given promotion', () => {
+      const state = { game: { board: { turn: 1 } } };
+      updateBoardWithPromotion({ x: 0, y: 1 }, 5)(dispatchSpy, () => state);
+
+      const board = boardFaker.instance();
+      expect(board.promotion).toEqual({ square: { x: 0, y: 1 }, newPieceValue: 5 });
+      expect(dispatchSpy).toHaveBeenCalledWith({ type: UPDATE_BOARD, board: { turn: -1 } });
+    });
+    it('updates the game state when the given move results in check after updating the board', () => {
+      boardFaker.force('onCheck');
+      const state = { game: { board: { turn: 1 } } };
+      updateBoardWithPromotion({ x: 0, y: 1 }, 5)(dispatchSpy, () => state);
+
+      expect(dispatchSpy.calls.argsFor(0)).toEqual([jasmine.objectContaining({ type: UPDATE_BOARD })]);
+      expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'check' }]);
+    });
+    it('updates the game state when the given move results in mate after updating the board', () => {
+      boardFaker.force('onMate');
+      const state = { game: { board: { turn: 1 } } };
+      updateBoardWithPromotion({ x: 0, y: 1 }, 5)(dispatchSpy, () => state);
+
+      expect(dispatchSpy.calls.argsFor(0)).toEqual([jasmine.objectContaining({ type: UPDATE_BOARD })]);
+      expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'mate' }]);
+    });
+  });
+
+  describe('onPromotionSelection', () => {
+    it('emits a board.promote event', () => {
+      onPromotionSelection({ x: 0, y: 1 }, 5)(dispatchSpy, undefined, socketSpy);
+      expect(socketSpy.emit).toHaveBeenCalledWith('board.promote', { x: 0, y: 1 }, 5);
     });
   });
 

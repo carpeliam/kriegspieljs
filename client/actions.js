@@ -41,15 +41,20 @@ export function updateBoard(board) {
   return { type: UPDATE_BOARD, board };
 }
 
-export function updateBoardWithMove(origCoords, newCoords) {
-  return (dispatch, getState) => {
+function processBoardAction(dispatch, getState) {
+  return (actionWithBoard) => {
     const postMoveActions = [];
     const board = new Board({
       gameState: getState().game.board,
       onCheck: () => postMoveActions.push({ type: GAME_EVENT, name: 'check' }),
       onMate: () => postMoveActions.push({ type: GAME_EVENT, name: 'mate' }),
+      onAdvancement: (x, y) => postMoveActions.push({
+        type: GAME_EVENT,
+        name: 'pawnAdvance',
+        square: { x, y },
+      }),
     });
-    board.move(origCoords.x, origCoords.y, newCoords.x, newCoords.y);
+    actionWithBoard(board);
     const gameState = board.gameState();
     dispatch(updateBoard(gameState));
     postMoveActions.forEach(action => dispatch(action));
@@ -59,10 +64,28 @@ export function updateBoardWithMove(origCoords, newCoords) {
   }
 }
 
+export function updateBoardWithMove(origCoords, newCoords) {
+  return (dispatch, getState) => {
+    processBoardAction(dispatch, getState)((board) => {
+      board.move(origCoords.x, origCoords.y, newCoords.x, newCoords.y);
+    });
+  }
+}
+
+export function updateBoardWithPromotion(square, newPieceValue) {
+  return (dispatch, getState) => {
+    processBoardAction(dispatch, getState)((board) => {
+      board.promote(square, newPieceValue);
+    });
+  }
+}
+
 export function move(origCoords, newCoords) {
-  return (dispatch, getState, socket) => {
-    socket.emit('board.move', origCoords, newCoords);
-  };
+  return (dispatch, getState, socket) => socket.emit('board.move', origCoords, newCoords);
+}
+
+export function onPromotionSelection(square, newPieceValue) {
+  return (dispatch, getState, socket) => socket.emit('board.promote', square, newPieceValue);
 }
 
 export function updateMembers(members) {

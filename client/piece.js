@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { DragSource } from 'react-dnd';
 
-function character(props) {
+export function character(props) {
   let { type, color } = props;
   let isWhite = color > 0;
   switch (type) {

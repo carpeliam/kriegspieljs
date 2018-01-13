@@ -97,9 +97,11 @@ describe 'GameManager', ->
 
     describe 'promotion', ->
       it 'alerts other clients when one client promotes a piece', (done) ->
+        spyOn(Board.prototype, 'promote').and.returnValue true
         black.on 'board.promote', (coord, newPieceType) ->
           expect(coord).toEqual {x: 0, y: 0}
           expect(newPieceType).toEqual 5
+          expect(Board.prototype.promote).toHaveBeenCalledWith {x: 0, y: 0}, 5
           done()
         white.emit 'board.promote', {x: 0, y: 0}, 5
 

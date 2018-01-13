@@ -67,6 +67,13 @@ describe('subcribeToSocketEvents', () => {
     expect(actions.updateBoardWithMove).toHaveBeenCalledWith({ x: 0, y: 1 }, { x: 2, y: 3 });
     expect(dispatchSpy).toHaveBeenCalledWith({ type: 'update with move' });
   });
+  it('updates board state upon promotions', () => {
+    spyOn(actions, 'updateBoardWithPromotion').and.returnValue({ type: 'update board with promotion' });
+    subcribeToSocketEvents(dispatchSpy, socket);
+    socket.receive('board.promote', { x: 1, y: 2 }, 5);
+    expect(actions.updateBoardWithPromotion).toHaveBeenCalledWith({ x: 1, y: 2 }, 5);
+    expect(dispatchSpy).toHaveBeenCalledWith({ type: 'update board with promotion' });
+  });
   it('updates members list upon receiving changes', () => {
     spyOn(actions, 'updateMembers').and.returnValue({ type: 'update members' });
     subcribeToSocketEvents(dispatchSpy, socket);

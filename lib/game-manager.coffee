@@ -40,7 +40,8 @@ module.exports = class GameManager
         @server.emit 'board.move', from, to
 
       socket.on 'board.promote', (coord, newPieceType) =>
-        @server.emit 'board.promote', coord, newPieceType
+        if @board.promote coord, newPieceType
+          @server.emit 'board.promote', coord, newPieceType
 
       socket.on 'speak', (msg) =>
         client = @clients[socket.id]

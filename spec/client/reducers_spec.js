@@ -22,7 +22,7 @@ describe('user reducer', () => {
 describe('game reducer', () => {
   it('has a default state with empty player info and default game state', () => {
     const board = new Board().gameState();
-    expect(game(undefined, { type: 'SOME_ACTION' })).toEqual({ players: {}, board, check: false, mate: false });
+    expect(game(undefined, { type: 'SOME_ACTION' })).toEqual({ players: {}, board, check: false, mate: false, pawnAdvance: undefined });
   });
   it('updates the players upon an UPDATE_PLAYER action', () => {
     const initialState = { players: { black: { id: 2 } }, board: { turn: 1 } };
@@ -31,10 +31,10 @@ describe('game reducer', () => {
     expect(state).toEqual({ players: { white: { id: 1 }, black: { id: 2 } }, board: { turn: 1 } });
   });
   it('updates the board upon an UPDATE_BOARD action', () => {
-    const initialState = { players: { black: { id: 2 } }, board: { turn: 1 }, check: false, mate: false };
+    const initialState = { players: { black: { id: 2 } }, board: { turn: 1 }, check: false, mate: false, pawnAdvance: undefined };
     const updateBoardAction = { type: UPDATE_BOARD, board: { turn: 2 } };
     const state = game(initialState, updateBoardAction);
-    expect(state).toEqual({ players: { black: { id: 2 } }, board: { turn: 2 }, check: false, mate: false });
+    expect(state).toEqual({ players: { black: { id: 2 } }, board: { turn: 2 }, check: false, mate: false, pawnAdvance: undefined });
   });
   it('processes check and mate game events', () => {
     const checkState = game({ check: false, mate: false }, { type: GAME_EVENT, name: 'check' });
@@ -42,11 +42,15 @@ describe('game reducer', () => {
     const mateState = game({ check: false, mate: false }, { type: GAME_EVENT, name: 'mate' });
     expect(mateState).toEqual({ check: false, mate: true});
   });
-  it('resets check game event upon subsequent board updates', () => {
-    const initialState = { players: { black: { id: 2 } }, board: { turn: 1 }, check: true, mate: false };
+  it('processes pawn advancement game events', () => {
+    const advanceState = game({}, { type: GAME_EVENT, name: 'pawnAdvance', square: { x: 1, y: 2 } });
+    expect(advanceState).toEqual({ pawnAdvance: { x: 1, y: 2 } });
+  });
+  it('resets check and pawnAdvance game event upon subsequent board updates', () => {
+    const initialState = { players: { black: { id: 2 } }, board: { turn: 1 }, check: true, mate: false, pawnAdvance: { x: 0, y: 0 } };
     const updateBoardAction = { type: UPDATE_BOARD, board: { turn: 2 } };
     const state = game(initialState, updateBoardAction);
-    expect(state).toEqual({ players: { black: { id: 2 } }, board: { turn: 2 }, check: false, mate: false });
+    expect(state).toEqual({ players: { black: { id: 2 } }, board: { turn: 2 }, check: false, mate: false, pawnAdvance: undefined });
   });
 });
 

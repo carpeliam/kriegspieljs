@@ -5,6 +5,7 @@ import UserNamePrompter from '../../client/username-prompter';
 import Board from '../../client/board';
 import SeatList from '../../client/seat-list';
 import Room from '../../client/room';
+import PawnPromotionPrompter from '../../client/pawn-promotion-prompter';
 
 const Kriegspiel = KriegspielDragDropContext.DecoratedComponent;
 
@@ -33,6 +34,10 @@ describe('Kriegspiel', () => {
     const userNamePrompter = kriegspiel.find(UserNamePrompter);
     userNamePrompter.props().onEnter('margaret');
     expect(setUserSpy).toHaveBeenCalledWith('margaret');
+  });
+
+  it('passes game state to PawnPromotionPrompter', () => {
+    expect(kriegspiel.find(PawnPromotionPrompter)).toBePresent();
   });
 
   it('contains the board, seat list, and room details', () => {

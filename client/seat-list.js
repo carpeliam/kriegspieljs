@@ -40,7 +40,7 @@ function mapStateToProps({ user, game: { players, board: { turn }, mate } }, { c
 function mapDispatchToProps(dispatch) {
   return {
     sitAs(color, user) { dispatch(sitAs(color, user)); },
-    stand(color) { dispatch(stand()); },
+    stand() { dispatch(stand()); },
   }
 }
 

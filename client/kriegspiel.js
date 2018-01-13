@@ -14,6 +14,7 @@ import Room from './room';
 // import MessageLog from './message-log';
 // import BoardCommunicator from './board-communicator';
 import UserNamePrompter from './username-prompter';
+import PawnPromotionPrompter from './pawn-promotion-prompter';
 
 // import Board from '../lib/board.coffee';
 
@@ -24,6 +25,7 @@ function Kriegspiel({ user, setUser, game }) {
       <SeatList />
       <Room />
       <UserNamePrompter user={user} onEnter={setUser} />
+      <PawnPromotionPrompter />
     </div>
   );
 }
