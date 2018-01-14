@@ -82,6 +82,7 @@
     "sass-loader": "^6.0.1",
     "style-loader": "^0.12.3",
     "url-loader": "^0.5.6",
-    "webpack-dev-middleware": "^1.10.1"
+    "webpack-dev-middleware": "^1.10.1",
+    "webpack-hot-middleware": "^2.21.0"
   }
 }

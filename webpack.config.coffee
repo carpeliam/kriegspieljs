@@ -52,6 +52,7 @@ plugins.push if isDev
     new webpack.optimize.UglifyJsPlugin()
 
 entry = if isDev then [
+  'webpack-hot-middleware/client',
   path.resolve appPath, '_dev.js'
   path.resolve appPath, 'index.js'
 ] else path.resolve appPath, 'index.js'

@@ -22,10 +22,13 @@ Kriegspiel = (options = {}) ->
 
     if process.env.NODE_ENV != 'production'
       webpackDevMiddleware = require 'webpack-dev-middleware'
+      webpackHotMiddleware = require 'webpack-hot-middleware'
       webpack = require 'webpack'
       webpackConfig = require '../webpack.config'
+      compiler = webpack(webpackConfig)
 
-      server.use webpackDevMiddleware(webpack(webpackConfig), noInfo: true, publicPath: '/assets/')
+      server.use webpackDevMiddleware(compiler, noInfo: true, publicPath: '/assets/')
+      server.use webpackHotMiddleware compiler
 
     io = (require 'socket.io')(http)
     new GameManager(io.sockets)
