@@ -6,10 +6,6 @@ serveStatic = require 'serve-static'
 logger = require 'connect-logger'
 session = require 'express-session'
 
-webpackDevMiddleware = require 'webpack-dev-middleware'
-webpack = require 'webpack'
-webpackConfig = require '../webpack.config'
-
 GameManager = require './game-manager'
 
 
@@ -24,8 +20,12 @@ Kriegspiel = (options = {}) ->
     server.use logger()
     server.use session(secret: 'WarGames')
 
-    # dev
-    server.use webpackDevMiddleware(webpack(webpackConfig), publicPath: '/assets/')
+    if (process.env.NODE_ENV != 'production')
+      webpackDevMiddleware = require 'webpack-dev-middleware'
+      webpack = require 'webpack'
+      webpackConfig = require '../webpack.config'
+
+      server.use webpackDevMiddleware(webpack(webpackConfig), noInfo: true, publicPath: '/assets/')
 
     io = (require 'socket.io')(http)
     new GameManager(io.sockets)

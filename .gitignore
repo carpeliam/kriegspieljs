@@ -2,3 +2,4 @@
 Capfile
 node_modules*
 .vscode
+pub/assets
