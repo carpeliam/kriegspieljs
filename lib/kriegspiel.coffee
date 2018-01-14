@@ -16,11 +16,11 @@ Kriegspiel = (options = {}) ->
   createServer = ->
     server = connect()
     http = require('http').createServer(server)
-    server.use serveStatic(process.cwd() + '/pub')
+    server.use serveStatic("#{process.cwd()}/public")
     server.use logger()
     server.use session(secret: 'WarGames')
 
-    if (process.env.NODE_ENV != 'production')
+    if process.env.NODE_ENV != 'production'
       webpackDevMiddleware = require 'webpack-dev-middleware'
       webpack = require 'webpack'
       webpackConfig = require '../webpack.config'

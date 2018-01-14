@@ -2,7 +2,7 @@ webpack = require 'webpack'
 ExtractTextPlugin = require('extract-text-webpack-plugin')
 path = require 'path'
 appPath = path.resolve __dirname, 'client'
-buildPath = path.resolve __dirname, 'pub', 'assets'
+buildPath = path.resolve __dirname, 'public', 'assets'
 
 isDev = process.env.NODE_ENV != 'production'
 

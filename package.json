@@ -11,7 +11,7 @@
     "test-server": "jasmine --helper=./spec/lib/specHelper.js spec/lib/*.coffee",
     "test": "npm run test-client && npm run test-server",
     "build": "webpack --progress --colors",
-    "clean": "rimraf ./pub/assets",
+    "clean": "rimraf ./public/assets",
     "deploy": "cf push kriegspiel -c 'npm start'"
   },
   "repository": {
