@@ -59,8 +59,8 @@ describe 'GameManager', ->
           white.on 'room.list', (roomList) ->
             done() if roomList.length == 2
 
-    it 'resets the board if both players stand', (done) ->
-      white.on 'board.update', ({ board }) ->
+    it 'resets the game if both players stand', (done) ->
+      white.on 'game.reset', ({ board }) ->
         emptyBoard = new Board()
         expect(new Board(gameState: board).gameState()).toEqual emptyBoard.gameState()
         done()

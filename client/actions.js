@@ -5,6 +5,7 @@ import Board from '../lib/board.coffee';
 export const SET_USER = 'SET_USER';
 export const UPDATE_PLAYER = 'UPDATE_PLAYER';
 export const UPDATE_BOARD = 'UPDATE_BOARD';
+export const RESET_GAME = 'RESET_GAME';
 export const GAME_EVENT = 'GAME_EVENT';
 export const UPDATE_MEMBERS = 'UPDATE_MEMBERS';
 export const ADD_MESSAGE = 'ADD_MESSAGE';
@@ -39,6 +40,10 @@ export function stand() {
 
 export function updateBoard(board) {
   return { type: UPDATE_BOARD, board };
+}
+
+export function resetGame(board) {
+  return { type: RESET_GAME, board };
 }
 
 function processBoardAction(dispatch, getState) {

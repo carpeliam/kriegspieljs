@@ -5,22 +5,24 @@ import {
   SET_USER,
   UPDATE_PLAYER,
   UPDATE_BOARD,
+  RESET_GAME,
   GAME_EVENT,
   UPDATE_MEMBERS,
   ADD_MESSAGE,
   setUser,
+  updateMembers,
   updatePlayer,
   sitAs,
   stand,
   updateBoard,
+  resetGame,
   move,
   updateBoardWithMove,
-  updateMembers,
+  onPromotionSelection,
+  updateBoardWithPromotion,
   sendMessage,
   processMessage,
   processAnnouncement,
-  onPromotionSelection,
-  updateBoardWithPromotion,
 } from '../../client/actions';
 
 class FakeBoard {
@@ -122,6 +124,13 @@ describe('actions', () => {
     it('updates the state of the board', () => {
       const action = updateBoard({ turn: 1 });
       expect(action).toEqual({ type: UPDATE_BOARD, board: { turn: 1 } });
+    });
+  });
+
+  describe('resetGame', () => {
+    it('resets the state of the game', () => {
+      const action = resetGame({ turn: 1 });
+      expect(action).toEqual({ type: RESET_GAME, board: { turn: 1 } });
     });
   });
 

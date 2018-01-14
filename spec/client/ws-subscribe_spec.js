@@ -46,6 +46,13 @@ describe('subcribeToSocketEvents', () => {
     expect(actions.updateBoard).toHaveBeenCalledWith({ turn: 1 });
     expect(dispatchSpy).toHaveBeenCalledWith({ type: 'update board' });
   });
+  it('resets board state upon receiving a board reset', () => {
+    spyOn(actions, 'resetGame').and.returnValue({ type: 'reset board' });
+    subcribeToSocketEvents(dispatchSpy, socket);
+    socket.receive('game.reset', { board: { turn: 1 } });
+    expect(actions.resetGame).toHaveBeenCalledWith({ turn: 1 });
+    expect(dispatchSpy).toHaveBeenCalledWith({ type: 'reset board' });
+  });
   it('seats a player upon receiving a sit notification', () => {
     spyOn(actions, 'updatePlayer').and.returnValue({ type: 'sit' });
     subcribeToSocketEvents(dispatchSpy, socket);

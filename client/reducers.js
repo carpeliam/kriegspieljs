@@ -1,5 +1,13 @@
 import { combineReducers } from 'redux';
-import { SET_USER, UPDATE_PLAYER, UPDATE_BOARD, GAME_EVENT, UPDATE_MEMBERS, ADD_MESSAGE } from './actions';
+import {
+  SET_USER,
+  UPDATE_PLAYER,
+  UPDATE_BOARD,
+  RESET_GAME,
+  GAME_EVENT,
+  UPDATE_MEMBERS,
+  ADD_MESSAGE,
+} from './actions';
 import Board from '../lib/board.coffee';
 
 export function user(state = null, action) {
@@ -29,6 +37,8 @@ export function game(state = initialGameState, action) {
       return Object.assign({}, state, { players });
     case UPDATE_BOARD:
       return Object.assign({}, state, { board: action.board, check: false, pawnAdvance: undefined });
+    case RESET_GAME:
+      return Object.assign({}, initialGameState, { board: action.board });
     case GAME_EVENT:
       if (action.name === 'pawnAdvance') {
         return Object.assign({}, state, { pawnAdvance: action.square });

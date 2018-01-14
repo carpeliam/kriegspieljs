@@ -33,7 +33,7 @@ module.exports = class GameManager
           @server.emit 'stand', color
           if !@players.white && !@players.black
             @board = new Board()
-            @server.emit 'board.update', board: @board
+            @server.emit 'game.reset', board: @board
 
       socket.on 'board.move', (from, to) =>
         @board.move(from.x, from.y, to.x, to.y)

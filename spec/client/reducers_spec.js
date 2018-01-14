@@ -2,9 +2,10 @@ import {
   SET_USER,
   UPDATE_PLAYER,
   UPDATE_BOARD,
+  RESET_GAME,
   GAME_EVENT,
   UPDATE_MEMBERS,
-  ADD_MESSAGE
+  ADD_MESSAGE,
 } from '../../client/actions';
 import { user, game, members, messages } from '../../client/reducers';
 import Board from '../../lib/board.coffee';
@@ -35,6 +36,11 @@ describe('game reducer', () => {
     const updateBoardAction = { type: UPDATE_BOARD, board: { turn: 2 } };
     const state = game(initialState, updateBoardAction);
     expect(state).toEqual({ players: { black: { id: 2 } }, board: { turn: 2 }, check: false, mate: false, pawnAdvance: undefined });
+  });
+  it('resets the game upon a RESET_GAME action', () => {
+    const expectedInitialState = game(undefined, { type: 'ANY_ACTION' });
+    const newGameState = game({}, { type: RESET_GAME, board: { turn: 1 } });
+    expect(newGameState).toEqual(Object.assign({}, expectedInitialState, { board: { turn: 1 } }));
   });
   it('processes check and mate game events', () => {
     const checkState = game({ check: false, mate: false }, { type: GAME_EVENT, name: 'check' });
