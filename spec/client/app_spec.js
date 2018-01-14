@@ -11,8 +11,5 @@ describe('App', () => {
 
   it('can be mounted', () => {
     mount(<App />);
-    // modal isn't actually rendered within App
-    // app.find('input').simulate('change', { target: { value: 'margaret' } });
-    // app.find('button').simulate('click');
   });
 });

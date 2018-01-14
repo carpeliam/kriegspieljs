@@ -51,13 +51,15 @@ plugins.push if isDev
   else
     new webpack.optimize.UglifyJsPlugin()
 
+entry = if isDev then [
+  path.resolve appPath, '_dev.js'
+  path.resolve appPath, 'index.js'
+] else path.resolve appPath, 'index.js'
+
 module.exports =
   context: __dirname
   devtool: if isDev then 'eval-source-map' else 'cheap-module-source-map'
-  entry: [
-    path.resolve appPath, '_dev.js'
-    path.resolve appPath, 'index.js'
-  ]
+  entry: entry
   output:
     path: buildPath
     filename: 'bundle.js'

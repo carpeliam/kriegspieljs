@@ -1,7 +1,9 @@
 import React from 'react';
+import { DragDropContext } from 'react-dnd';
+import HTML5Backend from 'react-dnd-html5-backend';
 import Square from './square';
 
-export default function Board(props) {
+export function Board(props) {
   return (
     <div className="board">
       {[7, 6, 5, 4, 3, 2, 1, 0].map((y) =>
@@ -12,3 +14,5 @@ export default function Board(props) {
     </div>
   );
 }
+
+export default DragDropContext(HTML5Backend)(Board);

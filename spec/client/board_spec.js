@@ -1,7 +1,9 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import Board from '../../client/board';
+import BoardDragDropContext from '../../client/board';
 import Square from '../../client/square';
+
+const Board = BoardDragDropContext.DecoratedComponent;
 
 describe('Board', () => {
   it('renders 64 squares', () => {

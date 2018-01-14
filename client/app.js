@@ -4,7 +4,7 @@ import thunk from 'redux-thunk';
 import { Provider } from 'react-redux';
 import reducer from './reducers';
 import { fetchUser } from './cookie-monster';
-import KriegspielContainer from './kriegspiel-container';
+import Kriegspiel from './kriegspiel';
 
 import io from 'socket.io-client';
 import subscribeToSocketEvents from './ws-subscribe';
@@ -24,7 +24,7 @@ subscribeToSocketEvents(store.dispatch, socket);
 export default function App() {
   return (
     <Provider store={store}>
-      <KriegspielContainer />
+      <Kriegspiel />
     </Provider>
   );
 }
