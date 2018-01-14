@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Button, Modal } from 'react-bootstrap';
+import Modal from 'react-modal';
 import { setUser } from './actions';
 
 export class UserNamePrompter extends React.Component {
@@ -19,9 +19,8 @@ export class UserNamePrompter extends React.Component {
   render() {
     const userName = this.props.user.name;
     return (
-      <Modal show={!userName}>
-        <Modal.Header><Modal.Title>Log In</Modal.Title></Modal.Header>
-        <Modal.Body>
+      <Modal isOpen={!userName}>
+        <h1>Log In</h1>
           <form className="form-horizontal">
             <div className="form-group">
               <label htmlFor="username" className="col-sm-2 control-label">Name</label>
@@ -30,10 +29,9 @@ export class UserNamePrompter extends React.Component {
               </div>
             </div>
           </form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button bsStyle="primary" onClick={this.logIn}>Let's go!</Button>
-        </Modal.Footer>
+        <footer>
+          <button onClick={this.logIn}>Let's go!</button>
+        </footer>
       </Modal>
     );
   }

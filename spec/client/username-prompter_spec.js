@@ -1,7 +1,7 @@
 import React from 'react';
 import { createStore } from 'redux';
 import { shallow } from 'enzyme';
-import { Button, Modal } from 'react-bootstrap';
+import Modal from 'react-modal';
 import UserNamePrompterContainer, { UserNamePrompter } from '../../client/username-prompter';
 import * as actions from '../../client/actions';
 
@@ -17,19 +17,19 @@ describe('UserNamePrompter', () => {
   }
   it('is visible if the username is undefined', () => {
     const component = createUserNamePrompter({user: { id: 1 }});
-    expect(component.find(Modal)).toHaveProp('show', true);
+    expect(component.find(Modal)).toHaveProp('isOpen', true);
   });
 
   it('is hidden if the username is present', () => {
     const component = createUserNamePrompter({user: { id: 1, name: 'jim' }});
-    expect(component.find(Modal)).toHaveProp('show', false);
+    expect(component.find(Modal)).toHaveProp('isOpen', false);
   });
 
   describe('when the button is clicked', () => {
     it('calls the signin call back with the username', () => {
       const component = createUserNamePrompter({ user: { id: 1 } });
       component.find('input').simulate('change', { target: { value: 'Jim' } });
-      component.find(Button).simulate('click');
+      component.find('button').simulate('click');
       expect(setUserSpy).toHaveBeenCalledWith('Jim');
     });
   });

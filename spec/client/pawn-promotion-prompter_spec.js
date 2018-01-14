@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import { Modal } from 'react-bootstrap';
+import Modal from 'react-modal';
 import PawnPromotionPrompterContainer, { PawnPromotionPrompter } from '../../client/pawn-promotion-prompter';
 import { createStore } from 'redux';
 import * as actions from '../../client/actions';
@@ -17,10 +17,10 @@ describe('PawnPromotionPrompter', () => {
     />);
   });
   it('is visible if there is a pawn advancement opportunity', () => {
-    expect(component.find(Modal)).toHaveProp('show', true);
+    expect(component.find(Modal)).toHaveProp('isOpen', true);
   });
   it('renders the right color pieces', () => {
-    const modalBody = component.find(Modal.Body).dive();
+    const modalBody = component.find('.choices');
     expect(modalBody).toIncludeText('♘');
     expect(modalBody).toIncludeText('♗');
     expect(modalBody).toIncludeText('♖');

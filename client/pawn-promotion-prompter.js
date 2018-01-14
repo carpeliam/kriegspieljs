@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Modal } from 'react-bootstrap';
+import Modal from 'react-modal';
 import { character } from './piece';
 import { onPromotionSelection } from './actions';
 
@@ -15,10 +15,10 @@ function pieceSelectionRenderer(onSelection, color) {
 export function PawnPromotionPrompter({ shouldShow, turn, onSelection }) {
   const onSelectionForType = pieceSelectionRenderer(onSelection, turn);
   return (
-    <Modal show={shouldShow}>
-      <Modal.Body>
+    <Modal isOpen={shouldShow}>
+      <div className="choices">
         {[2, 3, 4, 5].map(onSelectionForType)}
-      </Modal.Body>
+      </div>
     </Modal>
   );
 }

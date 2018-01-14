@@ -1,6 +1,3 @@
-$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
-@import "~bootstrap-sass/assets/stylesheets/bootstrap";
-
 @keyframes highlight {
   from {
     opacity: 0;
@@ -18,12 +15,14 @@ $icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
 }
 
 .board {
-  @extend .clearfix;
+  &::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
   font-size: 60px;
   div {
     background: #fff;
-    @include gradient-vertical(#fff, #eee);
-    @include box-shadow(inset 0 0 0 1px #fff);
     height: 80px;
     text-align: center;
     vertical-align: middle;
@@ -34,8 +33,6 @@ $icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
     @each $offset in 2 4 6 8 9 11 13 15 {
       &:nth-child(16n + #{$offset}) {
         background: #ccc;
-        @include gradient-vertical(#ccc, #eee);
-        @include box-shadow(inset 0 0 10px rgba(0,0,0,.4));
       }
     }
 
@@ -46,10 +43,10 @@ $icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
 }
 
 .btn-white {
-  @extend .btn-default;
+  // @extend .btn-default;
 }
 .btn-black {
-  @include button-variant(invert($btn-default-color), invert($btn-default-bg), invert($btn-default-border));
+  // @include button-variant(invert($btn-default-color), invert($btn-default-bg), invert($btn-default-border));
 }
 .btn-seat {
   &.active {
