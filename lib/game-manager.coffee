@@ -26,14 +26,7 @@ module.exports = class GameManager
         @server.emit 'sit', color, sittingPlayer
 
       socket.on 'stand', =>
-        client = @clients[socket.id]
-        color = ['white', 'black'].find (c) => @players[c] is client
-        if color?
-          delete @players[color]
-          @server.emit 'stand', color
-          if !@players.white && !@players.black
-            @board = new Board()
-            @server.emit 'game.reset', board: @board
+        @standIfSeated @clients[socket.id]
 
       socket.on 'board.move', (from, to) =>
         @board.move(from.x, from.y, to.x, to.y)
@@ -48,9 +41,19 @@ module.exports = class GameManager
         @server.emit 'speak', client, msg
 
       socket.on 'disconnect', =>
+        @standIfSeated @clients[socket.id]
         delete @clients[socket.id]
         @server.emit 'room.list', Object.values(@clients)
 
   addClient: (socket, nickname) ->
     getKriegspielId(socket)
     @clients[socket.id] = {id: getKriegspielId(socket), name: nickname}
+
+  standIfSeated: (client) ->
+    color = ['white', 'black'].find (c) => @players[c] is client
+    if color?
+      delete @players[color]
+      @server.emit 'stand', color
+      if !@players.white && !@players.black
+        @board = new Board()
+        @server.emit 'game.reset', board: @board

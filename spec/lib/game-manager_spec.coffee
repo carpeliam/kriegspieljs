@@ -47,7 +47,7 @@ describe 'GameManager', ->
   describe 'with two seated players', ->
     white = undefined
     black = undefined
-    beforeEach (done) ->
+    beforeEach ->
       server.connect().then (client) ->
         white = client
         white.withName 'Bobby'
@@ -55,10 +55,12 @@ describe 'GameManager', ->
         server.connect().then (client) ->
           black = client
           black.withName 'Gary'
+          roomHasTwoMembers = new Promise (resolve) ->
+            white.on 'room.list', (roomList) -> resolve() if roomList.length == 2
+          blackHasSat = new Promise (resolve) ->
+            white.on 'sit', (color) -> resolve() if color == 'black'
           black.emit 'sit', 'black'
-          white.on 'room.list', (roomList) ->
-            done() if roomList.length == 2
-
+          Promise.all([roomHasTwoMembers, blackHasSat])
     it 'resets the game if both players stand', (done) ->
       white.on 'game.reset', ({ board }) ->
         emptyBoard = new Board()
@@ -117,6 +119,11 @@ describe 'GameManager', ->
       it 'sends an updated room.list to other clients', (done) ->
         white.on 'room.list', (roomList) ->
           expect(roomList).toEqual [white.json()]
+          done()
+        black.disconnect()
+      it 'forces a sitting player to stand', (done) ->
+        white.on 'stand', (color) ->
+          expect(color).toEqual 'black'
           done()
         black.disconnect()
 
