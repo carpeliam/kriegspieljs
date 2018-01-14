@@ -22,7 +22,7 @@ loaders = [
   }
   {
     test: /\.scss$/
-    loader: ExtractTextPlugin.extract(fallback: 'style-loader', use: ['css-loader', 'sass-loader'])
+    loaders: ExtractTextPlugin.extract(fallback: 'style-loader', use: ['css-loader', 'sass-loader'])
   }
   {
     test: /\.(woff|woff2)$/
@@ -34,7 +34,8 @@ loaders = [
 ]
 
 if isDev
-  loaders[0].loaders.unshift 'react-hot-loader'
+  loaders.find((loader) -> loader.test.toString() == /\.js$/.toString()).loaders.unshift 'react-hot-loader'
+  loaders.find((loader) -> loader.test.toString() == /\.scss$/.toString()).loaders.unshift 'css-hot-loader'
   loaders.push {
     test: require.resolve('react-addons-perf')
     loader: 'expose-loader?Perf'
