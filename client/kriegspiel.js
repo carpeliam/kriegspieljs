@@ -7,10 +7,14 @@ import PawnPromotionPrompter from './pawn-promotion-prompter';
 
 export default function Kriegspiel() {
   return (
-    <div>
-      <Board />
-      <SeatList />
-      <Room />
+    <div style={{display: 'flex'}}>
+      <main>
+        <Board />
+      </main>
+      <aside style={{ marginLeft: 8 }}>
+        <SeatList />
+        <Room />
+      </aside>
       <UserNamePrompter />
       <PawnPromotionPrompter />
     </div>

@@ -6,7 +6,7 @@ import { sitAs, stand } from './actions';
 const oppositeColorOf = { white: 'black', black: 'white' };
 
 export function Seat({ color, active, winning, losing, user, players, sitAs, stand }) {
-  const className = cx(`btn btn-block btn-seat btn-${color}`, { active, winning, losing });
+  const className = cx(`btn-seat btn-${color}`, { active, winning, losing });
   const occupant = players[color];
   const opponent = players[oppositeColorOf[color]];
   const disabled = (occupant && occupant.id !== user.id) || (opponent && opponent.id === user.id);
@@ -20,11 +20,9 @@ export function Seat({ color, active, winning, losing, user, players, sitAs, sta
     onClick = () => sitAs(color, user);
   }
   return (
-    <span className="col-md-6">
-      <button className={className} onClick={onClick} disabled={!!disabled}>
-        {seatText}
-      </button>
-    </span>
+    <button className={className} onClick={onClick} disabled={!!disabled}>
+      {seatText}
+    </button>
   );
 }
 
@@ -48,47 +46,9 @@ export const SeatContainer = connect(mapStateToProps, mapDispatchToProps)(Seat);
 
 export default function SeatList(props) {
   return (
-    <div className="row">
+    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
       <SeatContainer color="white" />
       <SeatContainer color="black" />
     </div>
   );
 }
-
-// export default class SeatList extends React.Component {
-//   canSitOrStandAs(color) {
-//     if (this.props.playerColor) {
-//       return this.props.playerColor == color;
-//     } else {
-//       return !this.props[color];
-//     }
-//   }
-//   buttonTextFor(color) {
-//     if (this.props.playerColor == color) {
-//       return 'leave ' + color;
-//     } else if (this.props[color]) {
-//       return this.props[color];
-//     } else {
-//       return 'sit as ' + color;
-//     }
-//   }
-//   handleClick(color) {
-//     if (this.canSitOrStandAs(color)) {
-//       this.props.sitOrStandAs(color);
-//     }
-//   }
-//   render() {
-//     return  <div className="row">
-//               <span className="col-md-6">
-//                 <a className="btn btn-block btn-white"
-//                     disabled={!this.canSitOrStandAs('white')}
-//                     onClick={this.handleClick.bind(this, 'white')}>{this.buttonTextFor('white')}</a>
-//               </span>
-//               <span className="col-md-6">
-//                 <a className="btn btn-block btn-black"
-//                     disabled={!this.canSitOrStandAs('black')}
-//                     onClick={this.handleClick.bind(this, 'black')}>{this.buttonTextFor('black')}</a>
-//               </span>
-//             </div>;
-//   }
-// }

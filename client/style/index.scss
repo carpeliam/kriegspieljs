@@ -14,12 +14,44 @@
   }
 }
 
+html {
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.github-fork-ribbon {
+  box-sizing: content-box;
+}
+
+input[type="text"] {
+  font-size: 1em;
+  padding: 0.5em 1em;
+}
+button {
+  cursor: pointer;
+  font-size: 1em;
+  padding: 0.5em 1em;
+  border-radius: 3px;
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
 .board {
   &::after {
     content: "";
     display: table;
     clear: both;
   }
+  border: 5px solid black;
   font-size: 60px;
   div {
     background: #fff;
@@ -43,12 +75,15 @@
 }
 
 .btn-white {
-  // @extend .btn-default;
+  color: black;
+  background-color: white;
 }
 .btn-black {
-  // @include button-variant(invert($btn-default-color), invert($btn-default-bg), invert($btn-default-border));
+  color: white;
+  background-color: black;
 }
 .btn-seat {
+  width: 49%;
   &.active {
     animation: highlight 0.5s 2;
     box-shadow: 0px 0px 8px #ff6;
@@ -61,10 +96,19 @@
   }
 }
 
+.members span {
+  background-color: #ccc;
+  display: inline-block;
+  padding: 4px;
+  margin: 2px 5px 2px 0;
+  border-radius: 1px;
+}
+
 .messages {
   border: 1px solid #ccc;
   color: #999;
   padding: 4px;
+  min-width: 250px;
   height: 400px;
   overflow-y: auto;
   .event {
@@ -75,5 +119,36 @@
   }
   .mate {
     color: black;
+  }
+}
+
+.modal {
+  position: absolute;
+  top: 150px;
+  left: 0;
+  right: 0;
+  border: 1px solid rgb(204, 204, 204);
+  background: white;
+  overflow: auto;
+  border-radius: 4px;
+  outline: none;
+  padding: 20px;
+  margin: auto;
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.choices {
+  display: flex;
+  button {
+    flex: 1;
+    font-size: 60px;
+    padding: 0;
+    margin: 2px;
+    opacity: 0.5;
+    &:hover {
+      opacity: 1;
+    }
   }
 }

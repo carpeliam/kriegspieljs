@@ -15,7 +15,8 @@ function pieceSelectionRenderer(onSelection, color) {
 export function PawnPromotionPrompter({ shouldShow, turn, onSelection }) {
   const onSelectionForType = pieceSelectionRenderer(onSelection, turn);
   return (
-    <Modal isOpen={shouldShow}>
+    <Modal isOpen={shouldShow} className="modal" style={{ content: { width: 375 } }}>
+      <h2>Choose a new piece</h2>
       <div className="choices">
         {[2, 3, 4, 5].map(onSelectionForType)}
       </div>

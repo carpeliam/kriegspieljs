@@ -29,13 +29,20 @@ export class Room extends React.Component {
     return (
       <div>
         <details open className="members">
+          <summary>users</summary>
           {members.map(({ id, name }) => <span key={id}>{name}</span>)}
         </details>
         <div className="messages">
           {messages.map(chatMessage)}
         </div>
         <form onSubmit={this.onSubmit}>
-          <input type="text" placeholder="Chat!" onChange={this.onChange} value={this.state.message} />
+          <input
+            type="text"
+            placeholder="Chat!"
+            value={this.state.message}
+            onChange={this.onChange}
+            style={{ width: '100%' }}
+          />
         </form>
       </div>
     );

@@ -19,19 +19,12 @@ export class UserNamePrompter extends React.Component {
   render() {
     const userName = this.props.user.name;
     return (
-      <Modal isOpen={!userName}>
-        <h1>Log In</h1>
-          <form className="form-horizontal">
-            <div className="form-group">
-              <label htmlFor="username" className="col-sm-2 control-label">Name</label>
-              <div className="col-sm-10">
-                <input type="text" className="form-control" name="username" placeholder="Name" onChange={this.onNameChange} />
-              </div>
-            </div>
-          </form>
-        <footer>
-          <button onClick={this.logIn}>Let's go!</button>
-        </footer>
+      <Modal isOpen={!userName} className="modal" style={{ content: { width: 350 } }}>
+        <h2>Who are you?</h2>
+        <form>
+          <input type="text" name="username" placeholder="Name" onChange={this.onNameChange} />
+          <button type="submit" onClick={this.logIn} style={{ marginLeft: 5 }}>Let's go!</button>
+        </form>
       </Modal>
     );
   }
