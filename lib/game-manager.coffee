@@ -15,7 +15,7 @@ module.exports = class GameManager
 
       socket.on 'nickname.set', (nickname) =>
         @addClient socket, nickname
-        @server.emit 'room.list', Object.values(@clients)
+        @server.emit 'room.list', (client for id, client of @clients)
         ['white', 'black'].forEach (color) =>
           if player = @players[color]
             socket.emit 'sit', color, player
@@ -49,7 +49,7 @@ module.exports = class GameManager
       socket.on 'disconnect', =>
         @standIfSeated @clients[socket.id]
         delete @clients[socket.id]
-        @server.emit 'room.list', Object.values(@clients)
+        @server.emit 'room.list', (client for id, client of @clients)
 
   addClient: (socket, nickname) ->
     getKriegspielId(socket)
