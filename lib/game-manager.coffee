@@ -28,6 +28,12 @@ module.exports = class GameManager
       socket.on 'stand', =>
         @standIfSeated @clients[socket.id]
 
+      socket.on 'resign', =>
+        client = @clients[socket.id]
+        color = ['white', 'black'].find (c) => @players[c] is client
+        @board.inProgress = false
+        @server.emit 'game.resign', color, @board
+
       socket.on 'board.move', (from, to) =>
         @board.move(from.x, from.y, to.x, to.y)
         @server.emit 'board.move', from, to

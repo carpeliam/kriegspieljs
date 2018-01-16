@@ -67,6 +67,13 @@ describe('subcribeToSocketEvents', () => {
     expect(actions.updatePlayer).toHaveBeenCalledWith('white', undefined);
     expect(dispatchSpy).toHaveBeenCalledWith({ type: 'stand' });
   });
+  it('resigns a player upon receiving a resignation', () => {
+    spyOn(actions, 'resignPlayer').and.returnValue({ type: 'resign' });
+    subscribeToSocketEvents(dispatchSpy, socket);
+    socket.receive('game.resign', 'white', { inProgress: false });
+    expect(actions.resignPlayer).toHaveBeenCalledWith('white', { inProgress: false });
+    expect(dispatchSpy).toHaveBeenCalledWith({ type: 'resign' });
+  });
   it('updates board state upon moves', () => {
     spyOn(actions, 'updateBoardWithMove').and.returnValue({ type: 'update with move' });
     subcribeToSocketEvents(dispatchSpy, socket);

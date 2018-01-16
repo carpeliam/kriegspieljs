@@ -4,6 +4,7 @@ import Board from '../lib/board.coffee';
 
 export const SET_USER = 'SET_USER';
 export const UPDATE_PLAYER = 'UPDATE_PLAYER';
+export const RESIGN_PLAYER = 'RESIGN_PLAYER';
 export const UPDATE_BOARD = 'UPDATE_BOARD';
 export const RESET_GAME = 'RESET_GAME';
 export const GAME_EVENT = 'GAME_EVENT';
@@ -27,6 +28,17 @@ export function updatePlayer(color, user) {
     } else {
       dispatch(processAnnouncement(`${color} stood up`));
     }
+  };
+}
+
+export function offerResignation() {
+  return (dispatch, getState, socket) => socket.emit('resign');
+}
+
+export function resignPlayer(color, board) {
+  return (dispatch) => {
+    dispatch({ type: RESIGN_PLAYER, color, board });
+    dispatch(processAnnouncement(`${color} resigned`));
   };
 }
 

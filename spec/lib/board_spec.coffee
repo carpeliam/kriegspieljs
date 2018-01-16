@@ -17,6 +17,7 @@ describe "Board", ->
     expect(gameState.hasMoved).toEqual board.hasMoved
     expect(gameState.hasMoved).not.toBe board.hasMoved
     expect(gameState.turn).toEqual board.turn
+    expect(gameState.inProgress).toEqual board.inProgress
 
   it "can deserialize game state", ->
     board.forceMove 3, 0, 4, 1 # white queen e2
@@ -27,7 +28,14 @@ describe "Board", ->
       expect(newBoard.squares[i]).toEqual board.squares[i]
     expect(newBoard.hasMoved).toEqual board.hasMoved
     expect(newBoard.turn).toEqual board.turn
+    expect(newBoard.inProgress).toEqual board.inProgress
 
+  it "is not in progress initially", ->
+    expect(board.inProgress).toBeFalsy()
+
+  it "is in progress as soon as a move has been made", ->
+    board.move 0, 1, 0, 3
+    expect(board.inProgress).toBeTruthy()
 
   describe "#algebraicNotationFor", ->
     it "translates x,y to a point", ->
@@ -236,10 +244,11 @@ describe "Board", ->
       expect(board.move 5, 3, 5, 6).toBeTruthy()
       expect(onCheck).toHaveBeenCalled()
 
-    it "fires event when placed in checkmate", ->
+    it "fires event and ends the game when placed in checkmate", ->
       board.forceMove 3, 0, 5, 3
       board.forceMove 0, 0, 5, 2
       expect(board.move 5, 3, 5, 6).toBeTruthy()
+      expect(board.inProgress).toBeFalsy()
       expect(onMate).toHaveBeenCalled()
 
     describe "when castling", ->

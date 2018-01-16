@@ -61,6 +61,14 @@ describe 'GameManager', ->
             white.on 'sit', (color) -> resolve() if color == 'black'
           black.emit 'sit', 'black'
           Promise.all([roomHasTwoMembers, blackHasSat])
+    it 'forwards resignations to other users', (done) ->
+      black.on 'board.move', ->
+        black.on 'game.resign', (color, board) ->
+          expect(color).toEqual 'white'
+          expect(board.inProgress).toBeFalsy()
+          done()
+        white.emit 'resign'
+      white.emit 'board.move', {x: 0, y: 1}, {x: 0, y: 2}
     it 'resets the game if both players stand', (done) ->
       white.on 'game.reset', ({ board }) ->
         emptyBoard = new Board()
@@ -90,7 +98,7 @@ describe 'GameManager', ->
           client.withName 'Jim'
 
     describe 'moving', ->
-      it 'reports moves to all players', (done) ->
+      it 'reports moves to all users', (done) ->
         black.on 'board.move', (from, to) ->
           expect(from).toEqual {x: 0, y: 1}
           expect(to).toEqual {x: 0, y: 2}

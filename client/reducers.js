@@ -7,6 +7,7 @@ import {
   GAME_EVENT,
   UPDATE_MEMBERS,
   ADD_MESSAGE,
+  RESIGN_PLAYER,
 } from './actions';
 import Board from '../lib/board.coffee';
 
@@ -28,22 +29,29 @@ const initialGameState = {
 };
 export function game(state = initialGameState, action) {
   switch (action.type) {
-    case UPDATE_PLAYER:
-      const user = action.user && Object.assign({}, action.user);
+    case UPDATE_PLAYER: {
+      const user = action.user && Object.assign({ resigned: false }, action.user);
       const players = {
         white: (action.color === 'white') ? user : state.players.white,
         black: (action.color === 'black') ? user : state.players.black,
       };
       return Object.assign({}, state, { players });
+    }
+    case RESIGN_PLAYER: {
+      const resigningPlayer = Object.assign({}, state.players[action.color], { resigned: true });
+      const players = Object.assign({}, state.players, { [action.color]: resigningPlayer });
+      return Object.assign({}, state, { players, board: action.board });
+    }
     case UPDATE_BOARD:
       return Object.assign({}, state, { board: action.board, check: false, pawnAdvance: undefined });
     case RESET_GAME:
       return Object.assign({}, initialGameState, { board: action.board });
-    case GAME_EVENT:
+    case GAME_EVENT: {
       if (action.name === 'pawnAdvance') {
         return Object.assign({}, state, { pawnAdvance: action.square });
       }
       return Object.assign({}, state, { [action.name]: true });
+    }
     default:
       return state;
   }

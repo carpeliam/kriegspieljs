@@ -4,6 +4,7 @@ import * as board from '../../lib/board.coffee';
 import {
   SET_USER,
   UPDATE_PLAYER,
+  RESIGN_PLAYER,
   UPDATE_BOARD,
   RESET_GAME,
   GAME_EVENT,
@@ -14,6 +15,8 @@ import {
   updatePlayer,
   sitAs,
   stand,
+  resignPlayer,
+  offerResignation,
   updateBoard,
   resetGame,
   move,
@@ -91,9 +94,30 @@ describe('actions', () => {
   });
 
   describe('stand', () => {
-    it('updates the game with an undefined player in the given color', () => {
+    it('alerts the server that this client has stood up', () => {
       stand()(dispatchSpy, undefined, socketSpy);
       expect(socketSpy.emit).toHaveBeenCalledWith('stand');
+    });
+  });
+
+  describe('offerResignation', () => {
+    it('alerts the server that this client has resigned', () => {
+      offerResignation()(dispatchSpy, undefined, socketSpy);
+      expect(socketSpy.emit).toHaveBeenCalledWith('resign');
+    });
+  });
+
+  describe('resignPlayer', () => {
+    it('updates the player state to include resignation', () => {
+      resignPlayer('white', { inProgress: false })(dispatchSpy);
+      expect(dispatchSpy).toHaveBeenCalledWith({ type: RESIGN_PLAYER, color: 'white', board: { inProgress: false } });
+    });
+    it('posts an announcement of the resignation', () => {
+      resignPlayer('white', { inProgress: false })(dispatchSpy);
+      expect(dispatchSpy).toHaveBeenCalledWith({
+        type: ADD_MESSAGE,
+        message: { message: 'white resigned', type: 'event' },
+      });
     });
   });
 

@@ -38,11 +38,13 @@ class Board
     @hasMoved[BLACK] = king: false, kingsRook: false, queensRook: false
 
     @turn = WHITE
+    @inProgress = false
 
   loadState: (state) ->
     @squares = state.squares
     @hasMoved = state.hasMoved
     @turn = state.turn
+    @inProgress = state.inProgress
 
   valueAt: (x,y) ->
     @squares[x][y]
@@ -80,12 +82,11 @@ class Board
     @valueAt(x, y) / Math.abs(@valueAt(x, y))
 
   gameState: ->
-    state = {squares: []}
+    state = {squares: [], turn: @turn, inProgress: @inProgress}
     state.squares[x] = [@squares[x]...] for x in [0..7]
     state.hasMoved =
       "#{WHITE}": king: @hasMoved[WHITE].king, kingsRook: @hasMoved[WHITE].kingsRook, queensRook: @hasMoved[WHITE].queensRook
       "#{BLACK}": king: @hasMoved[BLACK].king, kingsRook: @hasMoved[BLACK].kingsRook, queensRook: @hasMoved[BLACK].queensRook
-    state.turn = @turn
     state
 
   # forces a given move, detects if a check exists, and then undoes the move
@@ -190,6 +191,7 @@ class Board
   move: (xOrig, yOrig, xNew, yNew) ->
     moved = @canMove(xOrig, yOrig, xNew, yNew) && @forceMove(xOrig, yOrig, xNew, yNew)
     if moved
+      @inProgress = true
       # keep track of king/rook movement for any future castling
       homeRow = if @turn is WHITE then 0 else 7
       switch @pieceType(xNew, yNew)
@@ -247,7 +249,11 @@ class Board
                     return false if @canMove(x, y, xDest, yDest)
                 xDest += xDelta; yDest += yDelta
         return true
-      if isMate() then @options.onMate?(pieces) else @options.onCheck?(pieces)
+      if isMate()
+        @inProgress = false
+        @options.onMate?(pieces)
+      else
+        @options.onCheck?(pieces)
 
 module.exports = exports = Board
 Object.defineProperty exports, '__esModule', value: true

@@ -6,6 +6,7 @@ import {
   GAME_EVENT,
   UPDATE_MEMBERS,
   ADD_MESSAGE,
+  RESIGN_PLAYER,
 } from '../../client/actions';
 import { user, game, members, messages } from '../../client/reducers';
 import Board from '../../lib/board.coffee';
@@ -26,10 +27,16 @@ describe('game reducer', () => {
     expect(game(undefined, { type: 'SOME_ACTION' })).toEqual({ players: {}, board, check: false, mate: false, pawnAdvance: undefined });
   });
   it('updates the players upon an UPDATE_PLAYER action', () => {
-    const initialState = { players: { black: { id: 2 } }, board: { turn: 1 } };
+    const initialState = { players: { black: { id: 2, resigned: false } }, board: { turn: 1 } };
     const updatePlayerAction = { type: UPDATE_PLAYER, color: 'white', user: { id: 1 } };
     const state = game(initialState, updatePlayerAction);
-    expect(state).toEqual({ players: { white: { id: 1 }, black: { id: 2 } }, board: { turn: 1 } });
+    expect(state).toEqual({ players: { white: { id: 1, resigned: false }, black: { id: 2, resigned: false } }, board: { turn: 1 } });
+  });
+  it('updates a player and game state upon a RESIGN_PLAYER action', () => {
+    const initialState = { players: { black: { id: 2, resigned: false } }, board: { inProgress: true } };
+    const resignPlayerAction = { type: RESIGN_PLAYER, color: 'black', board: { inProgress: false } };
+    const state = game(initialState, resignPlayerAction);
+    expect(state).toEqual({ players: { black: { id: 2, resigned: true } }, board: { inProgress: false } });
   });
   it('updates the board upon an UPDATE_BOARD action', () => {
     const initialState = { players: { black: { id: 2 } }, board: { turn: 1 }, check: false, mate: false, pawnAdvance: undefined };

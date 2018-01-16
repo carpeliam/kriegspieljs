@@ -6,6 +6,7 @@ import {
   updateBoardWithMove,
   updateBoardWithPromotion,
   processMessage,
+  resignPlayer,
 } from './actions';
 import { fetchUser } from './cookie-monster';
 
@@ -16,6 +17,7 @@ export default function subscribeToSocketEvents(dispatch, socket) {
   socket.on('room.list', members => dispatch(updateMembers(members)));
   socket.on('sit', (color, user) => dispatch(updatePlayer(color, user)));
   socket.on('stand', (color) => dispatch(updatePlayer(color, undefined)));
+  socket.on('game.resign', (color, board) => dispatch(resignPlayer(color, board)));
   socket.on('board.move', (from, to) => dispatch(updateBoardWithMove(from, to)));
   socket.on('board.promote', (square, newPieceValue) => dispatch(updateBoardWithPromotion(square, newPieceValue)));
   socket.on('speak', (author, message) => dispatch(processMessage(author, message)));
