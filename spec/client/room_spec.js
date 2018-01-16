@@ -2,7 +2,9 @@ import React from 'react';
 import { createStore } from 'redux';
 import { shallow, mount } from 'enzyme';
 import Room from '../../client/room';
+import reducer from '../../client/reducers';
 import * as actions from '../../client/actions';
+import { processMessage } from '../../client/actions';
 
 describe('Room', () => {
   const members = [
@@ -21,10 +23,7 @@ describe('Room', () => {
   let store;
   let submitSpy = jasmine.createSpyObj('submit', ['preventDefault']);
   beforeEach(() => {
-    store = createStore(state => state, {
-      members,
-      messages,
-    });
+    store = createStore(reducer, { members, messages });
     spyOn(store, 'dispatch');
     wrapper = mount(<Room store={store} />);
   });
@@ -56,5 +55,19 @@ describe('Room', () => {
     wrapper.find('form').simulate('submit', submitSpy);
     expect(submitSpy.preventDefault).toHaveBeenCalled();
     expect(actions.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('updates the scroll position for messages as they are appended', () => {
+    store.dispatch.and.callThrough();
+
+    const messagesDOMNode = wrapper.find('.messages').getDOMNode();
+    messagesDOMNode.style.height = '1px';
+    messagesDOMNode.style.overflow = 'scroll';
+    document.body.appendChild(messagesDOMNode);
+    const origScrollTop = messagesDOMNode.scrollTop;
+
+    store.dispatch(processMessage({ id: 'abc123', name: 'Bobby' }, 'another message'));
+
+    expect(messagesDOMNode.scrollTop).toBeGreaterThan(origScrollTop);
   });
 });

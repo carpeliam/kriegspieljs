@@ -24,6 +24,12 @@ export class Room extends React.Component {
       this.setState({ message: '' });
     }
   }
+  componentDidUpdate({ messages: oldMessages }) {
+    const newMessages = this.props.messages;
+    if (newMessages.length > oldMessages.length) {
+      this.messages.scrollTop = this.messages.scrollHeight;
+    }
+  }
   render() {
     const { members, messages } = this.props;
     return (
@@ -32,7 +38,7 @@ export class Room extends React.Component {
           <summary>users</summary>
           {members.map(({ id, name }) => <span key={id}>{name}</span>)}
         </details>
-        <div className="messages">
+        <div className="messages" ref={elem => (this.messages = elem)}>
           {messages.map(chatMessage)}
         </div>
         <form onSubmit={this.onSubmit}>
