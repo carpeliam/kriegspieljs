@@ -1,6 +1,8 @@
 var webpackConfig = require('./webpack.config');
 var path = require('path');
 
+process.env.CHROME_BIN = require('puppeteer').executablePath();
+
 module.exports = function(config) {
   config.set({
     // frameworks to use
@@ -47,7 +49,7 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['PhantomJS'],
+    browsers: ['ChromeHeadless'],
     // browsers: ['Chrome'],
   });
 }
