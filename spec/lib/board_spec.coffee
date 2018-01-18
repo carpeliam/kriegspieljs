@@ -42,6 +42,18 @@ describe "Board", ->
       expect(board.algebraicNotationFor(0, 0)).toBe 'a1'
       expect(board.algebraicNotationFor(7, 7)).toBe 'h8'
 
+  describe "#capturedPiece", ->
+    it "returns the value of the previously captured piece", ->
+      board.forceMove 3, 0, 4, 1 # white queen e2
+      board.forceMove 3, 7, 4, 2 # black queen e3
+      board.move 4, 1, 4, 2 # capture black queen
+      expect(board.capturedPiece).toEqual -5
+    it "resets to a falsy value if the previous move did not result in capture", ->
+      board.forceMove 3, 0, 4, 1 # white queen e2
+      board.forceMove 3, 7, 4, 2 # black queen e3
+      board.move 4, 1, 4, 2 # capture black queen
+      board.move 4, 6, 4, 4
+      expect(board.capturedPiece).toBeFalsy()
 
   describe "#pieceType", ->
     it "should be undefined when unoccupied", ->

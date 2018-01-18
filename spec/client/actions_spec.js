@@ -53,14 +53,17 @@ class FakeBoard {
 }
 function createFakeBoardWrapper() {
   let instance;
+  let capturedPieceValue = 0;
   const shouldCall = { onCheck: false, onMate: false, onAdvancement: false };
   return {
     newFake(...args) {
       instance = new FakeBoard(...args);
       instance.shouldCall = shouldCall;
+      instance.capturedPiece = capturedPieceValue;
       return instance;
     },
     force(callbackName) { shouldCall[callbackName] = true; },
+    setCapturedPiece(value) { capturedPieceValue = value; },
     instance: () => instance,
   };
 }
@@ -201,6 +204,16 @@ describe('actions', () => {
 
       expect(dispatchSpy.calls.argsFor(0)).toEqual([jasmine.objectContaining({ type: UPDATE_BOARD })]);
       expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'pawnAdvance', square: { x: 1, y: 2 } }]);
+    });
+    it('dispatches announcements when the given move resulted in a capture', () => {
+      boardFaker.setCapturedPiece(-5);
+      const state = { game: { board: { turn: 1 } } };
+      updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
+
+      expect(dispatchSpy).toHaveBeenCalledWith({
+        type: ADD_MESSAGE,
+        message: { type: 'event', message: 'A black queen was captured.' },
+      });
     });
     it('dispatches announcements when pawn captures are available', () => {
       const state = { game: { board: { turn: 1 } } };

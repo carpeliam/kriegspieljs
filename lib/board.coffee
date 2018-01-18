@@ -189,7 +189,9 @@ class Board
     canPromote
 
   move: (xOrig, yOrig, xNew, yNew) ->
+    valueAtNewSquare = @valueAt(xNew, yNew)
     moved = @canMove(xOrig, yOrig, xNew, yNew) && @forceMove(xOrig, yOrig, xNew, yNew)
+    @capturedPiece = valueAtNewSquare
     if moved
       @inProgress = true
       # keep track of king/rook movement for any future castling

@@ -74,6 +74,12 @@ function processBoardAction(dispatch, getState) {
     actionWithBoard(board);
     const gameState = board.gameState();
     dispatch(updateBoard(gameState));
+    if (board.capturedPiece) {
+      const color = (board.capturedPiece > 0) ? 'white' : 'black';
+      const pieces = { 1: 'pawn', 2: 'knight', 3: 'bishop', 4: 'rook', 5: 'queen' };
+      const pieceName = pieces[Math.abs(board.capturedPiece)];
+      dispatch(processAnnouncement(`A ${color} ${pieceName} was captured.`));
+    }
     postMoveActions.forEach(action => dispatch(action));
     for (const capture in board.pawnCaptures()) {
       dispatch(processAnnouncement(`The pawn on ${capture} can make a capture.`));
