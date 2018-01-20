@@ -54,7 +54,7 @@ function mapStateToProps({ user, game }, { x, y }) {
   const opposingPieceOwner = game.players[(color === 1) ? 'black' : 'white'];
   const userIsOpposingPieceOwner = !!opposingPieceOwner && opposingPieceOwner.id === user.id;
   const canDrag = !!activePlayer && activePlayer.id === user.id;
-  const piece = type && !userIsOpposingPieceOwner && { type, color, x, y, canDrag };
+  const piece = type && !(game.board.inProgress && userIsOpposingPieceOwner) && { type, color, x, y, canDrag };
   return {
     piece,
     canDrop: (origCoords, newCoords) => board.canMove(origCoords.x, origCoords.y, newCoords.x, newCoords.y)

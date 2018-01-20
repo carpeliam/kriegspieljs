@@ -17,11 +17,15 @@ function defaultState() {
     user: { id: 1 },
     game: {
       players: {},
-      board: { squares: [[3]], turn: 1 },
+      board: { squares: [[3]], turn: 1, inProgress: false },
     }
   };
   return {
     build: () => state,
+    inProgress() {
+      state.game.board.inProgress = true;
+      return this;
+    },
     withWhite() {
       state.game.players.white = { id: 1 };
       return this;
@@ -75,8 +79,8 @@ describe('Square', () => {
     expect(container.find(Piece)).toBeEmpty();
   });
 
-  it('does not render a Piece if the current user is seated with the opposite color', () => {
-    const initialState = defaultState().withWhite().build();
+  it('does not render a Piece if the game is in progress and the current user is seated with the opposite color', () => {
+    const initialState = defaultState().inProgress().withWhite().build();
     const store = createStore(state => state, initialState);
     spyOn(Board.prototype, 'pieceType').and.returnValue(3);
     spyOn(Board.prototype, 'color').and.returnValue(-1);
