@@ -15,6 +15,8 @@ describe "Board", ->
     board = new Board {onForcedMove, onCheck, onMate, onAdvancement, onPromotion}
 
   it "can serialize the game state", ->
+    board.move 3, 1, 3, 3 # d4
+    board.move 3, 6, 3, 4 # d5
     gameState = board.gameState()
     for i in [0...8]
       expect(gameState.squares[i]).toEqual board.squares[i]
@@ -23,10 +25,11 @@ describe "Board", ->
     expect(gameState.hasMoved).not.toBe board.hasMoved
     expect(gameState.turn).toEqual board.turn
     expect(gameState.inProgress).toEqual board.inProgress
+    expect(gameState.lastMove).toEqual board.lastMove
 
   it "can deserialize game state", ->
-    board.forceMove 3, 0, 4, 1 # white queen e2
-    board.forceMove 3, 7, 4, 2 # black queen e3
+    board.move 3, 1, 3, 3 # d4
+    board.move 3, 6, 3, 4 # d5
     gameState = board.gameState()
     newBoard = new Board {gameState}
     for i in [0...8]
@@ -34,6 +37,7 @@ describe "Board", ->
     expect(newBoard.hasMoved).toEqual board.hasMoved
     expect(newBoard.turn).toEqual board.turn
     expect(newBoard.inProgress).toEqual board.inProgress
+    expect(newBoard.lastMove).toEqual board.lastMove
 
   it "is not in progress initially", ->
     expect(board.inProgress).toBeFalsy()
@@ -153,6 +157,22 @@ describe "Board", ->
       expect(board.canMove(4, 3, 3, 4)).toBeFalsy()
       board.forceMove 3, 6, 3, 4
       expect(board.canMove(4, 3, 3, 4)).toBeTruthy()
+
+    it "should be able to capture en passant if the previous move enables it", ->
+      board.forceMove 4, 6, 4, 3 # black to e4
+      expect(board.move(3, 1, 3, 3)).toBeTruthy() # d4
+      expect(board.move(4, 3, 3, 2)).toBeTruthy() # exd3
+      expect(board.capturedPiece).toEqual 1
+      expect(board.valueAt(3, 3)).toBe 0
+
+    it "should not be able to capture en passant if play has continued past an opportunity", ->
+      board.forceMove 4, 6, 4, 3 # black to e4
+      board.move 3, 1, 3, 3 # d4
+      board.move 1, 7, 0, 5 # Na6
+      board.move 1, 0, 0, 2 # Na3
+      expect(board.move(4, 3, 3, 2)).toBeFalsy() # exd3 not allowed
+      expect(board.capturedPiece).toBeFalsy()
+      expect(board.valueAt(3, 3)).toBe 1
 
     describe "#pawnCaptures", ->
       it "returns which pawns can capture which squares", ->

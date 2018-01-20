@@ -45,6 +45,7 @@ class Board
     @hasMoved = state.hasMoved
     @turn = state.turn
     @inProgress = state.inProgress
+    @lastMove = state.lastMove
 
   valueAt: (x,y) ->
     @squares[x][y]
@@ -82,12 +83,19 @@ class Board
     @valueAt(x, y) / Math.abs(@valueAt(x, y))
 
   gameState: ->
-    state = {squares: [], turn: @turn, inProgress: @inProgress}
+    state = {squares: [], turn: @turn, inProgress: @inProgress, lastMove: @lastMove}
     state.squares[x] = [@squares[x]...] for x in [0..7]
     state.hasMoved =
       "#{WHITE}": king: @hasMoved[WHITE].king, kingsRook: @hasMoved[WHITE].kingsRook, queensRook: @hasMoved[WHITE].queensRook
       "#{BLACK}": king: @hasMoved[BLACK].king, kingsRook: @hasMoved[BLACK].kingsRook, queensRook: @hasMoved[BLACK].queensRook
     state
+
+  candidateMoveIsEnPassant: (xOrig, yOrig, xNew, yNew) ->
+    lastMoveIsOpposingPawnTwoSpaceMove = @lastMove? &&
+      @valueAt(@lastMove.xNew, @lastMove.yNew) == PAWN * -@turn &&
+      @lastMove.yNew - @lastMove.yOrig == 2 * -@turn
+    return lastMoveIsOpposingPawnTwoSpaceMove && @pieceType(xOrig, yOrig) == PAWN &&
+      xNew == @lastMove.xNew && yOrig == @lastMove.yNew
 
   # forces a given move, detects if a check exists, and then undoes the move
   moveResultsInCheck: (xOrig, yOrig, xNew, yNew) ->
@@ -134,17 +142,16 @@ class Board
     return false if @moveResultsInCheck(xOrig, yOrig, xNew, yNew).length > 0
     switch @pieceType(xOrig, yOrig)
       when PAWN
-        onHomeRow = if color is WHITE then (yOrig == 1) else (yOrig == 6)
         if xOrig == xNew # moving
+          onHomeRow = if color is WHITE then (yOrig == 1) else (yOrig == 6)
           maxMovement = if onHomeRow then 2 else 1
           return false unless 0 < color * (yNew - yOrig) <= maxMovement
           return false if @valueAt(xNew, yNew) isnt UNOCCUPIED
           return false if @passesOverPieces(xOrig, yOrig, xNew, yNew)
-        else # capturing
-          # TODO account for en passant
-          return false if Math.abs(xNew - xOrig) != 1
+        else if Math.abs(xNew - xOrig) == 1 # capturing
           return false if color != (yNew - yOrig)
-          return false if @color(xNew, yNew) != -color
+          return false if @color(xNew, yNew) != -color && !@candidateMoveIsEnPassant(xOrig, yOrig, xNew, yNew)
+        else return false
       when KNIGHT
         return false unless (Math.abs(xNew - xOrig) == 2 and Math.abs(yNew - yOrig) == 1) or
           (Math.abs(xNew - xOrig) == 1 and Math.abs(yNew - yOrig) == 2)
@@ -177,7 +184,6 @@ class Board
     return true if xOrig is xNew and yOrig is yNew
     @squares[xNew][yNew] = @squares[xOrig][yOrig]
     @squares[xOrig][yOrig] = UNOCCUPIED
-    # TODO handle pawn advancement, castling, check/mate
     true
 
   promote: ({x, y}, newPieceType) ->
@@ -190,8 +196,14 @@ class Board
 
   move: (xOrig, yOrig, xNew, yNew) ->
     valueAtNewSquare = @valueAt(xNew, yNew)
+    moveIsEnPassant = @candidateMoveIsEnPassant(xOrig, yOrig, xNew, yNew)
     moved = @canMove(xOrig, yOrig, xNew, yNew) && @forceMove(xOrig, yOrig, xNew, yNew)
-    @capturedPiece = valueAtNewSquare
+    if moveIsEnPassant
+      @capturedPiece = @valueAt(@lastMove.xNew, @lastMove.yNew)
+      @squares[@lastMove.xNew][@lastMove.yNew] = UNOCCUPIED
+    else
+      @capturedPiece = valueAtNewSquare
+    @lastMove = {xOrig, yOrig, xNew, yNew}
     if moved
       @inProgress = true
       # keep track of king/rook movement for any future castling
