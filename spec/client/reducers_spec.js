@@ -9,7 +9,7 @@ import {
   RESIGN_PLAYER,
 } from '../../client/actions';
 import { user, game, members, messages } from '../../client/reducers';
-import Board from '../../lib/board.coffee';
+import Game from '../../lib/game';
 
 describe('user reducer', () => {
   it('has a default state of null', () => {
@@ -23,7 +23,7 @@ describe('user reducer', () => {
 
 describe('game reducer', () => {
   it('has a default state with empty player info and default game state', () => {
-    const board = new Board().gameState();
+    const board = new Game().gameState();
     expect(game(undefined, { type: 'SOME_ACTION' })).toEqual({ players: {}, board, check: false, mate: false, pawnAdvance: undefined });
   });
   it('updates the players upon an UPDATE_PLAYER action', () => {

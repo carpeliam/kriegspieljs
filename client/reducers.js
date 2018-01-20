@@ -9,7 +9,7 @@ import {
   ADD_MESSAGE,
   RESIGN_PLAYER,
 } from './actions';
-import Board from '../lib/board.coffee';
+import Game from '../lib/game';
 
 export function user(state = null, action) {
   switch (action.type) {
@@ -22,7 +22,7 @@ export function user(state = null, action) {
 
 const initialGameState = {
   players: {},
-  board: new Board().gameState(),
+  board: new Game().gameState(),
   check: false,
   mate: false,
   pawnAdvance: undefined,

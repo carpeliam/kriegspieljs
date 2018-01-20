@@ -1,4 +1,4 @@
-Board = require('./board')
+Game = require('./game')
 parseCookie = require('cookie').parse
 
 getKriegspielId = (client) ->
@@ -7,11 +7,11 @@ getKriegspielId = (client) ->
 
 module.exports = class GameManager
   constructor: (@server) ->
-    @board = new Board()
+    @game = new Game()
     @clients = {}
     @players = {}
     @server.on 'connection', (socket) =>
-      socket.emit 'board.update', board: @board
+      socket.emit 'board.update', board: @game
 
       socket.on 'nickname.set', (nickname) =>
         @addClient socket, nickname
@@ -31,15 +31,15 @@ module.exports = class GameManager
       socket.on 'resign', =>
         client = @clients[socket.id]
         color = ['white', 'black'].find (c) => @players[c] is client
-        @board.inProgress = false
-        @server.emit 'game.resign', color, @board
+        @game.inProgress = false
+        @server.emit 'game.resign', color, @game
 
       socket.on 'board.move', (from, to) =>
-        @board.move(from.x, from.y, to.x, to.y)
+        @game.move(from.x, from.y, to.x, to.y)
         @server.emit 'board.move', from, to
 
       socket.on 'board.promote', (coord, newPieceType) =>
-        if @board.promote coord, newPieceType
+        if @game.promote coord, newPieceType
           @server.emit 'board.promote', coord, newPieceType
 
       socket.on 'speak', (msg) =>
@@ -61,5 +61,5 @@ module.exports = class GameManager
       delete @players[color]
       @server.emit 'stand', color
       if !@players.white && !@players.black
-        @board = new Board()
-        @server.emit 'game.reset', board: @board
+        @game = new Game()
+        @server.emit 'game.reset', board: @game

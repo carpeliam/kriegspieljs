@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { DropTarget } from 'react-dnd';
 import Piece from './piece';
-import Board from '../lib/board.coffee';
+import Game from '../lib/game';
 import { move } from './actions';
 
 const squareTarget = {
@@ -43,21 +43,21 @@ Square.propTypes = {
 
 export const SquareTarget = DropTarget('piece', squareTarget, collect)(Square);
 
-function mapStateToProps({ user, game }, { x, y }) {
-  const board = new Board({ gameState: game.board });
+function mapStateToProps({ user, game: { board, players } }, { x, y }) {
+  const game = new Game({ gameState: board });
   let activePlayer;
-  if (game.players.white && game.players.black) {
-    activePlayer = (game.board.turn === 1) ? game.players.white : game.players.black;
+  if (players.white && players.black) {
+    activePlayer = (board.turn === 1) ? players.white : players.black;
   }
-  const type = board.pieceType(x, y);
-  const color = board.color(x, y);
-  const opposingPieceOwner = game.players[(color === 1) ? 'black' : 'white'];
+  const type = game.pieceType(x, y);
+  const color = game.color(x, y);
+  const opposingPieceOwner = players[(color === 1) ? 'black' : 'white'];
   const userIsOpposingPieceOwner = !!opposingPieceOwner && opposingPieceOwner.id === user.id;
   const canDrag = !!activePlayer && activePlayer.id === user.id;
-  const piece = type && !(game.board.inProgress && userIsOpposingPieceOwner) && { type, color, x, y, canDrag };
+  const piece = type && !(board.inProgress && userIsOpposingPieceOwner) && { type, color, x, y, canDrag };
   return {
     piece,
-    canDrop: (origCoords, newCoords) => board.canMove(origCoords.x, origCoords.y, newCoords.x, newCoords.y)
+    canDrop: (origCoords, newCoords) => game.canMove(origCoords.x, origCoords.y, newCoords.x, newCoords.y),
   };
 }
 

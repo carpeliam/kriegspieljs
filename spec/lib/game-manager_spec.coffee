@@ -1,5 +1,5 @@
 GameManager = require("#{__dirname}/../../lib/game-manager")
-Board = require("#{__dirname}/../../lib/board")
+Game = require("#{__dirname}/../../lib/game")
 io = require 'socket.io-client'
 
 describe 'GameManager', ->
@@ -71,8 +71,8 @@ describe 'GameManager', ->
       white.emit 'board.move', {x: 0, y: 1}, {x: 0, y: 2}
     it 'resets the game if both players stand', (done) ->
       white.on 'game.reset', ({ board }) ->
-        emptyBoard = new Board()
-        expect(new Board(gameState: board).gameState()).toEqual emptyBoard.gameState()
+        emptyGame = new Game()
+        expect(new Game(gameState: board).gameState()).toEqual emptyGame.gameState()
         done()
       white.emit 'stand'
       black.emit 'stand'
@@ -80,10 +80,10 @@ describe 'GameManager', ->
     describe 'when a new client connects', ->
       it 'immediately informs them of the game state', (done) ->
         black.on 'board.move', ->
-          recreatedBoard = new Board()
-          recreatedBoard.move 5, 1, 5, 3
+          recreatedGame = new Game()
+          recreatedGame.move 5, 1, 5, 3
           server.connect().then (client) ->
-            expect(new Board(gameState: client.board).gameState()).toEqual recreatedBoard.gameState()
+            expect(new Game(gameState: client.board).gameState()).toEqual recreatedGame.gameState()
             done()
         white.emit 'board.move', {x: 5, y: 1}, {x: 5, y: 3}
       it 'informs them of seated players', (done) ->
@@ -107,11 +107,11 @@ describe 'GameManager', ->
 
     describe 'promotion', ->
       it 'alerts other clients when one client promotes a piece', (done) ->
-        spyOn(Board.prototype, 'promote').and.returnValue true
+        spyOn(Game.prototype, 'promote').and.returnValue true
         black.on 'board.promote', (coord, newPieceType) ->
           expect(coord).toEqual {x: 0, y: 0}
           expect(newPieceType).toEqual 5
-          expect(Board.prototype.promote).toHaveBeenCalledWith {x: 0, y: 0}, 5
+          expect(Game.prototype.promote).toHaveBeenCalledWith {x: 0, y: 0}, 5
           done()
         white.emit 'board.promote', {x: 0, y: 0}, 5
 

@@ -1,6 +1,6 @@
 import shortid from 'shortid';
 import { fetchUser, setUser as setUserCookie } from './cookie-monster';
-import Board from '../lib/board.coffee';
+import Game from '../lib/game';
 
 export const SET_USER = 'SET_USER';
 export const UPDATE_PLAYER = 'UPDATE_PLAYER';
@@ -61,7 +61,7 @@ export function resetGame(board) {
 function processBoardAction(dispatch, getState) {
   return (actionWithBoard) => {
     const postMoveActions = [];
-    const board = new Board({
+    const game = new Game({
       gameState: getState().game.board,
       onCheck: () => postMoveActions.push({ type: GAME_EVENT, name: 'check' }),
       onMate: () => postMoveActions.push({ type: GAME_EVENT, name: 'mate' }),
@@ -71,17 +71,17 @@ function processBoardAction(dispatch, getState) {
         square: { x, y },
       }),
     });
-    actionWithBoard(board);
-    const gameState = board.gameState();
+    actionWithBoard(game);
+    const gameState = game.gameState();
     dispatch(updateBoard(gameState));
-    if (board.capturedPiece) {
-      const color = (board.capturedPiece > 0) ? 'white' : 'black';
+    if (game.capturedPiece) {
+      const color = (game.capturedPiece > 0) ? 'white' : 'black';
       const pieces = { 1: 'pawn', 2: 'knight', 3: 'bishop', 4: 'rook', 5: 'queen' };
-      const pieceName = pieces[Math.abs(board.capturedPiece)];
+      const pieceName = pieces[Math.abs(game.capturedPiece)];
       dispatch(processAnnouncement(`A ${color} ${pieceName} was captured.`));
     }
     postMoveActions.forEach(action => dispatch(action));
-    for (const capture in board.pawnCaptures()) {
+    for (const capture in game.pawnCaptures()) {
       dispatch(processAnnouncement(`The pawn on ${capture} can make a capture.`));
     }
   }

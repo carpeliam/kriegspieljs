@@ -5,7 +5,7 @@ import { DragDropContext } from 'react-dnd';
 import TestBackend from 'react-dnd-test-backend';
 import Square, { SquareTarget } from '../../client/square';
 import Piece from '../../client/piece';
-import Board from '../../lib/board.coffee';
+import Game from '../../lib/game';
 import * as actions from '../../client/actions';
 
 function wrapInTestContext(DecoratedComponent) {
@@ -43,13 +43,13 @@ describe('Square', () => {
   it('renders the Piece for the given square', () => {
     const initialState = defaultState().build();
     const store = createStore(state => state, initialState);
-    spyOn(Board.prototype, 'loadState');
-    spyOn(Board.prototype, 'pieceType').and.returnValue(3);
-    spyOn(Board.prototype, 'color').and.returnValue(-1);
+    spyOn(Game.prototype, 'loadState');
+    spyOn(Game.prototype, 'pieceType').and.returnValue(3);
+    spyOn(Game.prototype, 'color').and.returnValue(-1);
     const container = mount(<SquareContext store={store} x={0} y={0} />);
-    expect(Board.prototype.loadState).toHaveBeenCalledWith(initialState.game.board);
-    expect(Board.prototype.pieceType).toHaveBeenCalledWith(0, 0);
-    expect(Board.prototype.color).toHaveBeenCalledWith(0, 0);
+    expect(Game.prototype.loadState).toHaveBeenCalledWith(initialState.game.board);
+    expect(Game.prototype.pieceType).toHaveBeenCalledWith(0, 0);
+    expect(Game.prototype.color).toHaveBeenCalledWith(0, 0);
     const piece = container.find(Piece);
     expect(piece).toHaveProp('type', 3);
     expect(piece).toHaveProp('x', 0);
@@ -73,8 +73,8 @@ describe('Square', () => {
 
   it('does not render a Piece if the given square is empty', () => {
     const store = createStore(state => state, defaultState().build());
-    spyOn(Board.prototype, 'pieceType').and.returnValue(undefined);
-    spyOn(Board.prototype, 'color').and.returnValue(undefined);
+    spyOn(Game.prototype, 'pieceType').and.returnValue(undefined);
+    spyOn(Game.prototype, 'color').and.returnValue(undefined);
     const container = mount(<SquareContext store={store} x={1} y={1} />);
     expect(container.find(Piece)).toBeEmpty();
   });
@@ -82,19 +82,19 @@ describe('Square', () => {
   it('does not render a Piece if the game is in progress and the current user is seated with the opposite color', () => {
     const initialState = defaultState().inProgress().withWhite().build();
     const store = createStore(state => state, initialState);
-    spyOn(Board.prototype, 'pieceType').and.returnValue(3);
-    spyOn(Board.prototype, 'color').and.returnValue(-1);
+    spyOn(Game.prototype, 'pieceType').and.returnValue(3);
+    spyOn(Game.prototype, 'color').and.returnValue(-1);
     const container = mount(<SquareContext store={store} x={0} y={0} />);
     expect(container.find(Piece)).toBeEmpty();
   });
 
-  it('asks the Board if dropping a piece makes a legal move', () => {
+  it('asks the Game if dropping a piece makes a legal move', () => {
     const initialState = defaultState().withWhite().withBlack().build();
     const store = createStore(state => state, initialState);
     spyOn(store, 'dispatch');
-    spyOn(Board.prototype, 'pieceType').and.returnValue(3);
-    spyOn(Board.prototype, 'canMove').and.returnValue(true);
-    spyOn(Board.prototype, 'color').and.returnValue(initialState.game.board.turn);
+    spyOn(Game.prototype, 'pieceType').and.returnValue(3);
+    spyOn(Game.prototype, 'canMove').and.returnValue(true);
+    spyOn(Game.prototype, 'color').and.returnValue(initialState.game.board.turn);
     spyOn(actions, 'move').and.returnValue({ type: 'move' });
     const container = mount(
       <div>
@@ -109,7 +109,7 @@ describe('Square', () => {
     backend.simulateBeginDrag([piece.getHandlerId()]);
     backend.simulateHover([target.getHandlerId()]);
     backend.simulateDrop();
-    expect(Board.prototype.canMove).toHaveBeenCalledWith(0, 1, 2, 3);
+    expect(Game.prototype.canMove).toHaveBeenCalledWith(0, 1, 2, 3);
     backend.simulateEndDrag();
     expect(actions.move).toHaveBeenCalledWith({ x: 0, y: 1 }, { x: 2, y: 3 });
     expect(store.dispatch).toHaveBeenCalledWith({ type: 'move' });

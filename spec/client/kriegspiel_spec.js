@@ -7,9 +7,6 @@ import SeatList from '../../client/seat-list';
 import Room from '../../client/room';
 import PawnPromotionPrompter from '../../client/pawn-promotion-prompter';
 
-// import KriegspielDragDropContext from '../../client/kriegspiel';
-// const Kriegspiel = KriegspielDragDropContext.DecoratedComponent;
-
 describe('Kriegspiel', () => {
   let kriegspiel;
 

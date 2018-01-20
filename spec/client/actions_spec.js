@@ -1,6 +1,6 @@
 import { createStore } from 'redux';
 import * as cookieMonster from '../../client/cookie-monster';
-import * as board from '../../lib/board.coffee';
+import * as game from '../../lib/game';
 import {
   SET_USER,
   UPDATE_PLAYER,
@@ -28,7 +28,7 @@ import {
   processAnnouncement,
 } from '../../client/actions';
 
-class FakeBoard {
+class FakeGame {
   constructor(fields) {
     this.args = {};
     this.moves = [];
@@ -51,13 +51,13 @@ class FakeBoard {
   }
   pawnCaptures() { return { e5: ['c5', 'd6'] }; }
 }
-function createFakeBoardWrapper() {
+function createFakeGameWrapper() {
   let instance;
   let capturedPieceValue = 0;
   const shouldCall = { onCheck: false, onMate: false, onAdvancement: false };
   return {
     newFake(...args) {
-      instance = new FakeBoard(...args);
+      instance = new FakeGame(...args);
       instance.shouldCall = shouldCall;
       instance.capturedPiece = capturedPieceValue;
       return instance;
@@ -168,21 +168,21 @@ describe('actions', () => {
     });
   });
   describe('updateBoardWithMove', () => {
-    let boardFaker;
+    let gameFaker;
     beforeEach(() => {
-      boardFaker = createFakeBoardWrapper();
-      spyOn(board, 'default').and.callFake(boardFaker.newFake);
+      gameFaker = createFakeGameWrapper();
+      spyOn(game, 'default').and.callFake(gameFaker.newFake);
     });
     it('updates the board state with the given move', () => {
       const state = { game: { board: { turn: 1 } } };
       updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
 
-      const board = boardFaker.instance();
+      const board = gameFaker.instance();
       expect(board.moves).toEqual([[0, 1, 2, 3]]);
       expect(dispatchSpy).toHaveBeenCalledWith({ type: UPDATE_BOARD, board: { turn: -1 } });
     });
     it('updates the game state when the given move results in check after updating the board', () => {
-      boardFaker.force('onCheck');
+      gameFaker.force('onCheck');
       const state = { game: { board: { turn: 1 } } };
       updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
 
@@ -190,7 +190,7 @@ describe('actions', () => {
       expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'check' }]);
     });
     it('updates the game state when the given move results in mate after updating the board', () => {
-      boardFaker.force('onMate');
+      gameFaker.force('onMate');
       const state = { game: { board: { turn: 1 } } };
       updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
 
@@ -198,7 +198,7 @@ describe('actions', () => {
       expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'mate' }]);
     });
     it('updates the game state when the given move results in pawn advancement', () => {
-      boardFaker.force('onAdvancement');
+      gameFaker.force('onAdvancement');
       const state = { game: { board: { turn: 1 } } };
       updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
 
@@ -206,7 +206,7 @@ describe('actions', () => {
       expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'pawnAdvance', square: { x: 1, y: 2 } }]);
     });
     it('dispatches announcements when the given move resulted in a capture', () => {
-      boardFaker.setCapturedPiece(-5);
+      gameFaker.setCapturedPiece(-5);
       const state = { game: { board: { turn: 1 } } };
       updateBoardWithMove({ x: 0, y: 1 }, { x: 2, y: 3 })(dispatchSpy, () => state);
 
@@ -226,21 +226,21 @@ describe('actions', () => {
   });
 
   describe('updateBoardWithPromotion', () => {
-    let boardFaker;
+    let gameFaker;
     beforeEach(() => {
-      boardFaker = createFakeBoardWrapper();
-      spyOn(board, 'default').and.callFake(boardFaker.newFake);
+      gameFaker = createFakeGameWrapper();
+      spyOn(game, 'default').and.callFake(gameFaker.newFake);
     });
     it('updates the board state with the given promotion', () => {
       const state = { game: { board: { turn: 1 } } };
       updateBoardWithPromotion({ x: 0, y: 1 }, 5)(dispatchSpy, () => state);
 
-      const board = boardFaker.instance();
+      const board = gameFaker.instance();
       expect(board.promotion).toEqual({ square: { x: 0, y: 1 }, newPieceValue: 5 });
       expect(dispatchSpy).toHaveBeenCalledWith({ type: UPDATE_BOARD, board: { turn: -1 } });
     });
     it('updates the game state when the given move results in check after updating the board', () => {
-      boardFaker.force('onCheck');
+      gameFaker.force('onCheck');
       const state = { game: { board: { turn: 1 } } };
       updateBoardWithPromotion({ x: 0, y: 1 }, 5)(dispatchSpy, () => state);
 
@@ -248,7 +248,7 @@ describe('actions', () => {
       expect(dispatchSpy.calls.argsFor(1)).toEqual([{ type: GAME_EVENT, name: 'check' }]);
     });
     it('updates the game state when the given move results in mate after updating the board', () => {
-      boardFaker.force('onMate');
+      gameFaker.force('onMate');
       const state = { game: { board: { turn: 1 } } };
       updateBoardWithPromotion({ x: 0, y: 1 }, 5)(dispatchSpy, () => state);
 
