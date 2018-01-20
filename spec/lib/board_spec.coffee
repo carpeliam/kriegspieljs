@@ -1,12 +1,17 @@
 describe "Board", ->
   Board = require("#{__dirname}/../../lib/board")
-  board = undefined
-  onForcedMove  = jasmine.createSpy('onForcedMove')
-  onCheck       = jasmine.createSpy('onCheck')
-  onMate        = jasmine.createSpy('onMate')
-  onAdvancement = jasmine.createSpy('onAdvancement')
-  onPromotion   = jasmine.createSpy('onPromotion')
+  board         = undefined
+  onForcedMove  = undefined
+  onCheck       = undefined
+  onMate        = undefined
+  onAdvancement = undefined
+  onPromotion   = undefined
   beforeEach ->
+    onForcedMove  = jasmine.createSpy('onForcedMove')
+    onCheck       = jasmine.createSpy('onCheck')
+    onMate        = jasmine.createSpy('onMate')
+    onAdvancement = jasmine.createSpy('onAdvancement')
+    onPromotion   = jasmine.createSpy('onPromotion')
     board = new Board {onForcedMove, onCheck, onMate, onAdvancement, onPromotion}
 
   it "can serialize the game state", ->
@@ -238,7 +243,6 @@ describe "Board", ->
       board.forceMove 3, 6, 3, 4
       expect(board.canMove(4, 4, 0, 4)).toBeFalsy()
 
-
   describe "a king", ->
     it "can move one square in any direction", ->
       board.forceMove 4, 0, 3, 3
@@ -256,12 +260,34 @@ describe "Board", ->
       expect(board.move 5, 3, 5, 6).toBeTruthy()
       expect(onCheck).toHaveBeenCalled()
 
-    it "fires event and ends the game when placed in checkmate", ->
-      board.forceMove 3, 0, 5, 3
-      board.forceMove 0, 0, 5, 2
-      expect(board.move 5, 3, 5, 6).toBeTruthy()
-      expect(board.inProgress).toBeFalsy()
-      expect(onMate).toHaveBeenCalled()
+    describe "checkmate", ->
+      beforeEach ->
+        board.move 5, 1, 5, 2 # f3
+        board.move 4, 6, 4, 4 # e5
+        board.move 6, 1, 6, 3 # g4
+      it "occurs if the king is unable to move", ->
+        expect(board.move 3, 7, 7, 3).toBeTruthy() # Qh4
+        expect(board.inProgress).toBeFalsy()
+        expect(onMate).toHaveBeenCalled()
+      it "does not occur if the king can move", ->
+        board.forceMove 3, 1, 3, 2 # d3
+        expect(board.move 3, 7, 7, 3).toBeTruthy() # Qh4
+        expect(board.canMove(4, 0, 3, 1)).toBeTruthy() # Kd2
+        expect(board.inProgress).toBeTruthy()
+        expect(onMate).not.toHaveBeenCalled()
+      it "does not occur if checking piece can be captured", ->
+        board.forceMove 6, 0, 6, 1 # Ng2
+        expect(board.move 3, 7, 7, 3).toBeTruthy() # Qh4
+        expect(board.canMove(6, 1, 7, 3)).toBeTruthy() # Nxh4
+        expect(board.inProgress).toBeTruthy()
+        expect(onMate).not.toHaveBeenCalled()
+      it "does not occur if check can be interposed", ->
+        board.forceMove 6, 3, 6, 1 # force pawn back to g2
+        expect(board.move 3, 7, 7, 3).toBeTruthy() # Qh4
+        expect(board.canMove(6, 1, 6, 2)).toBeTruthy() # g3
+        expect(board.inProgress).toBeTruthy()
+        expect(onMate).not.toHaveBeenCalled()
+
 
     describe "when castling", ->
       beforeEach ->

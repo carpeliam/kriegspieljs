@@ -142,8 +142,8 @@ class Board
           return false if @passesOverPieces(xOrig, yOrig, xNew, yNew)
         else # capturing
           # TODO account for en passant
-          return false if Math.abs(xNew - xOrig) > 1
-          return false if color * (yNew - yOrig) > 1
+          return false if Math.abs(xNew - xOrig) != 1
+          return false if color != (yNew - yOrig)
           return false if @color(xNew, yNew) != -color
       when KNIGHT
         return false unless (Math.abs(xNew - xOrig) == 2 and Math.abs(yNew - yOrig) == 1) or
@@ -235,7 +235,7 @@ class Board
           [xPiece, yPiece] = pieces[0]
           for x in [0..7]
             for y in [0..7]
-              return false if @canMove(xPiece, yPiece, x, y)
+              return false if @canMove(x, y, xPiece, yPiece)
           switch @pieceType(xPiece, yPiece)
             when BISHOP, ROOK, QUEEN
               # can we interpose?
