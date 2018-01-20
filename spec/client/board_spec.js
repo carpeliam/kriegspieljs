@@ -14,9 +14,11 @@ describe('Board', () => {
   });
 
   describe('when the current user is either playing as white or not playing', () => {
-    it('shows the A1 square at the bottom left of the board', () => {
+    it('shows the A8 square at the top left of the board', () => {
       const board = shallow(<Board observingColor="white" />);
       const squares = board.find(Square);
+      expect(board.find('.board__label--file').at(0)).toHaveText('a');
+      expect(board.find('.board__label--rank').at(0)).toHaveText('8');
       expect(squares.at(0)).toHaveProp('x', 0);
       expect(squares.at(0)).toHaveProp('y', 7);
       expect(squares.at(63)).toHaveProp('x', 7);
@@ -25,9 +27,11 @@ describe('Board', () => {
   });
 
   describe('when the current user is playing as black', () => {
-    it('shows the H8 square at the bottom left of the board', () => {
+    it('shows the H1 square at the top left of the board', () => {
       const board = shallow(<Board observingColor="black" />);
       const squares = board.find(Square);
+      expect(board.find('.board__label--file').at(0)).toHaveText('h');
+      expect(board.find('.board__label--rank').at(0)).toHaveText('1');
       expect(squares.at(0)).toHaveProp('x', 7);
       expect(squares.at(0)).toHaveProp('y', 0);
       expect(squares.at(63)).toHaveProp('x', 0);

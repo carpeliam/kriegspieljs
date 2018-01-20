@@ -7,12 +7,25 @@ import Square from './square';
 
 const ascending = [0, 1, 2, 3, 4, 5, 6, 7];
 const descending = [7, 6, 5, 4, 3, 2, 1, 0];
+const fileLabels = 'abcdefgh';
 function Board({ observingColor }) {
-  const rows = (observingColor === 'black') ? ascending : descending;
-  const cols = (observingColor === 'black') ? descending : ascending;
+  const ranks = (observingColor === 'black') ? ascending : descending;
+  const files = (observingColor === 'black') ? descending : ascending;
   return (
     <div className="board">
-      {rows.map(y => cols.map(x => <Square x={x} y={y} />))}
+      <header>
+        {files.map(file => <span key={`file${file}`} className="board__label board__label--file">{fileLabels[file]}</span>)}
+      </header>
+      {ranks.map(rank => (
+        [
+          <span key={`rank${rank}l`} className="board__label board__label--rank">{rank + 1}</span>,
+          ...files.map(file => <Square x={file} y={rank} />),
+          <span key={`rank${rank}r`} className="board__label board__label--rank">{rank + 1}</span>
+        ]
+      ))}
+      <footer>
+        {files.map(file => <span key={`file${file}`} className="board__label board__label--file">{fileLabels[file]}</span>)}
+      </footer>
     </div>
   );
 }
