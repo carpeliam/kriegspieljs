@@ -4,7 +4,7 @@ kriegspiel.js [![Build Status](https://travis-ci.org/carpeliam/kriegspieljs.svg?
 [Kriegspiel explained][1]. This is an implementation of Kriegspiel as a
 [node.js](https://nodejs.org) application, using [socket.io](https://socket.io/) for pushing moves
 from the server to the client and back. The server was originally written in
-[CoffeeScript](http://coffeescript.org/), though is being ported to modern JavaScript; the client
+[CoffeeScript](http://coffeescript.org/), though has been ported to modern JavaScript; the client
 was originally written with jQuery, but has been ported to [React](https://reactjs.org/) and
 [Redux](https://redux.js.org/).
 
