@@ -76,6 +76,7 @@
     "socket.io-client": "^2.0.4",
     "style-loader": "^0.12.3",
     "webpack-dev-middleware": "^1.10.1",
-    "webpack-hot-middleware": "^2.21.0"
+    "webpack-hot-middleware": "^2.21.0",
+    "webpack-merge": "^4.1.1"
   }
 }
