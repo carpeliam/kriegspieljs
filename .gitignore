@@ -1,5 +1,4 @@
 .DS_Store
-Capfile
 node_modules*
 .vscode
 public/assets
