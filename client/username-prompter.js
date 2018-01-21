@@ -13,7 +13,8 @@ export class UserNamePrompter extends React.Component {
   onNameChange(event) {
     this.setState({ name: event.target.value });
   }
-  logIn() {
+  logIn(e) {
+    e.preventDefault();
     this.props.setUser(this.state.name);
   }
   render() {
@@ -21,9 +22,9 @@ export class UserNamePrompter extends React.Component {
     return (
       <Modal isOpen={!userName} className="modal" style={{ content: { width: 350 } }}>
         <h2>Who are you?</h2>
-        <form>
-          <input type="text" name="username" placeholder="Name" onChange={this.onNameChange} />
-          <button type="submit" onClick={this.logIn} style={{ marginLeft: 5 }}>Let's go!</button>
+        <form onSubmit={this.logIn}>
+          <input autoFocus type="text" name="username" placeholder="Name" onChange={this.onNameChange} />
+          <button type="submit" style={{ marginLeft: 5 }}>Let's go!</button>
         </form>
       </Modal>
     );

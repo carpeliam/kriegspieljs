@@ -27,9 +27,11 @@ describe('UserNamePrompter', () => {
 
   describe('when the button is clicked', () => {
     it('calls the signin call back with the username', () => {
+      const submitSpy = jasmine.createSpyObj('submit', ['preventDefault']);
       const component = createUserNamePrompter({ user: { id: 1 } });
       component.find('input').simulate('change', { target: { value: 'Jim' } });
-      component.find('button').simulate('click');
+      component.find('form').simulate('submit', submitSpy);
+      expect(submitSpy.preventDefault).toHaveBeenCalled();
       expect(setUserSpy).toHaveBeenCalledWith('Jim');
     });
   });
