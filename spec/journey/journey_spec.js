@@ -14,7 +14,7 @@ class Player {
     console.log(`setting username to ${name}...`);
     await W(this.page.waitFor('input[name="username"]'));
     await W(this.page.type('input[name="username"]', name));
-    await W(this.page.click('.modal-footer button'));
+    await W(this.page.click('button[type="submit"]'));
   }
 
   async chooseColor(color) {
@@ -56,7 +56,7 @@ class Player {
     const cols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
     const col = cols.indexOf(notation[0]);
     const row = parseInt(notation[1], 10);
-    return W(this.page.$(`.board :nth-child(${(8 - row) * 8 + 1 + col})`));
+    return W(this.page.$(`.board > div:nth-of-type(${(8 - row) * 8 + 1 + col})`));
   }
 
   async hasTurn() {
