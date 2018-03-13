@@ -17,7 +17,8 @@ describe('Game', () => {
   });
   it('can serialize the game state', () => {
     game.move(3, 1, 3, 3); // d4
-    game.move(3, 6, 3, 4); // d5
+    game.move(4, 6, 4, 4); // d5
+    game.move(3, 3, 4, 4); // d4 x d5
     const gameState = game.gameState();
     for (let i = 0; i < 8; i += 1) {
       expect(gameState.squares[i]).toEqual(game.squares[i]);
@@ -28,10 +29,12 @@ describe('Game', () => {
     expect(gameState.turn).toEqual(game.turn);
     expect(gameState.inProgress).toEqual(game.inProgress);
     expect(gameState.lastMove).toEqual(game.lastMove);
+    expect(gameState.capturedPieces).toEqual(game.capturedPieces);
   });
   it('can deserialize game state', () => {
     game.move(3, 1, 3, 3); // d4
-    game.move(3, 6, 3, 4); // d5
+    game.move(4, 6, 4, 4); // d5
+    game.move(3, 3, 4, 4); // d4 x d5
     const gameState = game.gameState();
     const newGame = new Game({ gameState });
     for (let i = 0; i < 8; i += 1) {
@@ -41,6 +44,7 @@ describe('Game', () => {
     expect(newGame.turn).toEqual(game.turn);
     expect(newGame.inProgress).toEqual(game.inProgress);
     expect(newGame.lastMove).toEqual(game.lastMove);
+    expect(newGame.capturedPieces).toEqual(game.capturedPieces);
   });
   it('is not in progress initially', () => {
     expect(game.inProgress).toBeFalsy();
@@ -124,6 +128,15 @@ describe('Game', () => {
       }
     });
   });
+  describe('capturing', () => {
+    it('keeps track of captured pieces', () => {
+      game.forceMove(4, 6, 4, 3); // black to e4
+      expect(game.move(3, 1, 3, 3)).toBeTruthy(); // d4
+      game.move(4, 3, 3, 3); // e4 x d4
+      expect(game.capturedPieces).toEqual([1]);
+    });
+  });
+
   describe('a piece', () => {
     it("can't move off the board", () => {
       expect(game.canMove(0, 0, 0, -1)).toBeFalsy();
