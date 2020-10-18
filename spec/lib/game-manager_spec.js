@@ -203,8 +203,8 @@ class Server {
   constructor(done) {
     this.openConnections = 0;
     this.httpServer = require('http').createServer();
-    const ioServer = require('socket.io')(this.httpServer);
-    ioServer.on('connection', (serverSocket) => {
+    this.ioServer = require('socket.io')(this.httpServer);
+    this.ioServer.on('connection', (serverSocket) => {
       const cookieId = `abc${++this.openConnections}`;
       serverSocket.handshake = {
         headers: {
@@ -215,7 +215,7 @@ class Server {
       };
     });
     this.httpServer.listen(() => {
-      this.mgr = GameManager(ioServer);
+      this.mgr = GameManager(this.ioServer);
       this.url = `http://localhost:${(this.httpServer.address().port)}`;
       done();
     });
@@ -232,5 +232,7 @@ class Server {
     });
   }
 
-  close(done) { this.httpServer.close(done); }
+  close(done) {
+    this.ioServer.close(() => this.httpServer.close(() => done()));
+  }
 }
