@@ -12,7 +12,7 @@ class Player {
 
   async setUsername(name) {
     console.log(`setting username to ${name}...`);
-    await W(this.page.waitFor('input[name="username"]'));
+    await W(this.page.waitForSelector('input[name="username"]'));
     await W(this.page.type('input[name="username"]', name));
     await W(this.page.click('button[type="submit"]'));
   }
@@ -21,17 +21,17 @@ class Player {
     console.log(`choosing color ${color}...`);
     this.color = color;
     const buttonSelector = `.btn-${color}`;
-    await this.page.waitFor(200);
-    await W(this.page.waitFor(buttonSelector));
+    await this.page.waitForTimeout(200);
+    await W(this.page.waitForSelector(buttonSelector));
     await W(this.page.click(buttonSelector));
-    await W(this.page.waitFor((selector) => {
+    await W(this.page.waitForFunction((selector) => {
       return document.querySelector(selector).innerText.includes('leave');
     }, {}, buttonSelector));
   }
 
   async move(from, to) {
     console.log(`moving from ${from} to ${to}...`);
-    await this.page.waitFor(800);
+    await this.page.waitForTimeout(800);
     const fromElem = await this.getSquare(from);
     const fromBox = await W(fromElem.boundingBox());
     const toElem = await this.getSquare(to);
@@ -62,15 +62,15 @@ class Player {
   async hasTurn() {
     console.log(`${this.color} has a turn...`);
     const buttonSelector = `.btn-${this.color}.active`;
-    await W(this.page.waitFor(buttonSelector));
+    await W(this.page.waitForSelector(buttonSelector));
   }
 
   async wins() {
-    return W(this.page.waitFor(`#${this.color}.winning`));
+    return W(this.page.waitForSelector(`#${this.color}.winning`));
   }
 
   async loses() {
-    return W(this.page.waitFor(`#${this.color}.losing`));
+    return W(this.page.waitForSelector(`#${this.color}.losing`));
   }
 }
 
@@ -101,7 +101,8 @@ describe('fools mate', () => {
 
     await white.loses();
     await black.wins();
-  }, 10000);
+  }, 15000);
+
   afterEach(async () => {
     if (white.page) {
       await white.page.screenshot({ path: 'white.png' });

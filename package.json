@@ -5,7 +5,7 @@
   "license": "MIT",
   "version": "0.1.0",
   "scripts": {
-    "journey": "jasmine spec/journey/*_spec.js",
+    "journey": "concurrently -k 'yarn:start' 'wait-on http://localhost:8124 && jasmine spec/journey/*_spec.js'",
     "start": "node server.js",
     "test-client": "karma start --single-run",
     "test-server": "jasmine spec/lib/*_spec.js",
@@ -21,7 +21,7 @@
     "url": "https://github.com/carpeliam/kriegspieljs"
   },
   "engines": {
-    "node": ">=7.0.0 <10.0.0"
+    "node": ">=7.0.0 <15.0.0"
   },
   "dependencies": {
     "connect": "3.3.5",
@@ -40,6 +40,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "classnames": "^2.2.5",
+    "concurrently": "^5.3.0",
     "css-hot-loader": "^1.3.5",
     "css-loader": "^0.17.0",
     "enzyme": "^2.9.1",
@@ -56,7 +57,7 @@
     "karma-webpack": "^2.0.2",
     "node-sass": "^4.5.0",
     "prop-types": "^15.6.0",
-    "puppeteer": "^1.0.0",
+    "puppeteer": "^5.3.1",
     "react": "^15.4.2",
     "react-addons-perf": "^15.4.2",
     "react-addons-test-utils": "^15.4.2",
@@ -75,6 +76,7 @@
     "shortid": "^2.2.6",
     "socket.io-client": "^2.0.4",
     "style-loader": "^0.12.3",
+    "wait-on": "^5.2.0",
     "webpack-dev-middleware": "^1.10.1",
     "webpack-hot-middleware": "^2.21.0",
     "webpack-merge": "^4.1.1"
